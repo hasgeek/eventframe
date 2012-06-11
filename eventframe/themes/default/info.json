@@ -1,0 +1,9 @@
+{
+	"application": "eventframe",
+	"identifier": "default",
+	"name": "Eventframe Default",
+	"author": "HasGeek",
+	"description": "Default empty theme for Eventframe websites.",
+	"license": "BSD",
+	"doctype": "html5"
+}

@@ -3,8 +3,10 @@
 SITE_TITLE = 'HasGeek Eventframe'
 #: Site id (for network bar)
 SITE_ID = 'events'
-#: Admin domains
+#: Admin domains. The first is considered primary
 ADMIN_HOSTS = ['eventframe.hasgeek.com', 'efdev.hasgeek.in:8090']
+#: Using SSL?
+USE_SSL = True
 #: Database backend
 SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
 #: Secret key
@@ -17,6 +19,8 @@ LASTUSER_SERVER = 'https://login.hasgeek.com/'
 LASTUSER_CLIENT_ID = ''
 #: LastUser client secret
 LASTUSER_CLIENT_SECRET = ''
+#: Path to site themes (must be an absolute path)
+THEMES_PATH = ''
 #: Mail settings
 #: MAIL_FAIL_SILENTLY : default True
 #: MAIL_SERVER : default 'localhost'

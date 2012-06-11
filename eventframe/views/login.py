@@ -1,15 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from flask import Response, redirect, flash
+from flask import g, request, Response, redirect, flash, abort
 from flask.ext.lastuser import LastUser
 from flask.ext.lastuser.sqlalchemy import UserManager
 from coaster.views import get_next_url
 
 from eventframe import app
-from eventframe.models import db, User
+from eventframe.models import db, User, LoginCode
 
 lastuser = LastUser(app)
 lastuser.init_usermanager(UserManager(db, User))
+
+
+@app.route('/login/event')
+@lastuser.requires_login
+def login_event():
+    if 'code' in request.args:
+        code = LoginCode.query.filter_by(code=request.args['code']).first()
+        if code and not code.user:
+            code.user = g.user
+            db.session.commit()
+            # Redirect to event website
+            return redirect(code.return_url + '?code=' + code.code, code=302)
+        else:
+            abort(403)
 
 
 @app.route('/login')

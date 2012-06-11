@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{{ title }}</title>
+  <link href="{{ url_for('index', _external=True) }}"/>
+  <link rel="self" href="{{ request.base_url }}"/>
+  <updated>{{ updated }}</updated>
+  <id>{{ feedid }}</id>
+  <icon>{{ request.url_root[:-1] }}{{ theme_static('img/icon.png') }}</icon>
+  <author><name>{{ website.title }}</name></author>
+
+  {% for page in pages -%}
+  {%- if page.folder.name == '' -%}
+    {%- set page_url = url_for('folder', folder=page.name, _external=True) -%}
+  {%- else -%}
+    {%- set page_url = url_for('page', folder=page.folder.name, page=page.name, _external=True) -%}
+  {%- endif %}
+  <entry>
+    <title type="text">{{ page.title }}</title>
+    <id>{{ page_url }}</id>
+    <link href="{{ page_url }}"/>
+    <updated>{{ page.datetime.isoformat() }}Z</updated>
+    <published>{{ page.datetime.isoformat() }}Z</published>
+    <content type="html">
+      {{ page.content|forceescape }}
+    </content>
+  </entry>
+  {%- endfor %}
+</feed>
