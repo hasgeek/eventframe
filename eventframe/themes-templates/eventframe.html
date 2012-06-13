@@ -26,7 +26,10 @@
   <![endif]-->
 
   <!-- Included CSS Files -->
-  {% assets "css_all" -%}
+  {% assets "css_baseframe" -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}"/>
+  {% endassets -%}
+  {% assets "css_" + _theme -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}"/>
   {% endassets -%}
   {% if config['DEBUG'] -%}
@@ -84,9 +87,12 @@
   {%- endblock %}
 
   <!-- Included JS Files -->
-  {% assets "js_all" -%}
+  {% assets "js_baseframe" -%}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
+  {#{% assets "js_" + _theme -%}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}#}
 
   {%- if website.googleanalytics_code and not config['DEBUG'] -%}
     <script type="text/javascript">

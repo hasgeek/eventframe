@@ -20,7 +20,7 @@ LASTUSER_CLIENT_ID = ''
 #: LastUser client secret
 LASTUSER_CLIENT_SECRET = ''
 #: Path to site themes (must be an absolute path)
-THEMES_PATH = ''
+THEME_PATHS = ''
 #: Mail settings
 #: MAIL_FAIL_SILENTLY : default True
 #: MAIL_SERVER : default 'localhost'

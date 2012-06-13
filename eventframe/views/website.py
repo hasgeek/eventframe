@@ -3,7 +3,7 @@
 from functools import wraps
 from datetime import datetime
 from werkzeug.exceptions import NotFound
-from flask import g, request, url_for, Response
+from flask import g, request, url_for, Response, abort
 from flask.ext.themes import get_theme, render_theme_template
 from coaster.views import load_model, load_models
 from eventframe import eventapp
@@ -36,9 +36,12 @@ def index():
     (Page, {'name': 'page', 'folder': 'folder'}, 'page')
     )
 def page(folder, page):
+    g.folder = folder  # For the context processor to pick up theme for this request
+    if page.fragment:
+        abort(404)  # Don't render fragment pages
     theme = get_theme(folder.theme)
     return render_theme_template(theme, page.template,
-        website=folder.website, title=page.title, page=page)
+        website=folder.website, folder=folder, title=page.title, page=page, _fallback=False)
 
 
 @eventapp.route('/<folder>/')
@@ -49,30 +52,27 @@ def folder(website, folder):
     except NotFound:
         return page(folder=u'', page=folder)
 
-    # First, check if this folder is actually a page
-    rootfolder = Folder.query.filter_by(name=u'', website=website).first()
-    pageob = Page.query.filter_by(name=folder, folder=rootfolder).first()
-    # Not a page? Now check if it's a folder
-    if pageob is None:
-        return page(folder=folder, page=u'')
-    else:
-        # It is a page. Render it
-        theme = get_theme(folder.theme)
-        return render_theme_template(theme, pageob.template,
-            website=website, title=pageob.title, page=pageob)
-
 
 def feedquery():
-    return Page.query.filter_by(blog=True).filter_by(status=PAGE_STATUS.PUBLISHED).filter(
+    return Page.query.filter_by(blog=True).filter_by(fragment=False).filter_by(
+        status=PAGE_STATUS.PUBLISHED).filter(
         Page.datetime <= datetime.utcnow()).order_by(db.desc('datetime'))
+
+
+def rootfeed(website):
+    folder_ids = [i[0] for i in db.session.query(Folder.id).filter_by(website=website).all()]
+    return feedquery().filter(Page.folder_id.in_(folder_ids)).all()
+
+
+def folderfeed(folder):
+    return feedquery().filter_by(folder=folder).all()
 
 
 @eventapp.route('/feed')
 @get_website
 def feed(website):
     theme = get_theme(website.theme)
-    folder_ids = [i[0] for i in db.session.query(Folder.id).filter_by(website=website).all()]
-    pages = feedquery().filter(Page.folder_id.in_(folder_ids)).all()
+    pages = rootfeed(website)
     if pages:
         updated = pages[0].datetime.isoformat() + 'Z'
     else:
@@ -88,7 +88,7 @@ def feed(website):
 @load_model(Folder, {'name': 'folder', 'website': 'website'}, 'folder')
 def folder_feed(folder):
     theme = get_theme(folder.theme)
-    pages = feedquery().filter_by(folder=folder).all()
+    pages = folderfeed(folder)
     if pages:
         updated = pages[0].datetime.isoformat() + 'Z'
     else:

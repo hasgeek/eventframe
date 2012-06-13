@@ -2,14 +2,13 @@
 
 # The imports in this file are order-sensitive
 
-import os.path
+from threading import Lock
 from flask import Flask
 from flask.ext.assets import Environment, Bundle
-from flask.ext.themes import setup_themes, load_themes_from, packaged_themes_loader
+from flask.ext.themes import setup_themes
 from baseframe import baseframe, baseframe_js, baseframe_css
 from coaster.app import configure
-
-from threading import Lock
+from eventframe.assets import ThemeAwareEnvironment, load_theme_assets
 
 
 # First, create a domain dispatcher that knows where to send each request
@@ -33,20 +32,10 @@ class DomainDispatcher(object):
         return app(environ, start_response)
 
 
-def theme_loader(app):
-    """
-    Look for site themes in a specific path
-    """
-    dir = app.config.get('THEMES_PATH')
-    if dir and os.path.isdir(dir):
-        return load_themes_from(dir)
-    else:
-        return ()
-
 # Second, make the main and event apps and configure them
 
 app = Flask(__name__, instance_relative_config=True)
-eventapp = Flask(__name__, instance_relative_config=True)
+eventapp = Flask(__name__, instance_relative_config=True, template_folder='themes-templates')
 configure(app, 'ENVIRONMENT')
 configure(eventapp, 'ENVIRONMENT')
 
@@ -60,39 +49,29 @@ eventframe.models.db.init_app(app)
 eventframe.models.db.init_app(eventapp)
 
 
-# Fourth, setup baseframe and assets on both apps
+# Fourth, setup baseframe, assets and theme assets on both apps
 
 app.register_blueprint(baseframe)
 eventapp.register_blueprint(baseframe)
 
 assets = Environment(app)
-eventassets = Environment(eventapp)
+eventassets = ThemeAwareEnvironment(eventapp)
 
 js = Bundle(baseframe_js)
 css = Bundle(baseframe_css,
              'css/app.css')
 assets.register('js_all', js)
 assets.register('css_all', css)
-eventassets.register('js_all', js)
-eventassets.register('css_all', css)
+eventassets.register('js_baseframe', baseframe_js)
+eventassets.register('css_baseframe', baseframe_css)
 
-# TODO: Watch for side-effects before using this
-# assets.set_url('http://localhost:8000/static')
-
-setup_themes(eventapp,
-    loaders=(packaged_themes_loader, theme_loader),
-    app_identifier='eventframe')
+setup_themes(eventapp, app_identifier='eventframe')
+for theme in eventapp.theme_manager.list_themes():
+    load_theme_assets(eventassets, theme)
 
 # Finally, setup admin for the models on the main app
 
-#from flask.ext import admin
-#from flask.ext.admin.datastore.sqlalchemy import SQLAlchemyDatastore
-#from eventframe.views.login import lastuser
-
-#admin_datastore = SQLAlchemyDatastore(eventframe.models, eventframe.models.db.session)
-#admin_blueprint = admin.create_admin_blueprint(admin_datastore,
-#    view_decorator=lastuser.requires_permission('siteadmin'))
-
-#app.register_blueprint(admin_blueprint, url_prefix='/admin')
+eventframe.views.admin.admin.init_app(app)
+eventframe.views.admin.init_model_views()
 
 application = DomainDispatcher(app.config['ADMIN_HOSTS'], app, eventapp)

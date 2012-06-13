@@ -15,9 +15,14 @@ def default_user_id():
 
 class Website(BaseNameMixin, db.Model):
     __tablename__ = 'website'
+    #: URL to the website
+    url = db.Column(db.Unicode(80), nullable=False, default=u'')
+    #: Theme that this website uses as the default (folders can override)
     theme = db.Column(db.Unicode(80), nullable=False, default=u'default')
-    typekit_code = db.Column(db.Unicode(10), nullable=False, default=u'')
-    googleanalytics_code = db.Column(db.Unicode(10), nullable=False, default=u'')
+    #: Typekit code, if used
+    typekit_code = db.Column(db.Unicode(20), nullable=False, default=u'')
+    #: Google Analytics code, if used
+    googleanalytics_code = db.Column(db.Unicode(20), nullable=False, default=u'')
 
     def __init__(self, **kwargs):
         super(Website, self).__init__(**kwargs)
@@ -31,7 +36,9 @@ class Website(BaseNameMixin, db.Model):
 
 class Hostname(BaseMixin, db.Model):
     __tablename__ = 'hostname'
+    #: Hostname that a website may be accessed at. Typically name:port
     name = db.Column(db.String(80), unique=True, nullable=False)
+    #: Website this hostname applies to
     website_id = db.Column(db.Integer, db.ForeignKey('website.id'), nullable=False)
     website = db.relationship(Website,
         backref=db.backref('hostnames', cascade='all, delete-orphan'))
@@ -42,10 +49,14 @@ class Hostname(BaseMixin, db.Model):
 
 class LoginCode(BaseMixin, db.Model):
     __tablename__ = 'logincode'
+    #: Tracking code to enable users to login to an event website
     code = db.Column(db.Unicode(22), nullable=False, unique=True)
+    #: User who logged in
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, default=None)
     user = db.relationship(User)
+    #: URL on event website to return user to
     next_url = db.Column(db.Unicode(250), nullable=False)
+    #: Login handler URL on event website
     return_url = db.Column(db.Unicode(250), nullable=False)
 
     def __init__(self, **kwargs):
@@ -55,10 +66,13 @@ class LoginCode(BaseMixin, db.Model):
 
 class Folder(BaseMixin, db.Model):
     __tablename__ = 'folder'
+    #: Website this folder is under
     website_id = db.Column(db.Integer, db.ForeignKey('website.id'), nullable=False)
     website = db.relationship(Website,
         backref=db.backref('folders', cascade='all, delete-orphan'))
 
+    # XXX: Do folders need titles? The per-folder blog feed needs a title
+    #: Folder name (no title)
     name = db.Column(db.Unicode(80), nullable=False)
     _theme = db.Column("theme", db.Unicode(80), nullable=False, default=u'')
 
@@ -72,6 +86,7 @@ class Folder(BaseMixin, db.Model):
     def theme(self, value):
         self._theme = value
 
+    #: Theme used by the folder. Defaults to the website's theme.
     theme = db.synonym('_theme', descriptor=theme)
 
     def __init__(self, **kwargs):
@@ -112,6 +127,10 @@ class Page(BaseScopedNameMixin, db.Model):
 
     #: Does this page show in the blog feed? Use for blog entries vs static pages
     blog = db.Column(db.Boolean, default=False, nullable=False)
+
+    #: Is this page a fragment, meant to be embedded in a template?
+    #: Fragment pages cannot be loaded by themselves
+    fragment = db.Column(db.Boolean, default=False, nullable=False)
 
     #: Abstract that is shown in summaries. Plain text.
     description = db.Column(db.UnicodeText, nullable=False, default=u'')
