@@ -3,7 +3,7 @@
 from functools import wraps
 from datetime import datetime
 from werkzeug.exceptions import NotFound
-from flask import g, request, url_for, Response, abort
+from flask import g, request, url_for, Response, abort, redirect
 from flask.ext.themes import get_theme, render_theme_template
 from coaster.views import load_model, load_models
 from eventframe import eventapp
@@ -37,6 +37,8 @@ def index():
     )
 def page(folder, page):
     g.folder = folder  # For the context processor to pick up theme for this request
+    if page.redirect_url:
+        return redirect(page.redirect_url)
     if page.fragment:
         abort(404)  # Don't render fragment pages
     theme = get_theme(folder.theme)

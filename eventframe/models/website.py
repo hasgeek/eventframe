@@ -68,14 +68,14 @@ class Folder(BaseMixin, db.Model):
     __tablename__ = 'folder'
     #: Website this folder is under
     website_id = db.Column(db.Integer, db.ForeignKey('website.id'), nullable=False)
-    website = db.relationship(Website,
-        backref=db.backref('folders', cascade='all, delete-orphan'))
 
     # XXX: Do folders need titles? The per-folder blog feed needs a title
     #: Folder name (no title)
     name = db.Column(db.Unicode(80), nullable=False)
     _theme = db.Column("theme", db.Unicode(80), nullable=False, default=u'')
 
+    website = db.relationship(Website,
+        backref=db.backref('folders', order_by=name, cascade='all, delete-orphan'))
     __table_args__ = (db.UniqueConstraint('name', 'website_id'),)
 
     @property
@@ -113,9 +113,9 @@ class Page(BaseScopedNameMixin, db.Model):
 
     #: Folder in which this page is located
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=False)
-    folder = db.relationship(Folder,
-        backref=db.backref('pages', cascade='all, delete-orphan'))
-    parent = db.synonym('folder')
+
+    #: Redirect target, if this is a marker page
+    redirect_url = db.Column(db.Unicode(250), nullable=True)
 
     #: Datetime at which this page becomes public. Eventframe will pretend the page
     #: doesn't exist until then. This field is also used to sort entries for blog
@@ -140,6 +140,9 @@ class Page(BaseScopedNameMixin, db.Model):
     #: Template with which this page will be rendered
     template = db.Column(db.Unicode(80), nullable=False, default=u'page.html')
 
+    folder = db.relationship(Folder,
+        backref=db.backref('pages', order_by=datetime.desc(), cascade='all, delete-orphan'))
+    parent = db.synonym('folder')
     __table_args__ = (db.UniqueConstraint('name', 'folder_id'),)
 
     @property

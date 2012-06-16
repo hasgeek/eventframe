@@ -2,18 +2,20 @@
 
 from pytz import utc, timezone
 from flask import g
-from eventframe import eventapp
+from eventframe import app, eventapp
 from eventframe.models import Folder, Page
 from eventframe.views.website import get_website, rootfeed, folderfeed
 
 tz = timezone(eventapp.config['TIMEZONE'])
 
 
+@app.template_filter('shortdate')
 @eventapp.template_filter('shortdate')
 def shortdate(date):
     return utc.localize(date).astimezone(tz).strftime('%b %e')
 
 
+@app.template_filter('longdate')
 @eventapp.template_filter('longdate')
 def longdate(date):
     return utc.localize(date).astimezone(tz).strftime('%B %e, %Y')

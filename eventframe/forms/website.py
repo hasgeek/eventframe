@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import flask.ext.wtf as wtf
-from baseframe.forms import Form, RichTextField, DateTimeInput
+from baseframe.forms import Form, RichTextField, DateTimeField
 
-__all__ = ['WebsiteForm', 'HostnameForm', 'FolderForm', 'PageForm']
+__all__ = ['WebsiteForm', 'HostnameForm', 'FolderForm', 'PageForm', 'ImportForm']
 
 
 class WebsiteForm(Form):
@@ -41,10 +41,20 @@ class FolderForm(Form):
 class PageForm(Form):
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name")
-    datetime = wtf.DateTimeField(u"Publish datetime", widget=DateTimeInput(), validators=[wtf.Required()])
+    redirect_url = wtf.TextField("Redirect URL", validators=[wtf.Optional()],
+        description=u"If this page is a placeholder that redirects to another page, enter the URL here.")
+    datetime = DateTimeField(u"Publish datetime", validators=[wtf.Required()])
     blog = wtf.BooleanField("Is this a blog entry?")
     description = wtf.TextAreaField(u"Summary", description=u"Summary of this page")
-    content = RichTextField(u"Page content", validators=[wtf.Required()])
-    fragment = wtf.BooleanField("Is this a page fragment?")
-    template = wtf.TextField("Template", validators=[wtf.Required()],
+    content = RichTextField(u"Page content")
+    fragment = wtf.BooleanField("Is this a fragment?")
+    template = wtf.TextField("Template", validators=[wtf.Required()], default='page.html',
         description=u"Template with which this page will be rendered.")
+
+
+class ImportForm(Form):
+    file = wtf.FileField(u"Upload file", validators=[wtf.Required()])
+    import_updated = wtf.BooleanField(u"Only import newer pages", default=True,
+        description=u"Pages that are newer locally will not be imported")
+    preserve_user = wtf.BooleanField(u"Preserve ownership", default=True,
+        description=u"This will only work if the export file came from the same server.")

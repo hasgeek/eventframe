@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+{% block title %}{% if folder.name %}{{ folder.name }} &mdash; {% endif %}{{ website.title }}{% endblock %}
+{% block headline %}{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="span2">
+    <ul class="nav nav-pills nav-stacked">
+      {#<li class="nav-header">Folders</li>#}
+      {% for f in website.folders %}
+        <li {%- if f == folder %} class="active"{% endif %}><a href="{{ url_for('folder', website=website.name, folder=f.name) }}"><i class="icon-folder-{% if f == folder %}open{% else %}close{% endif %}"></i> /{{ f.name }}</a></li>
+      {% endfor %}
+      <li class="divider"></li>
+      <li><a href="{{ url_for('folder_new', website=website.name) }}"><i class="icon-plus"></i> Add folder...</a></li>
+    </ul>
+  </div>
+  <div class="span10">
+    <div class="row">
+      <div class="span6">
+        <div class="page-header">
+          <h1>{{ self.title() }}</h1>
+        </div>
+      </div>
+      <div class="span4">
+        <ul id="type-filter" class="nav nav-pills pull-right">
+          <li class="active"><a data-kind="" href="">All</a></li>
+          <li><a data-kind="Page" href="">Page</a></li>
+          <li><a data-kind="Blog" href="">Blog</a></li>
+          <li><a data-kind="Fragment" href="">Fragment</a></li>
+          <li><a data-kind="Redirect" href="">Redirect</a></li>
+        </ul>
+      </div>
+    </div>
+    <ul id="folder-listing" class="grid container-fluid">
+      <li class="row-fluid header">
+        <div class="span2">Name</div>
+        <div class="span4">Title</div>
+        <div class="span2">User</div>
+        <div class="span2">Kind</div>
+        <div class="span2">Published</div>
+      </li>
+      {% for page in folder.pages -%}
+        {% with -%}
+          {%- if page.redirect_url -%}
+            {% set kind = 'Redirect' %}
+          {%- elif page.fragment -%}
+            {% set kind = 'Fragment' %}
+          {%- elif page.blog -%}
+            {% set kind = 'Blog' %}
+          {%- else -%}
+            {% set kind = 'Page' %}
+          {%- endif %}
+          <li class="row-fluid item" data-kind="{{ kind }}">
+            <div class="span2"><a href="{{ url_for('page_edit', website=website.name, folder=folder.name, page=page.name) }}">
+  {{ page.name or '(index)' }}</a></div>
+            <div class="span4"><a href="{{ url_for('page_edit', website=website.name, folder=folder.name, page=page.name) }}">{{ page.title }}</a></div>
+            <div class="span2">{{ page.user.fullname }}</div>
+            <div class="span2">{{ kind }}</div>
+            <div class="span2">{{ page.datetime|longdate }}</div>
+          </li>
+        {%- endwith %}
+      {%- endfor %}
+    </ul>
+
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <a class="btn" href="{{ url_for('page_new', website=website.name, folder=folder.name) }}"><i class="icon-plus"></i> New page</a>
+      </div>
+      <div class="btn-group">
+        {% if folder.name == '' -%}
+          <a class="btn" href="{{ url_for('website_edit', website=website.name) }}"><i class="icon-pencil"></i> Settings</a>
+        {%- else -%}
+          <a class="btn" href="{{ url_for('folder_edit', website=website.name, folder=folder.name) }}"><i class="icon-pencil"></i> Edit folder</a>
+          <a class="btn" href="{{ url_for('folder_delete', website=website.name, folder=folder.name) }}"><i class="icon-trash"></i> Delete</a>
+          <a class="btn" href="{{ url_for('folder_export', website=website.name, folder=folder.name) }}"><i class="icon-download-alt"></i> Export</a>
+          <a class="btn" href="{{ url_for('folder_import', website=website.name, folder=folder.name) }}"><i class="icon-upload-alt"></i> Import</a>
+        {%- endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footerscripts %}
+<script type="text/javascript">
+  $(function() {
+    $("#type-filter a").click(function(){
+      $("#type-filter .active").removeClass('active');
+      $(this).closest('li').addClass('active');
+
+      var kind = $(this).attr('data-kind');
+      if (kind == '') {
+        $('#folder-listing li.item').slideDown('fast');
+      } else {
+        $('#folder-listing li.item').not('[data-kind="' + kind + '"]').slideUp('fast');
+        $('#folder-listing li.item[data-kind="' + kind + '"]').slideDown('fast');
+      };
+      return false;
+    });
+  });
+</script>
+{% endblock %}
