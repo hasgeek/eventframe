@@ -56,7 +56,7 @@ def website_delete(website):
         message=u"Delete website '%s'? This will also permanently remove all "
             "pages associated with the website. There is no undo." % website.title,
         success=u"You have deleted website '%s'." % website.title,
-        next=url_for('index'), ajax=True)
+        next=url_for('index'))
 
 
 @app.route('/<website>/_new', methods=['GET', 'POST'])
