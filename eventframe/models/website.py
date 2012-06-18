@@ -32,7 +32,7 @@ class Website(BaseNameMixin, db.Model):
 
     def __init__(self, **kwargs):
         super(Website, self).__init__(**kwargs)
-        root = Folder(name=u'', website=self)
+        root = Folder(name=u'', title=u'', website=self)
         self.folders.append(root)
         #root.pages[0].template = u'index.html'
 
