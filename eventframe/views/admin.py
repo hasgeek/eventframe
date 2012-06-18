@@ -30,7 +30,7 @@ def website_new():
         db.session.commit()
         return render_redirect(url_for('website', website=website.name), code=303)
     return render_form(form=form, title=u"New website", submit=u"Create",
-        cancel_url=url_for('index'), ajax=False)
+        cancel_url=url_for('index'), ajax=True)
 
 
 @app.route('/<website>/_edit', methods=['GET', 'POST'])
@@ -45,7 +45,7 @@ def website_edit(website):
         db.session.commit()
         return render_redirect(url_for('website', website=website.name), code=303)
     return render_form(form=form, title=u"Edit website", submit=u"Save",
-        cancel_url=url_for('website', website=website.name), ajax=False)
+        cancel_url=url_for('website', website=website.name), ajax=True)
 
 
 @app.route('/<website>/_delete', methods=['GET', 'POST'])

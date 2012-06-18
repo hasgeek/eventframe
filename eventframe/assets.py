@@ -82,7 +82,8 @@ def load_theme_assets(env, theme):
     if isinstance(css_list, basestring):
         css_list = [css_list]
     css = Bundle(*[Bundle('_themes/%s/%s' % (theme.identifier, item),
-        filters='cssmin', output='_themes/%s/%s.packed.css' % (theme.identifier, item)) for item in css_list])
+            filters='cssmin', output='_themes/%s/%s.packed.css' % (theme.identifier, item)) for item in css_list],
+        filters='cssrewrite', output='_themes/%s/eventframe.packed.css' % (theme.identifier))
     env.register('css_%s' % theme.identifier, css)
 
     js_list = theme.options.get('assets_js', [])
