@@ -42,7 +42,7 @@ class HostnamesField(wtf.Field):
 
 class WebsiteForm(Form):
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
-    name = wtf.TextField(u"URL name", validators=[wtf.Required()])
+    name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
     url = wtf.html5.URLField(u"Website URL", validators=[wtf.Required()])
     hostnames = HostnamesField(u"Hostnames", validators=[wtf.Required()],
         description=u"Hostnames at which this website will be accessed, comma separated")
@@ -60,10 +60,10 @@ class WebsiteForm(Form):
 
 
 class FolderForm(Form):
-    name = wtf.TextField(u"URL name",
+    name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name],
         description=u"Folder name as it appears in the URL (without slashes)")
     title = wtf.TextField(u"Title",
-        description=u"Folder title, used in the per-folder feed")
+        description=u"Folder title, used in the per-folder blog feed")
     theme = wtf.SelectField(u"Theme")
 
     def validate_name(self, field):
@@ -74,7 +74,7 @@ class FolderForm(Form):
 class ContentForm(Form):
     previous_id = wtf.HiddenField(u"Previous revision")
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
-    name = wtf.TextField(u"URL name")
+    name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name])
     description = wtf.TextAreaField(u"Summary", description=u"Summary of this page")
     content = RichTextField(u"Page content")
     template = wtf.TextField("Template", validators=[wtf.Required()], default='page.html',
@@ -91,7 +91,7 @@ class FragmentForm(Form):
     """
     previous_id = wtf.HiddenField(u"Previous revision")
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
-    name = wtf.TextField(u"URL name", validators=[wtf.Required()])
+    name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
     content = RichTextField(u"Page content")
 
     def validate_name(self, field):
@@ -100,7 +100,7 @@ class FragmentForm(Form):
 
 
 class RedirectForm(Form):
-    name = wtf.TextField(u"URL name", validators=[])
+    name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name])
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     redirect_url = wtf.TextField("Redirect URL", validators=[wtf.Required()])
 
