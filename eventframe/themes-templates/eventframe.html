@@ -90,9 +90,9 @@
   {% assets "js_baseframe" -%}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
-  {#{% assets "js_" + _theme -%}
+  {% assets "js_" + _theme -%}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {%- endassets -%}#}
+  {%- endassets -%}
 
   {%- if website.googleanalytics_code and not config['DEBUG'] -%}
     <script type="text/javascript">
