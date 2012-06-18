@@ -29,7 +29,7 @@ def login_event():
 @app.route('/login')
 @lastuser.login_handler
 def login():
-    return {'scope': 'id email'}
+    return {'scope': 'id'}
 
 
 @app.route('/logout')
