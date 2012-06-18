@@ -21,6 +21,8 @@ class DomainDispatcher(object):
         self.eventapp = eventapp
 
     def get_application(self, host):
+        if ':' in host:
+            host = host.split(':', 1)[0]
         with self.lock:
             if host in self.hosts:
                 return self.app
@@ -66,12 +68,8 @@ eventassets.register('js_baseframe', baseframe_js)
 eventassets.register('css_baseframe', baseframe_css)
 
 setup_themes(eventapp, app_identifier='eventframe')
+setup_themes(app, app_identifier='eventframe')  # To list themes in the admin views
 for theme in eventapp.theme_manager.list_themes():
     load_theme_assets(eventassets, theme)
-
-# Finally, setup admin for the models on the main app
-
-eventframe.views.admin.admin.init_app(app)
-eventframe.views.admin.init_model_views()
 
 application = DomainDispatcher(app.config['ADMIN_HOSTS'], app, eventapp)

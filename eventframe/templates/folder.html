@@ -1,3 +1,4 @@
+{% from "baseframe/forms.html" import renderform_inner -%}
 {% extends "layout.html" %}
 {% block title %}{% if folder.name %}{{ folder.name }} &mdash; {% endif %}{{ website.title }}{% endblock %}
 {% block headline %}{% endblock %}
@@ -22,11 +23,17 @@
       </div>
       <div class="span4">
         <ul id="type-filter" class="nav nav-pills pull-right">
-          <li class="active"><a data-kind="" href="">All</a></li>
-          <li><a data-kind="Page" href="">Page</a></li>
-          <li><a data-kind="Blog" href="">Blog</a></li>
-          <li><a data-kind="Fragment" href="">Fragment</a></li>
-          <li><a data-kind="Redirect" href="">Redirect</a></li>
+          <li class="active"><a data-type="" href="">All</a></li>
+          {% for ntype in node_registry.keys()[:2] -%}
+            <li><a data-type="{{ ntype }}" href="">{{ ntype|title }}</a></li>
+          {%- endfor %}
+          <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="">More <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-right">
+              {% for ntype in node_registry.keys()[2:] -%}
+                <li><a data-type="{{ ntype }}" href="">{{ ntype|title }}</a></li>
+              {%- endfor %}
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
@@ -35,27 +42,21 @@
         <div class="span2">Name</div>
         <div class="span4">Title</div>
         <div class="span2">User</div>
-        <div class="span2">Kind</div>
+        <div class="span2">Type</div>
         <div class="span2">Published</div>
       </li>
-      {% for page in folder.pages -%}
+      {% for node in folder.nodes -%}
         {% with -%}
-          {%- if page.redirect_url -%}
-            {% set kind = 'Redirect' %}
-          {%- elif page.fragment -%}
-            {% set kind = 'Fragment' %}
-          {%- elif page.blog -%}
-            {% set kind = 'Blog' %}
-          {%- else -%}
-            {% set kind = 'Page' %}
-          {%- endif %}
-          <li class="row-fluid item" data-kind="{{ kind }}">
-            <div class="span2"><a href="{{ url_for('page_edit', website=website.name, folder=folder.name, page=page.name) }}">
-  {{ page.name or '(index)' }}</a></div>
-            <div class="span4"><a href="{{ url_for('page_edit', website=website.name, folder=folder.name, page=page.name) }}">{{ page.title }}</a></div>
-            <div class="span2">{{ page.user.fullname }}</div>
-            <div class="span2">{{ kind }}</div>
-            <div class="span2">{{ page.datetime|longdate }}</div>
+          <li class="row-fluid item" data-type="{{ node.type }}">
+            <div class="span2"><a href="{{
+                url_for('node_edit', website=website.name, folder=folder.name, node=node.name)
+                }}" title="{{ node.name or '(index)' }}">{{ node.name or '(index)' }}</a></div>
+            <div class="span4"><a href="{{
+                url_for('node_edit', website=website.name, folder=folder.name, node=node.name)
+                }}" title="{{ node.title }}">{{ node.title }}</a></div>
+            <div class="span2">{{ node.user.fullname }}</div>
+            <div class="span2">{{ node.type|title }}</div>
+            <div class="span2">{{ node.published_at|longdate }}</div>
           </li>
         {%- endwith %}
       {%- endfor %}
@@ -63,7 +64,12 @@
 
     <div class="btn-toolbar">
       <div class="btn-group">
-        <a class="btn" href="{{ url_for('page_new', website=website.name, folder=folder.name) }}"><i class="icon-plus"></i> New page</a>
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-plus"></i> New <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          {% for ntype in node_registry %}
+            <li><a href="{{ url_for('node_new', website=website.name, folder=folder.name, type=ntype) }}">{{ ntype|title }}</a></li>
+          {% endfor %}
+        </ul>
       </div>
       <div class="btn-group">
         {% if folder.name == '' -%}
@@ -71,29 +77,47 @@
         {%- else -%}
           <a class="btn" href="{{ url_for('folder_edit', website=website.name, folder=folder.name) }}"><i class="icon-pencil"></i> Edit folder</a>
           <a class="btn" href="{{ url_for('folder_delete', website=website.name, folder=folder.name) }}"><i class="icon-trash"></i> Delete</a>
-          <a class="btn" href="{{ url_for('folder_export', website=website.name, folder=folder.name) }}"><i class="icon-download-alt"></i> Export</a>
-          <a class="btn" href="{{ url_for('folder_import', website=website.name, folder=folder.name) }}"><i class="icon-upload-alt"></i> Import</a>
         {%- endif %}
+          <a class="btn" href="{{ url_for('folder_export', website=website.name, folder=folder.name) }}"><i class="icon-download-alt"></i> Export</a>
+          <a class="btn" href="#import-modal" data-toggle="modal"><i class="icon-upload-alt"></i> Import</a>
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal hide" id="import-modal">
+  <div class="modal-header">
+    <a class="close" data-dismiss="modal">×</a>
+    <h3>Import to folder</h3>
+  </div>
+  <form id="importform" method="POST" action="{{
+      url_for('folder_import', website=website.name, folder=folder.name)
+      }}" enctype="multipart/form-data" accept-charset="UTF-8" class="unstyled">
+    <div class="modal-body">
+      {{ renderform_inner(importform, "importform") }}
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+      <button type="submit" class="btn btn-primary">Import</button>
+    </div>
+  </form>
 </div>
 {% endblock %}
 {% block footerscripts %}
 <script type="text/javascript">
   $(function() {
-    $("#type-filter a").click(function(){
+    $("#type-filter a[data-type]").click(function(e){
       $("#type-filter .active").removeClass('active');
       $(this).closest('li').addClass('active');
 
-      var kind = $(this).attr('data-kind');
-      if (kind == '') {
+      var type = $(this).attr('data-type');
+      if (type == '') {
         $('#folder-listing li.item').slideDown('fast');
       } else {
-        $('#folder-listing li.item').not('[data-kind="' + kind + '"]').slideUp('fast');
-        $('#folder-listing li.item[data-kind="' + kind + '"]').slideDown('fast');
+        $('#folder-listing li.item').not('[data-type="' + type + '"]').slideUp('fast');
+        $('#folder-listing li.item[data-type="' + type + '"]').slideDown('fast');
       };
-      return false;
+      e.preventDefault();
     });
   });
 </script>

@@ -8,20 +8,20 @@
   <icon>{{ request.url_root[:-1] }}{{ theme_static('img/icon.png') }}</icon>
   <author><name>{{ website.title }}</name></author>
 
-  {% for page in pages -%}
-  {%- if page.folder.name == '' -%}
-    {%- set page_url = url_for('folder', folder=page.name, _external=True) -%}
+  {% for post in posts -%}
+  {%- if post.folder.name == '' -%}
+    {%- set post_url = url_for('folder', folder=post.name, _external=True) -%}
   {%- else -%}
-    {%- set page_url = url_for('page', folder=page.folder.name, page=page.name, _external=True) -%}
+    {%- set post_url = url_for('node', folder=post.folder.name, node=post.name, _external=True) -%}
   {%- endif %}
   <entry>
-    <title type="text">{{ page.title }}</title>
-    <id>{{ page_url }}</id>
-    <link href="{{ page_url }}"/>
-    <updated>{{ page.datetime.isoformat() }}Z</updated>
-    <published>{{ page.datetime.isoformat() }}Z</published>
+    <title type="text">{{ post.title }}</title>
+    <id>{{ post_url }}</id>
+    <link href="{{ post_url }}"/>
+    <updated>{{ post.datetime.isoformat() }}Z</updated>
+    <published>{{ post.datetime.isoformat() }}Z</published>
     <content type="html">
-      {{ page.content|forceescape }}
+      {{ post.content|forceescape }}
     </content>
   </entry>
   {%- endfor %}

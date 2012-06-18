@@ -4,7 +4,7 @@ SITE_TITLE = 'HasGeek Eventframe'
 #: Site id (for network bar)
 SITE_ID = 'events'
 #: Admin domains. The first is considered primary
-ADMIN_HOSTS = ['eventframe.hasgeek.com', 'efdev.hasgeek.in:8090']
+ADMIN_HOSTS = ['eventframe.hasgeek.com', 'efdev.hasgeek.in']
 #: Using SSL?
 USE_SSL = True
 #: Database backend

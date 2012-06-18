@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from flask import Markup, g
-from coaster import newid
-from eventframe.models import db, BaseMixin, BaseNameMixin, BaseScopedNameMixin
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.associationproxy import association_proxy
+from flask import g
+from coaster import newid, parse_isoformat
+from eventframe.models import db, TimestampMixin, BaseMixin, BaseNameMixin, BaseScopedNameMixin
 from eventframe.models.user import User
 
-__all__ = ['Website', 'Hostname', 'LoginCode', 'Folder', 'Page', 'PAGE_STATUS']
+__all__ = ['Website', 'Hostname', 'LoginCode', 'Folder', 'Node', 'NodeMixin']
 
 
 def default_user_id():
@@ -24,11 +26,15 @@ class Website(BaseNameMixin, db.Model):
     #: Google Analytics code, if used
     googleanalytics_code = db.Column(db.Unicode(20), nullable=False, default=u'')
 
+    _hostnames = db.relationship("Hostname", cascade='all, delete-orphan', backref='website')
+    hostnames = association_proxy('_hostnames', 'name',
+        creator=lambda name: Hostname.get(name=name))
+
     def __init__(self, **kwargs):
         super(Website, self).__init__(**kwargs)
         root = Folder(name=u'', website=self)
         self.folders.append(root)
-        root.pages[0].template = u'index.html'
+        #root.pages[0].template = u'index.html'
 
     def __repr__(self):
         return u'<Website %s "%s">' % (self.name, self.title)
@@ -40,11 +46,14 @@ class Hostname(BaseMixin, db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     #: Website this hostname applies to
     website_id = db.Column(db.Integer, db.ForeignKey('website.id'), nullable=False)
-    website = db.relationship(Website,
-        backref=db.backref('hostnames', cascade='all, delete-orphan'))
 
     def __repr__(self):
         return u'<Hostname %s>' % self.name
+
+    @classmethod
+    def get(cls, name, website=None):
+        hostname = cls.query.filter_by(name=name).first()
+        return hostname or cls(name=name, website=website)
 
 
 class LoginCode(BaseMixin, db.Model):
@@ -64,18 +73,16 @@ class LoginCode(BaseMixin, db.Model):
         self.code = newid()
 
 
-class Folder(BaseMixin, db.Model):
+class Folder(BaseScopedNameMixin, db.Model):
     __tablename__ = 'folder'
     #: Website this folder is under
     website_id = db.Column(db.Integer, db.ForeignKey('website.id'), nullable=False)
 
-    # XXX: Do folders need titles? The per-folder blog feed needs a title
-    #: Folder name (no title)
-    name = db.Column(db.Unicode(80), nullable=False)
     _theme = db.Column("theme", db.Unicode(80), nullable=False, default=u'')
 
     website = db.relationship(Website,
-        backref=db.backref('folders', order_by=name, cascade='all, delete-orphan'))
+        backref=db.backref('folders', order_by='Folder.name', cascade='all, delete-orphan'))
+    parent = db.synonym('website')
     __table_args__ = (db.UniqueConstraint('name', 'website_id'),)
 
     @property
@@ -91,69 +98,58 @@ class Folder(BaseMixin, db.Model):
 
     def __init__(self, **kwargs):
         super(Folder, self).__init__(**kwargs)
-        index = Page(name=u'', title=u'Index', folder=self, template=u'page.html')
-        index.name = u''  # Reset it to a blank
-        self.pages.append(index)
+        #index = Page(name=u'', title=u'Index', folder=self, template=u'page.html')
+        #index.name = u''  # Reset it to a blank
+        #self.pages.append(index)
 
     def __repr__(self):
         return u'<Folder %s at %s>' % (self.name or '(root)', self.website.name)
 
 
-class PAGE_STATUS:
-    DRAFT = 0
-    PENDING = 1
-    PUBLISHED = 2
-
-
-class Page(BaseScopedNameMixin, db.Model):
-    __tablename__ = 'page'
-    #: User who made this page
+class Node(BaseScopedNameMixin, db.Model):
+    __tablename__ = 'node'
+    #: Id of the node across sites (staging, production, etc) for import/export
+    uuid = db.Column(db.Unicode(22), unique=True, default=newid, nullable=False)
+    #: User who made this node
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, default=default_user_id)
     user = db.relationship(User)
-
-    #: Folder in which this page is located
+    #: Folder in which this node is located
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=False)
-
-    #: Redirect target, if this is a marker page
-    redirect_url = db.Column(db.Unicode(250), nullable=True)
-
-    #: Datetime at which this page becomes public. Eventframe will pretend the page
-    #: doesn't exist until then. This field is also used to sort entries for blog
-    #: feeds
-    datetime = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-
-    #: Status of the page (draft, published)
-    status = db.Column(db.Integer, default=0, nullable=False)
-
-    #: Does this page show in the blog feed? Use for blog entries vs static pages
-    blog = db.Column(db.Boolean, default=False, nullable=False)
-
-    #: Is this page a fragment, meant to be embedded in a template?
-    #: Fragment pages cannot be loaded by themselves
-    fragment = db.Column(db.Boolean, default=False, nullable=False)
-
-    #: Abstract that is shown in summaries. Plain text.
-    description = db.Column(db.UnicodeText, nullable=False, default=u'')
-    #: Page content. Rich text.
-    _content = db.Column(db.UnicodeText, nullable=False, default=u'')
-
-    #: Template with which this page will be rendered
-    template = db.Column(db.Unicode(80), nullable=False, default=u'page.html')
-
     folder = db.relationship(Folder,
-        backref=db.backref('pages', order_by=datetime.desc(), cascade='all, delete-orphan'))
+        backref=db.backref('nodes', order_by='Node.name', cascade='all, delete-orphan'))
     parent = db.synonym('folder')
+    #: Publication date
+    published_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    #: Type of node, for polymorphic identity
+    type = db.Column('type', db.Unicode(20))
     __table_args__ = (db.UniqueConstraint('name', 'folder_id'),)
+    __mapper_args__ = {'polymorphic_on': type}
 
-    @property
-    def content(self):
-        return Markup(self._content)
+    def as_json(self):
+        return {
+            'uuid': self.uuid,
+            'name': self.name,
+            'title': self.title,
+            'created_at': self.created_at.isoformat() + 'Z',
+            'updated_at': self.updated_at.isoformat() + 'Z',
+            'published_at': self.published_at.isoformat() + 'Z',
+            'userid': self.user.userid,
+            'type': self.type,
+        }
 
-    @content.setter
-    def content(self, value):
-        self._content = value
+    def import_from(self, data):
+        self.name = data['name']
+        self.title = data['title']
+        self.published_at = parse_isoformat(data['published_at'])
 
-    content = db.synonym('_content', descriptor=content)
 
-    def __repr__(self):
-        return u'<Page %s/%s "%s" at %s>' % (self.folder.name, self.name or '(index)', self.title, self.folder.website.name)
+class NodeMixin(TimestampMixin):
+    @declared_attr
+    def id(cls):
+        """Link back to node"""
+        return db.Column(db.Integer, db.ForeignKey('node.id'), primary_key=True, nullable=False)
+
+    @declared_attr
+    def __mapper_args__(cls):
+        """Use the table name as the polymorphic identifier"""
+        return {'polymorphic_identity': cls.__tablename__}
