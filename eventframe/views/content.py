@@ -50,6 +50,9 @@ class ContentHandler(AutoFormHandler):
         if not node.title:
             # New object. Copy title from first revision
             node.title = revision.title
+        elif not node.is_published:
+            # There is no published version, so use title from the draft
+            node.title = revision.title
         if not node.id and not node.name:
             node.make_name()
         db.session.commit()
