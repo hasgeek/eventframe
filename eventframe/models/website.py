@@ -138,6 +138,7 @@ class Node(BaseScopedNameMixin, db.Model):
         }
 
     def import_from(self, data):
+        self.uuid = data['uuid']
         self.name = data['name']
         self.title = data['title']
         self.published_at = parse_isoformat(data['published_at'])
