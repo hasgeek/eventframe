@@ -157,12 +157,12 @@ def node_edit(website, folder, node):
 @load_models(
     (Website, {'name': 'website'}, 'website'),
     (Folder, {'name': 'folder', 'website': 'website'}, 'folder'),
-    (Page, {'name': 'node', 'folder': 'folder'}, 'node')
+    (Node, {'name': 'node', 'folder': 'folder'}, 'node')
     )
 def node_delete(website, folder, node):
     return render_delete_sqla(node, db, title=u"Confirm delete",
-        message=u"Delete node '%s'? This is permanent. There is no undo." % website.title,
-        success=u"You have deleted node '%s'." % node.title,
+        message=u"Delete '%s'? This is permanent. There is no undo." % node.title,
+        success=u"You have deleted '%s'." % node.title,
         next=url_for('folder', website=website.name, folder=folder.name))
 
 
