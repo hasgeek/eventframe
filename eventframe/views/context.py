@@ -21,13 +21,13 @@ def longdate(date):
     return utc.localize(date).astimezone(tz).strftime('%B %e, %Y')
 
 
-def feedhelper(folder=None):
+def feedhelper(folder=None, limit=20):
     if folder is None:
         folder = Folder.query.filter_by(name=u'', website=g.website).first()
     if folder.name == '':
-        return rootfeed(folder.website)
+        return rootfeed(folder.website, limit)
     else:
-        return folderfeed(folder)
+        return folderfeed(folder, limit)
 
 
 def fragmenthelper(folder, fragment):

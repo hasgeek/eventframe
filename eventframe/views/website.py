@@ -64,13 +64,19 @@ def feedquery():
     return Post.query.filter_by(is_published=True).order_by('post.published_at')
 
 
-def rootfeed(website):
+def rootfeed(website, limit=20):
     folder_ids = [i[0] for i in db.session.query(Folder.id).filter_by(website=website).all()]
-    return feedquery().filter(Node.folder_id.in_(folder_ids)).all()
+    query = feedquery().filter(Node.folder_id.in_(folder_ids))
+    if limit:
+        query = query.limit(limit)
+    return query.all()
 
 
-def folderfeed(folder):
-    return feedquery().filter(Node.folder == folder).all()
+def folderfeed(folder, limit=20):
+    query = feedquery().filter(Node.folder == folder)
+    if limit:
+        query = query.limit(limit)
+    return query.all()
 
 
 @eventapp.route('/feed')
@@ -79,7 +85,7 @@ def feed(website):
     theme = get_theme(website.theme)
     posts = rootfeed(website)
     if posts:
-        updated = posts[0].published_at.isoformat() + 'Z'
+        updated = max(posts[0].revisions.published.updated_at, posts[0].published_at).isoformat() + 'Z'
     else:
         updated = datetime.utcnow().isoformat() + 'Z'
     return Response(render_theme_template(theme, 'feed.xml',

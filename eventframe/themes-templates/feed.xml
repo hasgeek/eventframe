@@ -18,8 +18,8 @@
     <title type="text">{{ post.title }}</title>
     <id>{{ post_url }}</id>
     <link href="{{ post_url }}"/>
-    <updated>{{ post.datetime.isoformat() }}Z</updated>
-    <published>{{ post.datetime.isoformat() }}Z</published>
+    <updated>{{ post.revisions.published.updated_at.isoformat() }}Z</updated>
+    <published>{{ post.published_at.isoformat() }}Z</published>
     <content type="html">
       {{ post.content|forceescape }}
     </content>

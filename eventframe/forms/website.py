@@ -4,7 +4,7 @@ from coaster import make_name
 import flask.ext.wtf as wtf
 from baseframe.forms import Form, RichTextField
 
-__all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportForm', 'RedirectForm']
+__all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportForm', 'RedirectForm', 'PublishForm']
 
 
 def valid_name(form, field):
@@ -131,3 +131,7 @@ class ImportForm(Form):
     import_file = wtf.FileField(u"Upload file", validators=[wtf.Required()])
     import_updated = wtf.BooleanField(u"Only import newer nodes", default=True,
         description=u"Nodes that are newer locally will not be imported")
+
+
+class PublishForm(Form):
+    pass  # Only needed for CSRF confirmation

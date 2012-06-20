@@ -106,9 +106,11 @@ class ContentMixin(NodeMixin):
         if revision is None:
             revision = self.revisions.draft
         if revision is not None:
+            if not self.revisions.published:
+                # TODO: Expose this for user editing. Don't assume current
+                self.published_at = datetime.utcnow()
             self.revisions.published = revision
             self.is_published = True
-            self.published_at = datetime.utcnow()
             # Update node title from the revision
             self.title = revision.title
             # If this was the latest draft, there's no longer a latest draft
