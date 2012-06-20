@@ -160,7 +160,7 @@ def folder_import(website, folder):
     if form.validate_on_submit():
         data = json.loads(request.files['import_file'].getvalue())
         for inode in data['nodes']:
-            mtime = parse_isoformat(inode['updated_at'])
+            mtime = parse_isoformat(inode.get('revision_updated_at', inode['updated_at']))
             node = Node.query.filter_by(folder=folder, uuid=inode['uuid']).first()
             if node is None:
                 nreg = node_registry.get(inode['type'])
