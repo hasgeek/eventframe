@@ -3,7 +3,7 @@
 from pytz import utc, timezone
 from flask import g
 from eventframe import app, eventapp
-from eventframe.models import Folder, Fragment
+from eventframe.models import Folder, Node, Fragment
 from eventframe.views.website import rootfeed, folderfeed
 
 tz = timezone(eventapp.config['TIMEZONE'])
@@ -36,6 +36,12 @@ def fragmenthelper(folder, fragment):
     return fragment
 
 
+def nodehelper(folder, node):
+    folder = Folder.query.filter_by(name=folder, website=g.website).first()
+    node = Node.query.filter_by(name=node, folder=folder).first()
+    return node
+
+
 @eventapp.context_processor
 def helpers():
     website = g.website if hasattr(g, 'website') else None
@@ -45,6 +51,13 @@ def helpers():
             '_theme': g.folder.theme if hasattr(g, 'folder') else website.theme,
             'feed': feedhelper,
             'fragment': fragmenthelper,
+            'getnode': nodehelper,
         }
     else:
-        return {}
+        return {
+            'website': None,
+            '_theme': '',
+            'feed': None,
+            'fragment': None,
+            'getnode': None,
+        }
