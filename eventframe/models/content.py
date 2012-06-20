@@ -95,7 +95,10 @@ class ContentMixin(NodeMixin):
         super(ContentMixin, self).__init__(**kwargs)
 
     def last_revision(self):
-        return ContentRevision.query.filter_by(parent=self.revisions).order_by(db.desc('id')).limit(1).first()
+        revision = self.revisions.draft or self.revisions.published
+        if revision is None:
+            revision = ContentRevision.query.filter_by(parent=self.revisions).order_by(db.desc('id')).limit(1).first()
+        return revision
 
     def publish(self, revision=None):
         """
