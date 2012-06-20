@@ -72,6 +72,11 @@ class PostHandler(ContentHandler):
     title_new = u"New blog post"
     title_edit = u"Edit blog post"
 
+    def make_form(self, folder, node):
+        form = super(PostHandler, self).make_form(folder, node)
+        form.template.data = 'post.html'
+        return form
+
 
 class FragmentHandler(ContentHandler):
     model = Fragment
@@ -210,5 +215,5 @@ def node_unpublish(website, folder, node):
         db.session.commit()
         flash(u"Unpublished '%s'" % node.title, 'success')
         return render_redirect(url_for('folder', website=folder.website.name, folder=folder.name), code=303)
-    return render_form(form=form, title="Publish node", submit=u"Publish",
+    return render_form(form=form, title="Unpublish node", submit=u"Unpublish",
             cancel_url=url_for('folder', website=folder.website.name, folder=folder.name))

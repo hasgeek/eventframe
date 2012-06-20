@@ -124,7 +124,7 @@ class ContentMixin(NodeMixin):
         """
         Withdraw the published version and go back to being a draft.
         """
-        self.revisions.published = False
+        self.revisions.published = None
         revision = ContentRevision.query.filter_by(parent=self.revisions).order_by(db.desc('id')).limit(1).first()
         self.revisions.draft = revision
         self.title = revision.title
