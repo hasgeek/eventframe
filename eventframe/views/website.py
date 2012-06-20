@@ -61,7 +61,7 @@ def folder(website, folder):
 
 
 def feedquery():
-    return Post.query.filter_by(is_published=True).order_by('post.published_at')
+    return Post.query.filter_by(is_published=True).order_by('node.published_at')
 
 
 def rootfeed(website, limit=20):
