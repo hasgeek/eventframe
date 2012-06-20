@@ -72,13 +72,17 @@ class FolderForm(Form):
 
 
 class ContentForm(Form):
-    previous_id = wtf.HiddenField(u"Previous revision")
+    previous_id = wtf.HiddenField(u"Previous revision", coerce=int)
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name])
     description = wtf.TextAreaField(u"Summary", description=u"Summary of this page")
     content = RichTextField(u"Page content")
     template = wtf.TextField("Template", validators=[wtf.Required()], default='page.html',
         description=u"Template with which this page will be rendered.")
+
+    def validate_previous_id(self, field):
+        if not field.data:
+            field.data = None
 
     def validate_name(self, field):
         # TODO
