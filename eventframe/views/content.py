@@ -28,7 +28,7 @@ class ContentHandler(AutoFormHandler):
     def make_form(self, folder, node):
         # TODO: Add support for editing a specific revision
         if node:
-            form = self.form(obj=node.revisions.draft)
+            form = self.form(obj=node.last_revision())
             if request.method == 'GET':
                 form.name.data = node.name
             return form
