@@ -8,3 +8,4 @@ db = SQLAlchemy()
 from eventframe.models.user import *
 from eventframe.models.website import *
 from eventframe.models.content import *
+from eventframe.models.list import *

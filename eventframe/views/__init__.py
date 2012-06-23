@@ -47,3 +47,4 @@ import eventframe.views.eventlogin
 import eventframe.views.admin
 import eventframe.views.context
 import eventframe.views.content
+import eventframe.views.list

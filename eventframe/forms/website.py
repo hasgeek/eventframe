@@ -4,7 +4,8 @@ from coaster import make_name
 import flask.ext.wtf as wtf
 from baseframe.forms import Form, RichTextField
 
-__all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportForm', 'RedirectForm', 'PublishForm']
+__all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportForm', 'RedirectForm',
+    'PublishForm', 'ListForm']
 
 
 def valid_name(form, field):
@@ -135,3 +136,11 @@ class ImportForm(Form):
 
 class PublishForm(Form):
     pass  # Only needed for CSRF confirmation
+
+
+class ListForm(Form):
+    title = wtf.TextField(u"Title", validators=[wtf.Required()])
+    name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
+    list = wtf.TextAreaField('Nodes', validators=[wtf.Required()],
+        description=u'Enter one node name per line, in "folder/node" syntax. '
+            u'For nodes in the root folder, enter "/node".')
