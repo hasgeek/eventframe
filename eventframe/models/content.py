@@ -248,6 +248,8 @@ class FunnelLink(ContentMixin, Node):
             for proposal in self._data_cached['proposals']:
                 proposal['submitted'] = datetime.strptime(proposal['submitted'], '%Y-%m-%dT%H:%M:%S')
                 proposal['section_name'] = sectionmap.get(proposal['section'])
+                v = proposal['votes']
+                proposal['votes'] = '+%d' % v if v > 0 else '%d' % v
         return self._data_cached
 
     def sections(self):

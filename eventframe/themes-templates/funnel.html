@@ -13,19 +13,19 @@
 </ul>
 <ul id="funnel-listing" class="grid container-fluid">
   <li class="row-fluid header">
-    <div class="span5">Title</div>
+    <div class="span6">Title</div>
     <div class="span3">By</div>
     <div class="span1"><i class="icon-comments"></i></div>
     <div class="span1">+1</div>
-    <div class="span2">Date</div>
+    <div class="span1">Date</div>
   </li>
   {% for proposal in node.proposals() -%}
     <li class="row-fluid item" data-section="{{ proposal['section_name'] }}">
-      <div class="span5"><a target="_blank" href="{{ proposal['url'] }}" title="{{ proposal['title'] }}">{{ proposal['title'] }}</a></div>
+      <div class="span6"><a target="_blank" href="{{ proposal['url'] }}" title="{{ proposal['title'] }}">{{ proposal['title'] }}</a></div>
       <div class="span3">{{ proposal['proposer'] }}</div>
       <div class="span1">{{ proposal['comments'] }}</div>
-      <div class="span1">+{{ proposal['votes'] }}</div>
-      <div class="span2">{{ proposal['submitted'] }}</div>
+      <div class="span1">{{ proposal['votes'] }}</div>
+      <div class="span1">{{ proposal['submitted']|shortdate }}</div>
     </li>
   {%- endfor %}
 </ul>
