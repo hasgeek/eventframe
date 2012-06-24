@@ -24,19 +24,41 @@
       <div class="span4">
         <ul id="type-filter" class="nav nav-pills pull-right">
           <li class="active"><a data-type="" href="">All</a></li>
-          {% for ntype in node_registry.keys()[:2] -%}
-            <li><a data-type="{{ ntype }}" href="">{{ ntype|title }}</a></li>
+          {% for ntype in node_registry.values()[:2] -%}
+            <li><a data-type="{{ ntype.name }}" href="">{{ ntype.title }}</a></li>
           {%- endfor %}
           <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="">More <b class="caret"></b></a>
             <ul class="dropdown-menu dropdown-right">
-              {% for ntype in node_registry.keys()[2:] -%}
-                <li><a data-type="{{ ntype }}" href="">{{ ntype|title }}</a></li>
+              {% for ntype in node_registry.values()[2:] -%}
+                <li><a data-type="{{ ntype.name }}" href="">{{ ntype.title }}</a></li>
               {%- endfor %}
             </ul>
           </li>
         </ul>
       </div>
     </div>
+
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-plus"></i> New <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          {% for ntype in node_registry.values() %}
+            <li><a href="{{ url_for('node_new', website=website.name, folder=folder.name, type=ntype.name) }}">{{ ntype.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="btn-group">
+        {% if folder.name == '' -%}
+          <a class="btn" href="{{ url_for('website_edit', website=website.name) }}"><i class="icon-pencil"></i> Settings</a>
+        {%- else -%}
+          <a class="btn" href="{{ url_for('folder_edit', website=website.name, folder=folder.name) }}"><i class="icon-pencil"></i> Edit folder</a>
+          <a class="btn" href="{{ url_for('folder_delete', website=website.name, folder=folder.name) }}"><i class="icon-trash"></i> Delete</a>
+        {%- endif %}
+          <a class="btn" href="{{ url_for('folder_export', website=website.name, folder=folder.name) }}"><i class="icon-download-alt"></i> Export</a>
+          <a class="btn" href="#import-modal" data-toggle="modal"><i class="icon-upload-alt"></i> Import</a>
+      </div>
+    </div>
+
     <ul id="folder-listing" class="grid container-fluid">
       <li class="row-fluid header">
         <div class="span2">Name</div>
@@ -55,33 +77,12 @@
                 url_for('node_edit', website=website.name, folder=folder.name, node=node.name)
                 }}" title="{{ node.title }}">{{ node.title }}</a></div>
             <div class="span2">{{ node.user.fullname }}</div>
-            <div class="span2">{{ node.type|title }}</div>
+            <div class="span2">{{ node.__title__ }}</div>
             <div class="span2">{{ node.published_at|longdate }}</div>
           </li>
         {%- endwith %}
       {%- endfor %}
     </ul>
-
-    <div class="btn-toolbar">
-      <div class="btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-plus"></i> New <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          {% for ntype in node_registry %}
-            <li><a href="{{ url_for('node_new', website=website.name, folder=folder.name, type=ntype) }}">{{ ntype|title }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div class="btn-group">
-        {% if folder.name == '' -%}
-          <a class="btn" href="{{ url_for('website_edit', website=website.name) }}"><i class="icon-pencil"></i> Settings</a>
-        {%- else -%}
-          <a class="btn" href="{{ url_for('folder_edit', website=website.name, folder=folder.name) }}"><i class="icon-pencil"></i> Edit folder</a>
-          <a class="btn" href="{{ url_for('folder_delete', website=website.name, folder=folder.name) }}"><i class="icon-trash"></i> Delete</a>
-        {%- endif %}
-          <a class="btn" href="{{ url_for('folder_export', website=website.name, folder=folder.name) }}"><i class="icon-download-alt"></i> Export</a>
-          <a class="btn" href="#import-modal" data-toggle="modal"><i class="icon-upload-alt"></i> Import</a>
-      </div>
-    </div>
   </div>
 </div>
 

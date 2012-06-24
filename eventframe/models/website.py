@@ -154,3 +154,8 @@ class NodeMixin(TimestampMixin):
     def __mapper_args__(cls):
         """Use the table name as the polymorphic identifier"""
         return {'polymorphic_identity': cls.__tablename__}
+
+    @declared_attr
+    def __title__(cls):
+        """Create a title for the type, from the class name"""
+        return cls.__tablename__.replace('_', ' ').title()

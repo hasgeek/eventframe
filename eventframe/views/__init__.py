@@ -30,11 +30,12 @@ class NodeRegistry(OrderedDict):
     def register(self, model, handler, render=False):
         item = _RegistryItem()
         item.model = model
-        item.type = model.__mapper_args__['polymorphic_identity']
+        item.name = model.__mapper_args__['polymorphic_identity']
+        item.title = model.__title__
         item.handler = handler
         item.render = render
 
-        self[item.type] = item
+        self[item.name] = item
 
 node_registry = NodeRegistry()
 
