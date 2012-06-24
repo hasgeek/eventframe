@@ -5,7 +5,7 @@ import flask.ext.wtf as wtf
 from baseframe.forms import Form, RichTextField
 
 __all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportForm', 'RedirectForm',
-    'PublishForm', 'ListForm']
+    'PublishForm', 'ListForm', 'FunnelLinkForm']
 
 
 def valid_name(form, field):
@@ -93,6 +93,11 @@ class ContentForm(Form):
     def validate_name(self, field):
         # TODO
         pass
+
+
+class FunnelLinkForm(ContentForm):
+    funnel_name = wtf.TextField(u"Funnel name", validators=[wtf.Required()],
+        description=u"URL name of the event in the HasGeek funnel")
 
 
 class FragmentForm(Form):

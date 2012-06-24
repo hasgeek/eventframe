@@ -5,8 +5,8 @@ from coaster.views import load_models
 from baseframe.forms import render_form, render_redirect, render_delete_sqla
 from eventframe import app
 from eventframe.views import NodeHandler, node_registry
-from eventframe.forms import ContentForm, FragmentForm, RedirectForm, PublishForm
-from eventframe.models import db, Website, Folder, Node, Page, Post, Fragment, Redirect
+from eventframe.forms import ContentForm, FragmentForm, RedirectForm, PublishForm, FunnelLinkForm
+from eventframe.models import db, Website, Folder, Node, Page, Post, Fragment, Redirect, FunnelLink
 from eventframe.views.login import lastuser
 
 
@@ -35,6 +35,9 @@ class ContentHandler(AutoFormHandler):
         else:
             return self.form()
 
+    def process_node(self, folder, node, form):
+        pass
+
     def process_form(self, folder, node, form):
         if node is None:
             # Creating a new object
@@ -47,6 +50,7 @@ class ContentHandler(AutoFormHandler):
         # Make a revision and apply changes to it
         revision = node.revise()
         form.populate_obj(revision)
+        self.process_node(folder, node, form)
         if not node.title:
             # New object. Copy title from first revision
             node.title = revision.title
@@ -74,7 +78,8 @@ class PostHandler(ContentHandler):
 
     def make_form(self, folder, node):
         form = super(PostHandler, self).make_form(folder, node)
-        form.template.data = 'post.html'
+        if request.method == 'GET' and not node:
+            form.template.data = 'post.html'
         return form
 
 
@@ -83,6 +88,25 @@ class FragmentHandler(ContentHandler):
     form = FragmentForm
     title_new = u"New page fragment"
     title_edit = u"Edit page fragment"
+
+
+class FunnelLinkHandler(ContentHandler):
+    model = FunnelLink
+    form = FunnelLinkForm
+    title_new = u"New funnel link"
+    title_edit = u"Edit funnel link"
+
+    def make_form(self, folder, node):
+        form = super(FunnelLinkHandler, self).make_form(folder, node)
+        if request.method == 'GET':
+            if node:
+                form.funnel_name.data = node.funnel_name
+            else:
+                form.template.data = 'funnel.html'
+        return form
+
+    def process_node(self, folder, node, form):
+        node.funnel_name = form.funnel_name.data
 
 
 class RedirectHandler(AutoFormHandler):
@@ -107,6 +131,7 @@ node_registry.register(Page, PageHandler(), render=True)
 node_registry.register(Post, PostHandler(), render=True)
 node_registry.register(Fragment, FragmentHandler(), render=False)
 node_registry.register(Redirect, RedirectHandler(), render=False)
+node_registry.register(FunnelLink, FunnelLinkHandler(), render=True)
 
 
 # --- Routes ------------------------------------------------------------------

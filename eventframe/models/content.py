@@ -3,13 +3,14 @@
 from datetime import datetime
 from coaster import parse_isoformat
 from flask import Markup
+import requests
 from sqlalchemy.ext.declarative import declared_attr
 from eventframe.models import db, BaseMixin
 from eventframe.models.user import User
 from eventframe.models.website import NodeMixin, Node, default_user_id
 
 
-__all__ = ['Page', 'Post', 'Fragment', 'Redirect']
+__all__ = ['Page', 'Post', 'Fragment', 'Redirect', 'FunnelLink']
 
 
 class ContentRevision(BaseMixin, db.Model):
@@ -224,3 +225,34 @@ class Redirect(NodeMixin, Node):
     def import_from(self, data):
         super(Redirect, self).import_from(data)
         self.redirect_url = data['redirect_url']
+
+
+class FunnelLink(ContentMixin, Node):
+    __tablename__ = 'funnel_link'
+    funnel_name = db.Column(db.Unicode(80), nullable=False)
+
+    def as_json(self):
+        result = super(FunnelLink, self).as_json()
+        result.update({'funnel_name': self.funnel_name})
+        return result
+
+    def import_from(self, data):
+        super(FunnelLink, self).import_from(data)
+        self.funnel_name = data['funnel_name']
+
+    def _data(self):
+        if not hasattr(self, '_data_cached'):
+            # Get JSON and cache locally
+            self._data_cached = requests.get('http://funnel.hasgeek.com/%s/json' % self.funnel_name).json
+            sectionmap = dict([(s['title'], s['name']) for s in self._data_cached['sections']])
+            for proposal in self._data_cached['proposals']:
+                proposal['submitted'] = datetime.strptime(proposal['submitted'], '%Y-%m-%dT%H:%M:%S')
+                proposal['section_name'] = sectionmap.get(proposal['section'])
+        return self._data_cached
+
+    def sections(self):
+        # Get data from Funnel and cache locally
+        return self._data()['sections']
+
+    def proposals(self):
+        return self._data()['proposals']
