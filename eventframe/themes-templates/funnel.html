@@ -5,7 +5,7 @@
 
 {% block content %}
 {{ node.content }}
-<ul id="funnel-filter" class="nav nav-pills">
+<ul id="funnel-filter" class="nav nav-tabs nav-grid">
   <li class="active"><a data-section="" href="">All</a></li>
   {% for s in node.sections() %}
     <li><a data-section="{{ s.name }}" href="">{{ s.title }}</a></li>
