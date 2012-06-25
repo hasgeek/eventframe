@@ -4,6 +4,7 @@ from datetime import datetime
 from coaster import parse_isoformat
 from flask import Markup
 import requests
+from requests.exceptions import ConnectionError
 from sqlalchemy.ext.declarative import declared_attr
 from eventframe.models import db, BaseMixin
 from eventframe.models.user import User
@@ -243,13 +244,21 @@ class FunnelLink(ContentMixin, Node):
     def _data(self):
         if not hasattr(self, '_data_cached'):
             # Get JSON and cache locally
-            self._data_cached = requests.get('http://funnel.hasgeek.com/%s/json' % self.funnel_name).json
-            sectionmap = dict([(s['title'], s['name']) for s in self._data_cached['sections']])
-            for proposal in self._data_cached['proposals']:
-                proposal['submitted'] = datetime.strptime(proposal['submitted'], '%Y-%m-%dT%H:%M:%S')
-                proposal['section_name'] = sectionmap.get(proposal['section'])
-                v = proposal['votes']
-                proposal['votes'] = '+%d' % v if v > 0 else '%d' % v
+            try:
+                data = requests.get('http://funnel.hasgeek.com/%s/json' % self.funnel_name).json
+                sectionmap = dict([(s['title'], s['name']) for s in data['sections']])
+                for proposal in data['proposals']:
+                    proposal['submitted'] = datetime.strptime(proposal['submitted'], '%Y-%m-%dT%H:%M:%S')
+                    proposal['section_name'] = sectionmap.get(proposal['section'])
+                    v = proposal['votes']
+                    proposal['votes'] = '+%d' % v if v > 0 else '%d' % v
+                self._data_cached = data
+            except ConnectionError:
+                self._data_cached = {
+                    'proposals': [],
+                    'sections': [],
+                    'space': {},
+                }
         return self._data_cached
 
     def sections(self):
