@@ -29,4 +29,4 @@ class ListHandler(AutoFormHandler):
         db.session.commit()
         return render_redirect(url_for('folder', website=folder.website.name, folder=folder.name), code=303)
 
-node_registry.register(List, ListHandler(), render=False)
+node_registry.register(List, ListHandler, render=False)

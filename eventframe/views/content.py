@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import g, abort, flash, url_for, request
+from flask import g, abort, flash, url_for, request, redirect
 from coaster.views import load_models
 from baseframe.forms import render_form, render_redirect, render_delete_sqla
 from eventframe import app
@@ -17,52 +17,70 @@ class AutoFormHandler(NodeHandler):
     title_new = u"New node"
     title_edit = u"Edit node"
 
-    def render_form(self, folder, node, form):
-        return render_form(form=form, title=self.title_edit if node else self.title_new, submit=u"Save",
-            cancel_url=url_for('folder', website=folder.website.name, folder=folder.name))
+    def __init__(self, app, website, folder, node):
+        super(AutoFormHandler, self).__init__(app, website, folder, node)
+        self.form = self.make_form()
+
+    def GET(self):
+        return self.render_form()
+
+    def POST(self):
+        if self.form.validate_on_submit():
+            return self.process_form()
+        return self.render_form()
+
+    def make_form(self):
+        raise NotImplementedError
+
+    def process_form(self):
+        raise NotImplementedError
+
+    def render_form(self):
+        return render_form(form=self.form, title=self.title_edit if self.node else self.title_new, submit=u"Save",
+            cancel_url=url_for('folder', website=self.website.name, folder=self.folder.name))
 
 
 class ContentHandler(AutoFormHandler):
-    form = ContentForm
+    form_class = ContentForm
 
-    def make_form(self, folder, node):
+    def make_form(self):
         # TODO: Add support for editing a specific revision
-        if node:
-            form = self.form(obj=node.last_revision())
+        if self.node:
+            form = self.form_class(obj=self.node.last_revision())
             if request.method == 'GET':
-                form.name.data = node.name
+                form.name.data = self.node.name
             return form
         else:
-            return self.form()
+            return self.form_class()
 
-    def process_node(self, folder, node, form):
+    def process_node(self):
         pass
 
-    def process_form(self, folder, node, form):
-        if node is None:
+    def process_form(self):
+        if self.node is None:
             # Creating a new object
-            node = self.model(folder=folder, user=g.user)
-            db.session.add(node)
+            self.node = self.model(folder=self.folder, user=g.user)
+            db.session.add(self.node)
         # Name isn't in revision history, so name changes
         # are applied to the node. TODO: Move this into a separate
         # rename action
-        node.name = form.name.data
+        self.node.name = self.form.name.data
         # Make a revision and apply changes to it
-        revision = node.revise()
-        form.populate_obj(revision)
-        self.process_node(folder, node, form)
-        if not node.title:
+        revision = self.node.revise()
+        self.form.populate_obj(revision)
+        self.process_node()
+        if not self.node.title:
             # New object. Copy title from first revision
-            node.title = revision.title
-        elif not node.is_published:
+            self.node.title = revision.title
+        elif not self.node.is_published:
             # There is no published version, so use title from the draft
-            node.title = revision.title
-        if not node.id and not node.name:
-            node.make_name()
+            self.node.title = revision.title
+        if not self.node.id and not self.node.name:
+            self.node.make_name()
         db.session.commit()
         # FIXME: Say created when created
-        flash(u"Edited node '%s'." % node.title, 'success')
-        return render_redirect(url_for('folder', website=folder.website.name, folder=folder.name), code=303)
+        flash(u"Edited node '%s'." % self.node.title, 'success')
+        return render_redirect(url_for('folder', website=self.website.name, folder=self.folder.name), code=303)
 
 
 class PageHandler(ContentHandler):
@@ -76,37 +94,37 @@ class PostHandler(ContentHandler):
     title_new = u"New blog post"
     title_edit = u"Edit blog post"
 
-    def make_form(self, folder, node):
-        form = super(PostHandler, self).make_form(folder, node)
-        if request.method == 'GET' and not node:
+    def make_form(self):
+        form = super(PostHandler, self).make_form()
+        if request.method == 'GET' and not self.node:
             form.template.data = 'post.html'
         return form
 
 
 class FragmentHandler(ContentHandler):
     model = Fragment
-    form = FragmentForm
+    form_class = FragmentForm
     title_new = u"New page fragment"
     title_edit = u"Edit page fragment"
 
 
 class FunnelLinkHandler(ContentHandler):
     model = FunnelLink
-    form = FunnelLinkForm
+    form_class = FunnelLinkForm
     title_new = u"New funnel link"
     title_edit = u"Edit funnel link"
 
-    def make_form(self, folder, node):
-        form = super(FunnelLinkHandler, self).make_form(folder, node)
+    def make_form(self):
+        form = super(FunnelLinkHandler, self).make_form()
         if request.method == 'GET':
-            if node:
-                form.funnel_name.data = node.funnel_name
+            if self.node:
+                form.funnel_name.data = self.node.funnel_name
             else:
                 form.template.data = 'funnel.html'
         return form
 
-    def process_node(self, folder, node, form):
-        node.funnel_name = form.funnel_name.data
+    def process_node(self):
+        self.node.funnel_name = self.form.funnel_name.data
 
 
 class RedirectHandler(AutoFormHandler):
@@ -114,24 +132,28 @@ class RedirectHandler(AutoFormHandler):
     title_new = u"New redirect"
     title_edit = u"Edit redirect"
 
-    def make_form(self, folder, node):
-        return RedirectForm(obj=node)
+    def make_form(self):
+        return RedirectForm(obj=self.node)
 
-    def process_form(self, folder, node, form):
-        if node is None:
-            node = self.model(folder=folder, user=g.user)
-            db.session.add(node)
-        form.populate_obj(node)
+    def process_form(self):
+        if self.node is None:
+            self.node = self.model(folder=self.folder, user=g.user)
+            db.session.add(self.node)
+        self.form.populate_obj(self.node)
         db.session.commit()
-        flash(u"Edited redirect '%s'." % node.title, 'success')
-        return render_redirect(url_for('folder', website=folder.website.name, folder=folder.name), code=303)
+        flash(u"Edited redirect '%s'." % self.node.title, 'success')
+        return render_redirect(url_for('folder', website=self.website.name, folder=self.folder.name), code=303)
 
 
-node_registry.register(Page, PageHandler(), render=True)
-node_registry.register(Post, PostHandler(), render=True)
-node_registry.register(Fragment, FragmentHandler(), render=False)
-node_registry.register(Redirect, RedirectHandler(), render=False)
-node_registry.register(FunnelLink, FunnelLinkHandler(), render=True)
+class RedirectViewHandler(NodeHandler):
+    def GET(self):
+        return redirect(self.node.redirect_url)
+
+node_registry.register(Page, PageHandler, render=True)
+node_registry.register(Post, PostHandler, render=True)
+node_registry.register(Fragment, FragmentHandler, render=False)
+node_registry.register(Redirect, RedirectHandler, view_handler=RedirectViewHandler, render=False)
+node_registry.register(FunnelLink, FunnelLinkHandler, render=True)
 
 
 # --- Routes ------------------------------------------------------------------
@@ -149,13 +171,17 @@ def node_new(website, folder, kwargs):
     if type not in node_registry:
         abort(404)
     record = node_registry[type]
-    handler = record.handler
-    if handler is None:
+    handler_class = record.edit_handler
+    if handler_class is None:
         abort(404)
-    form = handler.make_form(folder=folder, node=None)
-    if form.validate_on_submit():
-        return handler.process_form(folder, None, form)
-    return handler.render_form(folder, None, form)
+    handler = handler_class(app, website, folder, None)
+
+    if request.method == 'GET':
+        return handler.GET()
+    elif request.method == 'POST':
+        return handler.POST()
+    else:
+        abort(405)
 
 
 @app.route('/<website>/<folder>/<node>/_edit', methods=['GET', 'POST'])
@@ -170,13 +196,17 @@ def node_new(website, folder, kwargs):
     )
 def node_edit(website, folder, node):
     record = node_registry[node.type]
-    handler = record.handler
-    if handler is None:
+    handler_class = record.edit_handler
+    if handler_class is None:
         abort(404)
-    form = handler.make_form(folder=folder, node=node)
-    if form.validate_on_submit():
-        return handler.process_form(folder, node, form)
-    return handler.render_form(folder, node, form)
+    handler = handler_class(app, website, folder, node)
+
+    if request.method == 'GET':
+        return handler.GET()
+    elif request.method == 'POST':
+        return handler.POST()
+    else:
+        abort(405)
 
 
 @app.route('/<website>/<folder>/<node>/_delete', methods=['GET', 'POST'])
