@@ -153,4 +153,4 @@ def path_handler(website, path):
             abort(404)
         else:
             urls = node_registry[node.type].view_url_map.bind_to_environ(request)
-            return urls.dispatch(lambda e, v: getattr(node_registry[node.type].view_handler, 'e')(**v))
+            return urls.dispatch(lambda e, v: getattr(node_registry[node.type].view_handler, e)(**v))
