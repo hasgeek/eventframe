@@ -59,4 +59,5 @@ import eventframe.views.admin
 import eventframe.views.context
 import eventframe.views.content
 import eventframe.views.list
+import eventframe.views.map
 import eventframe.views.errorhandlers

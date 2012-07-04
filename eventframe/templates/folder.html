@@ -1,6 +1,6 @@
 {% from "baseframe/forms.html" import renderform_inner -%}
 {% extends "layout.html" %}
-{% block title %}{% if folder.name %}{{ folder.name }} &mdash; {% endif %}{{ website.title }}{% endblock %}
+{% block title %}{% if folder.name %}{{ folder.title or folder.name }} &mdash; {% endif %}{{ website.title }}{% endblock %}
 {% block headline %}{% endblock %}
 {% block content %}
 <div class="row">

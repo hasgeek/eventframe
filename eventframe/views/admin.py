@@ -6,7 +6,7 @@ Admin views
 
 from coaster import parse_isoformat
 from coaster.views import load_model, load_models
-from flask import g, flash, url_for, render_template, request, jsonify, json
+from flask import g, flash, url_for, render_template, request, Response, json
 from flask.ext.themes import get_themes_list
 from baseframe.forms import render_form, render_redirect, render_delete_sqla
 
@@ -64,8 +64,7 @@ def website_delete(website):
 @load_model(Website, {'name': 'website'}, 'website')
 def folder_new(website):
     form = FolderForm()
-    with eventapp.test_request_context():
-        themes = [('', 'Website Default')] + [(t.identifier, t.name) for t in get_themes_list()]
+    themes = [('', 'Website Default')] + [(t.identifier, t.name) for t in get_themes_list()]
     form.theme.choices = themes
     if form.validate_on_submit():
         folder = Folder(website=website)
@@ -87,14 +86,13 @@ def folder_edit(website, folder):
     form = FolderForm(obj=folder)
     if request.method == 'GET':
         form.theme.data = folder._theme
-    with eventapp.test_request_context():
-        themes = [('', 'Website Default')] + [(t.identifier, t.name) for t in get_themes_list()]
+    themes = [('', 'Website Default')] + [(t.identifier, t.name) for t in get_themes_list()]
     form.theme.choices = themes
     if form.validate_on_submit():
         form.populate_obj(folder)
         db.session.commit()
         return render_redirect(url_for('folder', website=website.name, folder=folder.name), code=303)
-    return render_form(form=form, title=u"Edit folder", submit=u"Create",
+    return render_form(form=form, title=u"Edit folder", submit=u"Save",
         cancel_url=url_for('folder', website=website.name, folder=folder.name), ajax=True)
 
 
@@ -137,12 +135,15 @@ def folder_delete(website, folder):
     (Folder, {'name': 'folder', 'website': 'website'}, 'folder')
     )
 def folder_export(website, folder):
-    response = jsonify(
-        website=website.name,
-        folder=folder.name,
-        nodes=[node.as_json() for node in folder.nodes])
-    response.headers['Content-Disposition'] = 'attachment; filename="%s-%s.json"' % (
-        website.name, folder.name)
+    response = Response(
+        json.dumps({
+                'website': website.name,
+                'folder': folder.name,
+                'nodes': [node.as_json() for node in folder.nodes]},
+            use_decimal=True, sort_keys=True, indent=4),
+        mimetype='application/json',
+        headers={'Content-Disposition': 'attachment; filename="%s-%s.json"' % (
+            website.name, folder.name)})
     return response
 
 
@@ -157,8 +158,9 @@ def folder_import(website, folder):
     import_count = 0
     create_count = 0
     form = ImportForm()
+    internal_imports = []
     if form.validate_on_submit():
-        data = json.loads(request.files['import_file'].getvalue())
+        data = json.loads(request.files['import_file'].getvalue(), use_decimal=True)
         for inode in data['nodes']:
             mtime = parse_isoformat(inode.get('revision_updated_at', inode['updated_at']))
             node = Node.query.filter_by(folder=folder, uuid=inode['uuid']).first()
@@ -176,7 +178,13 @@ def folder_import(website, folder):
                 if form.import_updated.data and mtime <= node.updated_at:
                     continue
             node.import_from(inode)
+            internal_imports.append(inode)
             import_count += 1
+        db.session.commit()
+        # Second pass for internal data of nodes
+        for inode in internal_imports:
+            node = Node.query.filter_by(folder=folder, uuid=inode['uuid']).first()
+            node.import_from_internal(inode)
         db.session.commit()
         flash("%d nodes were imported and %d new nodes were created" % (import_count, create_count), "success")
         return render_redirect(url_for('folder', website=website.name, folder=folder.name), code=303)

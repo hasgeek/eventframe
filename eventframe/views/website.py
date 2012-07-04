@@ -105,9 +105,12 @@ def folder_feed(folder):
         updated = posts[0].published_at.isoformat() + 'Z'
     else:
         updated = datetime.utcnow().isoformat() + 'Z'
-    return Response(render_theme_template(theme, 'feed.xml',
+    return Response(render_theme_template(
+            theme, 'feed.xml',
             feedid=url_for('folder', folder=folder.name),
-            website=folder.website, title=u"%s — %s" % (folder.title, folder.website.title), posts=posts, updated=updated),
+            website=folder.website,
+            title=u"%s — %s" % (folder.title or folder.name, folder.website.title),
+            posts=posts, updated=updated),
         content_type='application/atom+xml; charset=utf-8')
 
 

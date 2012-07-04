@@ -5,7 +5,7 @@ import flask.ext.wtf as wtf
 from baseframe.forms import Form, RichTextField
 
 __all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportForm', 'RedirectForm',
-    'PublishForm', 'ListForm', 'FunnelLinkForm']
+    'PublishForm', 'ListForm', 'FunnelLinkForm', 'MapForm']
 
 
 def valid_name(form, field):
@@ -144,8 +144,22 @@ class PublishForm(Form):
 
 
 class ListForm(Form):
-    title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
-    list = wtf.TextAreaField('Nodes', validators=[wtf.Required()],
-        description=u'Enter one node name per line, in "folder/node" syntax. '
-            u'For nodes in the root folder, enter "/node".')
+    title = wtf.TextField(u"Title", validators=[wtf.Required()])
+    list = wtf.TextAreaField('Items', validators=[wtf.Required()],
+        description=u'Enter each row as a JSON array with ["name", title", "url", "folder/node"]. '
+            u'For nodes in the root folder, use "/node". To not include a node, use "".')
+
+
+class MapForm(Form):
+    name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
+    title = wtf.TextField(u"Title", validators=[wtf.Required()])
+    list = wtf.TextAreaField('Map markers', validators=[wtf.Required()],
+        description=u'Enter each row as a JSON object with name, title, url, '
+            u'latitude, longitude, zoomlevel and marker. '
+            u'The URL, zoomlevel and marker can be null, others cannot.')
+
+
+class FileFolderForm(Form):
+    name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
+    title = wtf.TextField(u"Title", validators=[wtf.Required()])

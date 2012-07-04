@@ -143,6 +143,10 @@ class Node(BaseScopedNameMixin, db.Model):
         self.title = data['title']
         self.published_at = parse_isoformat(data['published_at'])
 
+    def import_from_internal(self, data):
+        # Only required for nodes that keep internal references to other nodes
+        pass
+
 
 class NodeMixin(TimestampMixin):
     @declared_attr
