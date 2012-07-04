@@ -267,3 +267,6 @@ class FunnelLink(ContentMixin, Node):
 
     def proposals(self):
         return self._data()['proposals']
+
+    def confirmed(self):
+	return [p for p in self._data()['proposals'] if p['confirmed']]
