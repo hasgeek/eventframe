@@ -6,3 +6,4 @@ Flask-SQLAlchemy
 https://github.com/hasgeek/flask-lastuser/zipball/master
 https://bitbucket.org/jace/flask-themes/get/tip.zip
 requests
+simplejson

@@ -6,11 +6,12 @@ Admin views
 
 from coaster import parse_isoformat
 from coaster.views import load_model, load_models
-from flask import g, flash, url_for, render_template, request, Response, json
+from flask import g, flash, url_for, render_template, request, Response
+import simplejson as json
 from flask.ext.themes import get_themes_list
 from baseframe.forms import render_form, render_redirect, render_delete_sqla
 
-from eventframe import app, eventapp
+from eventframe import app
 from eventframe.models import db, User, Website, Folder, Node
 from eventframe.forms import WebsiteForm, FolderForm, ImportForm
 from eventframe.views import node_registry

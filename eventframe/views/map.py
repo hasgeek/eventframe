@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from flask import request, url_for, flash, json
+from flask import request, url_for, flash
+import simplejson as json
 from baseframe.forms import render_redirect
 from eventframe.models import db, Map
 from eventframe.forms import MapForm
