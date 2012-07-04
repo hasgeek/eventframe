@@ -3,7 +3,7 @@
 from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
-from flask import g
+from flask import g, url_for
 from coaster import newid, parse_isoformat
 from eventframe.models import db, TimestampMixin, BaseMixin, BaseNameMixin, BaseScopedNameMixin
 from eventframe.models.user import User
@@ -146,6 +146,15 @@ class Node(BaseScopedNameMixin, db.Model):
     def import_from_internal(self, data):
         # Only required for nodes that keep internal references to other nodes
         pass
+
+    def url(self):
+        """
+        Return a URL to this node.
+        """
+        if self.folder.name == u'':
+            return url_for('folder', folder=self.name)
+        else:
+            return url_for('node', folder=self.folder.name, node=self.name)
 
 
 class NodeMixin(TimestampMixin):

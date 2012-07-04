@@ -107,12 +107,18 @@ class List(NodeMixin, Node):
         super(NodeMixin, self).import_from_internal(data)
         self.populate_list(data['items'])
 
+    def get_by_node(self, node):
+        if node is not None:
+            for i in self.items:
+                if i.node == node:
+                    return i
+
     def prev_to(self, item, items=None):
         items = items or self.items
 
         candidate = None
         for i in items:
-            if i is item:
+            if i == item:
                 return candidate
             else:
                 candidate = i
@@ -128,7 +134,7 @@ class List(NodeMixin, Node):
 
         candidate = None
         for i in items:
-            if i.node is node:
+            if i.node == node:
                 return candidate
             else:
                 candidate = i

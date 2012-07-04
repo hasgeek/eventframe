@@ -65,6 +65,12 @@ class Map(NodeMixin, Node):
         super(NodeMixin, self).import_from(data)
         self.populate_map(data['items'])
 
+    def get_by_name(self, name):
+        if name is not None:
+            for i in self.items:
+                if i.name == name:
+                    return i
+
     def prev_to(self, item, items=None):
         items = items or self.items
 
