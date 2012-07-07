@@ -116,6 +116,9 @@ class Property(BaseMixin, db.Model):
     __table_args__ = (db.UniqueConstraint('name', 'node_id'),)
 
 
+__marker = []
+
+
 class _NodeProperties(dict):
     """
     Requires self.node to point to a node.
@@ -127,6 +130,18 @@ class _NodeProperties(dict):
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).iteritems():
             self[k] = v
+
+    def __delitem__(self, key):
+        dict.__delitem__(self, key)
+        del self.node.node_properties[key]
+
+    def pop(self, key, default=__marker):
+        if default is __marker:
+            self.node.node_properties.pop(key, default)
+            return dict.pop(self, key)
+        else:
+            self.node.node_properties(key, default)
+            return dict.pop(self, key, default)
 
     def __setitem__(self, key, value):
         if isinstance(value, Property):
