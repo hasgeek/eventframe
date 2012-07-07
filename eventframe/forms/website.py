@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import simplejson as json
 from coaster import make_name
 import flask.ext.wtf as wtf
 from baseframe.forms import Form, RichTextField
@@ -41,6 +42,24 @@ class HostnamesField(wtf.Field):
                 yield item
 
 
+class DictField(wtf.Field):
+    widget = wtf.TextArea()
+
+    def _value(self):
+        if isinstance(self.data, dict):
+            return '\r\n'.join([json.dumps({key: value}) for key, value in self.data.items()])
+        return ''
+
+    def process_formdata(self, valuelist):
+        self.data = {}
+        if valuelist:
+            for row in valuelist[0].split('\n'):
+                if row:
+                    rowdata = json.loads(row)
+                    if isinstance(rowdata, dict):
+                        self.data.update(rowdata)
+
+
 class WebsiteForm(Form):
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
@@ -80,6 +99,7 @@ class ContentForm(Form):
     content = RichTextField(u"Page content")
     template = wtf.TextField("Template", validators=[wtf.Required()], default='page.html',
         description=u"Template with which this page will be rendered.")
+    properties = DictField("Properties")
 
     def validate_previous_id(self, field):
         if not field.data:
@@ -98,6 +118,7 @@ class ContentForm(Form):
 class FunnelLinkForm(ContentForm):
     funnel_name = wtf.TextField(u"Funnel name", validators=[wtf.Required()],
         description=u"URL name of the event in the HasGeek funnel")
+    properties = DictField("Properties")
 
 
 class FragmentForm(Form):
@@ -108,6 +129,7 @@ class FragmentForm(Form):
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
     content = RichTextField(u"Page content")
+    properties = DictField("Properties")
 
     def validate_previous_id(self, field):
         if not field.data:
@@ -127,6 +149,7 @@ class RedirectForm(Form):
     name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name])
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     redirect_url = wtf.TextField("Redirect URL", validators=[wtf.Required()])
+    properties = DictField("Properties")
 
     def validate_name(self, field):
         # TODO
@@ -149,6 +172,7 @@ class ListForm(Form):
     list = wtf.TextAreaField('Items', validators=[wtf.Required()],
         description=u'Enter each row as a JSON array with ["name", title", "url", "folder/node"]. '
             u'For nodes in the root folder, use "/node". To not include a node, use "".')
+    properties = DictField("Properties")
 
 
 class MapForm(Form):
@@ -158,8 +182,10 @@ class MapForm(Form):
         description=u'Enter each row as a JSON object with name, title, url, '
             u'latitude, longitude, zoomlevel and marker. '
             u'The URL, zoomlevel and marker can be null, others cannot.')
+    properties = DictField("Properties")
 
 
 class FileFolderForm(Form):
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
+    properties = DictField("Properties")

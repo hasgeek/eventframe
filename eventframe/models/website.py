@@ -3,6 +3,7 @@
 from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm.collections import attribute_mapped_collection
 from flask import g, url_for
 from coaster import newid, parse_isoformat
 from eventframe.models import db, TimestampMixin, BaseMixin, BaseNameMixin, BaseScopedNameMixin
@@ -106,6 +107,40 @@ class Folder(BaseScopedNameMixin, db.Model):
         return u'<Folder %s at %s>' % (self.name or '(root)', self.website.name)
 
 
+class Property(BaseMixin, db.Model):
+    __tablename__ = 'property'
+    node_id = db.Column(None, db.ForeignKey('node.id'), nullable=False)
+    name = db.Column(db.Unicode(40), nullable=False)
+    value = db.Column(db.Unicode(250), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint('name', 'node_id'),)
+
+
+class _NodeProperties(dict):
+    """
+    Requires self.node to point to a node.
+    """
+    def __init__(self, *args, **kwargs):
+        self.node = kwargs.pop('node')
+        self.update(*args, **kwargs)
+
+    def update(self, *args, **kwargs):
+        for k, v in dict(*args, **kwargs).iteritems():
+            self[k] = v
+
+    def __setitem__(self, key, value):
+        if isinstance(value, Property):
+            dict.__setitem__(self, key, value.value)
+        else:
+            value = unicode(value)  # Since Property.value = db.Unicode
+            dict.__setitem__(self, key, value)
+            if key in self.node.node_properties:
+                self.node.node_properties[key].value = value
+            else:
+                prop = Property(name=key, value=value)
+                self.node.node_properties[key] = prop
+
+
 class Node(BaseScopedNameMixin, db.Model):
     __tablename__ = 'node'
     #: Id of the node across sites (staging, production, etc) for import/export
@@ -125,6 +160,26 @@ class Node(BaseScopedNameMixin, db.Model):
     __table_args__ = (db.UniqueConstraint('name', 'folder_id'),)
     __mapper_args__ = {'polymorphic_on': type}
 
+    node_properties = db.relationship(Property,
+        cascade='all, delete-orphan',
+        collection_class=attribute_mapped_collection('name'),
+        backref='node')
+
+    @property
+    def properties(self):
+        if not hasattr(self, '_cached_properties'):
+            self._cached_properties = _NodeProperties(self.node_properties, node=self)
+        return self._cached_properties
+
+    @properties.setter
+    def properties(self, value):
+        if not isinstance(value, dict):
+            raise ValueError("Value is not a dictionary")
+        for key in list(self.node_properties.keys()):
+            if key not in value:
+                self.node_properties.pop(key)
+        self._cached_properties = _NodeProperties(value, node=self)
+
     def as_json(self):
         return {
             'uuid': self.uuid,
@@ -135,6 +190,7 @@ class Node(BaseScopedNameMixin, db.Model):
             'published_at': self.published_at.isoformat() + 'Z',
             'userid': self.user.userid,
             'type': self.type,
+            'properties': self.properties,
         }
 
     def import_from(self, data):
@@ -142,6 +198,7 @@ class Node(BaseScopedNameMixin, db.Model):
         self.name = data['name']
         self.title = data['title']
         self.published_at = parse_isoformat(data['published_at'])
+        self.properties = data['properties']
 
     def import_from_internal(self, data):
         # Only required for nodes that keep internal references to other nodes

@@ -36,10 +36,19 @@ def fragmenthelper(folder, fragment):
     return fragment
 
 
-def nodehelper(folder, node):
-    folder = Folder.query.filter_by(name=folder, website=g.website).first()
-    node = Node.query.filter_by(name=node, folder=folder).first()
-    return node
+def nodehelper(folder=None, node=None, path=None):
+    if path:
+        if "/" in path:
+            folder, node = path.split('/', 1)
+        else:
+            node = path
+    if folder is None:
+        folder = g.folder
+    else:
+        folder = Folder.query.filter_by(name=folder, website=g.website).first()
+    if node is None:
+        return None
+    return Node.query.filter_by(name=node, folder=folder).first()
 
 
 @eventapp.context_processor
@@ -54,6 +63,7 @@ def helpers():
             'getnode': nodehelper,
         }
     else:
+        # This is called when showing error pages.
         return {
             'website': None,
             '_theme': '',

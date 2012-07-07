@@ -40,7 +40,9 @@ def index():
     (Node, {'name': 'node', 'folder': 'folder'}, 'node')
     )
 def node(folder, node):
-    g.folder = folder  # For the context processor to pick up theme for this request
+    # For the context processor to pick up theme for this request
+    # and for the nodehelper to know the current folder
+    g.folder = folder
     if node_registry[node.type].view_handler is not None:
         # This node type is capable of rendering itself
         return node_registry[node.type].view_handler(eventapp, folder.website, folder, node).GET()

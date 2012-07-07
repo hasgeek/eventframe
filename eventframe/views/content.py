@@ -10,9 +10,6 @@ from eventframe.models import db, Website, Folder, Node, Page, Post, Fragment, R
 from eventframe.views.login import lastuser
 
 
-# TODO: make handlers request instances and handle complete request within here
-# instead of breaking up into three parts
-
 class AutoFormHandler(NodeHandler):
     title_new = u"New node"
     title_edit = u"Edit node"
@@ -49,6 +46,7 @@ class ContentHandler(AutoFormHandler):
             form = self.form_class(obj=self.node.last_revision())
             if request.method == 'GET':
                 form.name.data = self.node.name
+                form.properties.data = self.node.properties
             return form
         else:
             return self.form_class()
@@ -67,7 +65,10 @@ class ContentHandler(AutoFormHandler):
         self.node.name = self.form.name.data
         # Make a revision and apply changes to it
         revision = self.node.revise()
+        # FIXME: Not all form fields are in the revision object. Don't
+        # use populate_obj here
         self.form.populate_obj(revision)
+        self.node.properties = self.form.properties.data
         self.process_node()
         if not self.node.title:
             # New object. Copy title from first revision

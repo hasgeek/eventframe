@@ -1,9 +1,9 @@
-{% extends "frame.html" %}
+{% extends "eventframe.html" %}
 {% block titletags -%}
   <title>{% block title %}{{ website.title }}{% endblock %}</title>
   <meta name="DC.title" content="{{ website.title }}"/>
 {%- endblock %}
 
 {% block content -%}
-{{ page.content }}
+{{ node.content }}
 {%- endblock %}
