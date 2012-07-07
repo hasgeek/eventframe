@@ -116,7 +116,7 @@ class Property(BaseMixin, db.Model):
     __table_args__ = (db.UniqueConstraint('name', 'node_id'),)
 
 
-__marker = []
+_marker = []
 
 
 class _NodeProperties(dict):
@@ -135,8 +135,8 @@ class _NodeProperties(dict):
         dict.__delitem__(self, key)
         del self.node.node_properties[key]
 
-    def pop(self, key, default=__marker):
-        if default is __marker:
+    def pop(self, key, default=_marker):
+        if default is _marker:
             self.node.node_properties.pop(key, default)
             return dict.pop(self, key)
         else:
