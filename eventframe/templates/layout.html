@@ -1,0 +1,28 @@
+{% extends "baseframe.html" -%}
+
+{% block baseheadline -%}
+{%- endblock %}
+
+{% block basecontent -%}
+  <div class="row">
+    <div class="span2">
+      {% if g.website %}
+        <ul class="nav nav-pills nav-stacked">
+          {% for f in g.website.folders %}
+            <li {%- if f == g.folder %} class="active"{% endif %}><a href="{{ url_for('folder', website=g.website.name, folder=f.name) }}"><i class="icon-folder-{% if f == g.folder %}open{% else %}close{% endif %}"></i> /{{ f.name }}</a></li>
+          {% endfor %}
+          <li class="divider"></li>
+          <li><a href="{{ url_for('folder_new', website=g.website.name) }}"><i class="icon-plus"></i> Add folder...</a></li>
+        </ul>
+      {% endif %}
+    </div>
+    <div class="span10">
+      {% block headline -%}
+        <div class="page-header">
+          <h1>{{ self.title() }}</h1>
+        </div>
+      {%- endblock %}
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+{%- endblock %}

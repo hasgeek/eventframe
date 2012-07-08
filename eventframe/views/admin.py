@@ -38,6 +38,7 @@ def website_new():
 @lastuser.requires_permission('siteadmin')
 @load_model(Website, {'name': 'website'}, 'website')
 def website_edit(website):
+    g.website = website
     form = WebsiteForm(obj=website)
     themes = [(t.identifier, t.name) for t in get_themes_list()]
     form.theme.choices = themes
@@ -53,6 +54,7 @@ def website_edit(website):
 @lastuser.requires_permission('siteadmin')
 @load_model(Website, {'name': 'website'}, 'website')
 def website_delete(website):
+    g.website = website
     return render_delete_sqla(website, db, title=u"Confirm delete",
         message=u"Delete website '%s'? This will also permanently remove all "
             "pages associated with the website. There is no undo." % website.title,
@@ -64,6 +66,7 @@ def website_delete(website):
 @lastuser.requires_permission('siteadmin')
 @load_model(Website, {'name': 'website'}, 'website')
 def folder_new(website):
+    g.website = website
     form = FolderForm()
     themes = [('', 'Website Default')] + [(t.identifier, t.name) for t in get_themes_list()]
     form.theme.choices = themes
@@ -84,6 +87,8 @@ def folder_new(website):
     (Folder, {'name': 'folder', 'website': 'website'}, 'folder')
     )
 def folder_edit(website, folder):
+    g.website = website
+    g.folder = folder
     form = FolderForm(obj=folder)
     if request.method == 'GET':
         form.theme.data = folder._theme
@@ -104,6 +109,8 @@ def folder_edit(website, folder):
     (Folder, {'name': 'folder', 'website': 'website'}, 'folder')
     )
 def folder(website, folder):
+    g.website = website
+    g.folder = folder
     return render_template('folder.html', website=website, folder=folder,
         node_registry=node_registry, importform=ImportForm())
 
@@ -111,6 +118,7 @@ def folder(website, folder):
 @app.route('/<website>/', methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 def website(website):
+    g.website = website
     return folder(website=website, folder='')
 
 
@@ -121,6 +129,8 @@ def website(website):
     (Folder, {'name': 'folder', 'website': 'website'}, 'folder')
     )
 def folder_delete(website, folder):
+    g.website = website
+    g.folder = folder
     return render_delete_sqla(folder, db, title=u"Confirm delete",
         message=u"Delete folder '%s'? This will also permanently remove all "
             "pages in this folder. There is no undo." % folder.name,
@@ -156,6 +166,8 @@ def folder_export(website, folder):
     (Folder, {'name': 'folder', 'website': 'website'}, 'folder')
     )
 def folder_import(website, folder):
+    g.website = website
+    g.folder = folder
     import_count = 0
     create_count = 0
     form = ImportForm()

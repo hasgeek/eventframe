@@ -168,6 +168,8 @@ node_registry.register(FunnelLink, FunnelLinkHandler, render=True)
     kwargs=True
     )
 def node_new(website, folder, kwargs):
+    g.website = website
+    g.folder = folder
     type = kwargs['type']
     if type not in node_registry:
         abort(404)
@@ -196,6 +198,8 @@ def node_new(website, folder, kwargs):
     (Node, {'name': 'node', 'folder': 'folder'}, 'node')
     )
 def node_edit(website, folder, node):
+    g.website = website
+    g.folder = folder
     record = node_registry[node.type]
     handler_class = record.edit_handler
     if handler_class is None:
@@ -221,6 +225,8 @@ def node_edit(website, folder, node):
     (Node, {'name': 'node', 'folder': 'folder'}, 'node')
     )
 def node_delete(website, folder, node):
+    g.website = website
+    g.folder = folder
     return render_delete_sqla(node, db, title=u"Confirm delete",
         message=u"Delete '%s'? This is permanent. There is no undo." % node.title,
         success=u"You have deleted '%s'." % node.title,
@@ -239,6 +245,8 @@ def node_delete(website, folder, node):
     (Node, {'name': 'node', 'folder': 'folder'}, 'node')
     )
 def node_publish(website, folder, node):
+    g.website = website
+    g.folder = folder
     if not (hasattr(node, 'publish') and callable(node.publish)):
         abort(404)
     form = PublishForm(obj=node)
@@ -263,6 +271,8 @@ def node_publish(website, folder, node):
     (Node, {'name': 'node', 'folder': 'folder'}, 'node')
     )
 def node_unpublish(website, folder, node):
+    g.website = website
+    g.folder = folder
     if not (hasattr(node, 'unpublish') and callable(node.unpublish)):
         abort(404)
     form = PublishForm(obj=node)

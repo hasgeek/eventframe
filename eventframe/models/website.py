@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from urlparse import urljoin
 from flask import g, url_for
 from coaster import newid, parse_isoformat
 from eventframe.models import db, TimestampMixin, BaseMixin, BaseNameMixin, BaseScopedNameMixin
@@ -105,6 +106,12 @@ class Folder(BaseScopedNameMixin, db.Model):
 
     def __repr__(self):
         return u'<Folder %s at %s>' % (self.name or '(root)', self.website.name)
+
+    def view_url(self):
+        """
+        Returns a view URL based on the website's URL field.
+        """
+        return urljoin(self.website.url, self.name)
 
 
 class Property(BaseMixin, db.Model):

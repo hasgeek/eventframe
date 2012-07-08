@@ -31,8 +31,8 @@ class HostnamesField(wtf.Field):
         else:
             self.data = []
 
-    @classmethod
-    def _remove_duplicates(cls, seq):
+    @staticmethod
+    def _remove_duplicates(seq):
         """Remove duplicates and convert to lowercase"""
         d = {}
         for item in seq:
@@ -44,6 +44,12 @@ class HostnamesField(wtf.Field):
 
 class DictField(wtf.Field):
     widget = wtf.TextArea()
+    description = u'One per line, as {"key": "value"}'
+
+    def __init__(self, *args, **kwargs):
+        if not 'description' in kwargs:
+            kwargs['description'] = self.description
+        super(DictField, self).__init__(*args, **kwargs)
 
     def _value(self):
         if isinstance(self.data, dict):
