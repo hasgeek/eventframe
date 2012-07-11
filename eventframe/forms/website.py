@@ -13,7 +13,7 @@ def valid_name(form, field):
     field.data = make_name(field.data)
 
 
-class HostnamesField(wtf.Field):
+class HostnamesField(wtf.fields.Field):
     widget = wtf.TextInput()
 
     def __init__(self, label='', validators=None, **kwargs):
@@ -42,7 +42,7 @@ class HostnamesField(wtf.Field):
                 yield item
 
 
-class DictField(wtf.Field):
+class DictField(wtf.fields.Field):
     widget = wtf.TextArea()
     description = u'One per line, as {"key": "value"}'
 
@@ -102,7 +102,7 @@ class ContentForm(Form):
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name])
     description = wtf.TextAreaField(u"Summary", description=u"Summary of this page")
-    content = RichTextField(u"Page content")
+    content = RichTextField(u"Page content", linkify=False)
     template = wtf.TextField("Template", validators=[wtf.Required()], default='page.html',
         description=u"Template with which this page will be rendered.")
     properties = DictField("Properties")
@@ -134,7 +134,7 @@ class FragmentForm(Form):
     previous_id = wtf.HiddenField(u"Previous revision")
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
-    content = RichTextField(u"Page content")
+    content = RichTextField(u"Page content", linkify=False)
     properties = DictField("Properties")
 
     def validate_previous_id(self, field):
