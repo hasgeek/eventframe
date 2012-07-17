@@ -146,7 +146,7 @@ def path_handler(website, path):
             node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
     else:
         folder = Folder.query.filter_by(website=website, name=components[0]).first_or_404()
-        node = Node.query.filter_by(folder=folder, node=components[1]).first_or_404()
+        node = Node.query.filter_by(folder=folder, name=components[1]).first_or_404()
     if len(components) <= 2 and request.method == 'POST':
         # This is a POST request on the node. Does it take POST?
         if node_registry[node.type].view_handler is None:
