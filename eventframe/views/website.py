@@ -121,21 +121,23 @@ def folder_feed(folder):
 def path_handler(website, path):
     """Handles paths for nodes with internal items."""
     components = path.split('/')
+    if components[0] == u'':
+        # We had a / prefix. Discard it.
+        components.pop(0)
     if len(components) > 2 and components[-1] == u'':
         # We got a trailing slash and it's not a folder. Pop it.
         components.pop(-1)
-        return redirect(u'/'.join(components))
-    # The first part of components is always blank to indicate the leading /
-    components.pop(0)
+        return redirect(request.script_root + u'/'.join(components))
     # Now what do we have?
     # A: /
     # B: /folder/ or /node/
     # C: /folder/node
     if len(components) == 0:
+        # Render (root)/(index) [both named '']
         folder = Folder.query.filter_by(website=website, name=u'').first_or_404()
         node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
     elif len(components) == 1:
-        # Could be folder or node:
+        # Could be a folder or node:
         folder = Folder.query.filter_by(website=website, name=components[0]).first()
         if folder is not None:
             node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
