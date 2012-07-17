@@ -20,7 +20,6 @@
 
   <link rel="icon" href="/favicon.ico"/>
   <link rel="alternate" type="application/atom+xml"  title="{{ website.title }}" href="{{ url_for('feed') }}" />
-  <script src="{{ url_for('baseframe.static', filename='js/modernizr.min.js') }}"></script>
 
   {#-
   <!-- HTML5 shim, for IE6-8 support of HTML elements -->
@@ -41,6 +40,7 @@
   {%- else -%}
     <link href='//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
   {%- endif %}
+  <script src="{{ url_for('baseframe.static', filename='js/modernizr.min.js') }}"></script>
 
   {#-
   <!-- FIXME: This css/ie.css doesn't exist right now. -->
