@@ -41,6 +41,14 @@ class Website(BaseNameMixin, db.Model):
     def __repr__(self):
         return u'<Website %s "%s">' % (self.name, self.title)
 
+    def url_for(self, action='view'):
+        if action == 'view':  # View in event app
+            return url_for('index')
+        elif action == 'list':  # Folder listing in admin app
+            return url_for('website', website=self.name)
+        elif action == 'edit':  # Edit website settings
+            return url_for('website_edit', website=self.name)
+
 
 class Hostname(BaseMixin, db.Model):
     __tablename__ = 'hostname'
@@ -107,11 +115,20 @@ class Folder(BaseScopedNameMixin, db.Model):
     def __repr__(self):
         return u'<Folder %s at %s>' % (self.name or '(root)', self.website.name)
 
-    def view_url(self):
+    def url_for(self, action='view'):
         """
         Returns a view URL based on the website's URL field.
         """
-        return urljoin(self.website.url, self.name)
+        if action == 'view':
+            return urljoin(self.website.url, self.name)
+        elif action == 'list':
+            if self.name == u'':
+                return url_for('website', website=self.website.name)
+            else:
+                return url_for('folder', website=self.website.name, folder=self.name)
+        elif action == 'edit':
+            if self.name != u'':
+                return url_for('folder_edit', website=self.website.name, folder=self.name)
 
 
 class Property(BaseMixin, db.Model):
@@ -226,14 +243,25 @@ class Node(BaseScopedNameMixin, db.Model):
         # Only required for nodes that keep internal references to other nodes
         pass
 
-    def url(self):
+    def url_for(self, action='view'):
         """
         Return a URL to this node.
         """
-        if self.folder.name == u'':
-            return url_for('folder', folder=self.name)
-        else:
-            return url_for('node', folder=self.folder.name, node=self.name)
+        if action == 'view':
+            if self.folder.name == u'':
+                return url_for('folder', folder=self.name)
+            else:
+                return url_for('node', folder=self.folder.name, node=self.name)
+        elif action == 'edit':
+            return url_for('node_edit',
+                website=self.folder.website.name,
+                folder=self.folder.name,
+                node=self.name)
+        elif action == 'delete':
+            return url_for('node_delete',
+                website=self.folder.website.name,
+                folder=self.folder.name,
+                node=self.name)
 
 
 class NodeMixin(TimestampMixin):
