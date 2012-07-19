@@ -18,7 +18,10 @@
   <meta name="description" content="{% block description %}{% endblock %}">
   <meta name="author" href="/humans.txt">
 
+  {% block favicon %}
   <link rel="icon" href="/favicon.ico"/>
+  {% endblock %}
+
   <link rel="alternate" type="application/atom+xml"  title="{{ website.title }}" href="{{ url_for('feed') }}" />
 
   {#-
