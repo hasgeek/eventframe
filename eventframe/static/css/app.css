@@ -1,0 +1,80 @@
+header #page-header h1 {
+  margin-top: 0;
+}
+
+#folder-header .btn-toolbar {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+#folder-header .nav {
+  margin-bottom: 0;
+}
+
+.shadow-bottom {
+  -moz-box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
+}
+
+@media screen and (min-width: 768px) {
+  header, #folder-column, #folder-header {
+    background: white;
+    position: fixed;
+    z-index: 2;
+  }
+
+  header {
+    left: 0;
+    top: 0;
+    right: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    z-index: 3;
+  }
+
+  header + .container {
+    padding-top: 76px;
+  }
+
+  #folder-column, #folder-header, #edit-tabs {
+    padding-top: 11px;
+  }
+
+  #folder-column {
+    width: 104px;
+  }
+
+  #folder-listing-header {
+    padding-top: 44px;
+    position: fixed;
+    background: white;
+    z-index: 1;
+    width: 600px;
+  }
+  #folder-listing-header + .item {
+    margin-top: 43px;
+  }
+
+  #folder-listing {
+    padding-top: 88px;
+  }
+}
+@media screen and (min-width: 980px) {
+  #folder-column {
+    width: 140px;
+  }
+
+  #folder-listing-header {
+    width: 780px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  #folder-column {
+    width: 170px;
+  }
+
+  #folder-listing-header {
+    width: 970px;
+  }
+}

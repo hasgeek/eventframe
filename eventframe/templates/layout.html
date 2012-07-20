@@ -1,20 +1,36 @@
 {% extends "baseframe.html" -%}
 
+{% block headerbox -%}
+<header>
+  {{ networkbar(siteid='events', login=true) }}
+  <div id="page-header" class="container{% if not folder %} shadow-bottom{% endif %}">
+    <h1>
+      <a href="{{ url_for('index') }}">Eventframe</a>
+      {%- if g.website %} / <a href="{{ url_for('website', website=g.website.name) }}">{{ g.website.title }}</a>{% endif %}
+      {%- if g.folder and g.folder.name != '' %} / <a href="{{ url_for('folder', website=g.website.name, folder=g.folder.name) }}">{{ g.folder.title or g.folder.name }}</a>{% endif %}
+    </h1>
+  </div>
+</header>
+{%- endblock %}
+
 {% block baseheadline -%}
 {%- endblock %}
 
 {% block basecontent -%}
   <div class="row">
     <div class="span2">
-      {% if g.website %}
-        <ul class="nav nav-pills nav-stacked">
-          {% for f in g.website.folders %}
-            <li {%- if f == g.folder %} class="active"{% endif %}><a href="{{ url_for('folder', website=g.website.name, folder=f.name) }}"><i class="icon-folder-{% if f == g.folder %}open{% else %}close{% endif %}"></i> /{{ f.name }}</a></li>
-          {% endfor %}
-          <li class="divider"></li>
-          <li><a href="{{ url_for('folder_new', website=g.website.name) }}"><i class="icon-plus"></i> Add folder...</a></li>
-        </ul>
-      {% endif %}
+      <div id="folder-column">
+        {% if g.website %}
+          <ul class="nav nav-pills nav-stacked">
+            {% for f in g.website.folders %}
+              <li {%- if f == g.folder %} class="active"{% endif %}><a href="{{ url_for('folder', website=g.website.name, folder=f.name) }}"><i class="icon-folder-{% if f == g.folder %}open{% else %}close{% endif %}"></i> /{{ f.name }}</a></li>
+            {% endfor %}
+            <li class="divider"></li>
+            <li><a href="{{ url_for('folder_new', website=g.website.name) }}"><i class="icon-plus"></i> Add folder...</a></li>
+          </ul>
+        {% endif %}
+      </div>
+      &nbsp;
     </div>
     <div class="span10">
       {% block headline -%}

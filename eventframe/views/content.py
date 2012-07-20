@@ -2,12 +2,13 @@
 
 from flask import g, abort, flash, url_for, request, redirect
 from coaster.views import load_models
-from baseframe.forms import render_form, render_redirect, render_delete_sqla
+from baseframe.forms import render_redirect, render_delete_sqla
 from eventframe import app
 from eventframe.views import NodeHandler, node_registry
 from eventframe.forms import ContentForm, FragmentForm, RedirectForm, PublishForm, FunnelLinkForm
 from eventframe.models import db, Website, Folder, Node, Page, Post, Fragment, Redirect, FunnelLink
 from eventframe.views.login import lastuser
+from eventframe.views.shared import render_form
 
 
 class AutoFormHandler(NodeHandler):
@@ -26,6 +27,9 @@ class AutoFormHandler(NodeHandler):
             return self.process_form()
         return self.render_form()
 
+    def edit_tabs(self):
+        return []
+
     def make_form(self):
         raise NotImplementedError
 
@@ -34,11 +38,19 @@ class AutoFormHandler(NodeHandler):
 
     def render_form(self):
         return render_form(form=self.form, title=self.title_edit if self.node else self.title_new, submit=u"Save",
-            cancel_url=url_for('folder', website=self.website.name, folder=self.folder.name))
+            cancel_url=url_for('folder', website=self.website.name, folder=self.folder.name),
+            tabs=self.edit_tabs(), ajax=True)
 
 
 class ContentHandler(AutoFormHandler):
     form_class = ContentForm
+
+    def edit_tabs(self):
+        return [
+            {'title': u"Edit", 'url': self.node.url_for('edit'), 'active': True},
+            {'title': u"Publish", 'url': self.node.url_for('publish')},
+            {'title': u"Unpublish", 'url': self.node.url_for('unpublish')},
+            ]
 
     def make_form(self):
         # TODO: Add support for editing a specific revision

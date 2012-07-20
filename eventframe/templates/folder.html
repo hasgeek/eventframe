@@ -3,21 +3,39 @@
 {% block title %}{% if folder.name %}{{ folder.title or folder.name }} &mdash; {% endif %}{{ website.title }}{% endblock %}
 {% block headline %}{% endblock %}
 {% block content %}
-<div class="row">
+<div id="folder-header" class="row">
   <div class="span6">
-    <div class="page-header">
-      <h1>{{ self.title() }}</h1>
+    <div class="btn-toolbar">
+      <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-plus"></i> New <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          {% for ntype in node_registry.values() %}
+            <li><a href="{{ url_for('node_new', website=website.name, folder=folder.name, type=ntype.name) }}">{{ ntype.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="btn-group">
+        {% if folder.name == '' -%}
+          <a class="btn" href="{{ url_for('website_edit', website=website.name) }}"><i class="icon-pencil"></i> Settings</a>
+        {%- else -%}
+          <a class="btn" href="{{ url_for('folder_edit', website=website.name, folder=folder.name) }}"><i class="icon-pencil"></i> Edit folder</a>
+          <a class="btn" href="{{ url_for('folder_delete', website=website.name, folder=folder.name) }}" title="Delete"><i class="icon-trash"></i></a>
+        {%- endif %}
+        <a class="btn" href="{{ url_for('folder_export', website=website.name, folder=folder.name) }}" title="Export"><i class="icon-download-alt"></i></a>
+        <a class="btn" href="#import-modal" title="Import" data-toggle="modal"><i class="icon-upload-alt"></i></a>
+        <a class="btn" href="{{ folder.url_for('view') }}"target="_blank"><i class="icon-eye-open"></i> View</a>
+      </div>
     </div>
   </div>
   <div class="span4">
     <ul id="type-filter" class="nav nav-pills pull-right">
       <li class="active"><a data-type="" href="">All</a></li>
-      {% for ntype in node_registry.values()[:2] -%}
+      {%- for ntype in node_registry.values()[:2] %}
         <li><a data-type="{{ ntype.name }}" href="">{{ ntype.title }}</a></li>
       {%- endfor %}
       <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="">More <b class="caret"></b></a>
         <ul class="dropdown-menu dropdown-right">
-          {% for ntype in node_registry.values()[2:] -%}
+          {%- for ntype in node_registry.values()[2:] %}
             <li><a data-type="{{ ntype.name }}" href="">{{ ntype.title }}</a></li>
           {%- endfor %}
         </ul>
@@ -26,38 +44,16 @@
   </div>
 </div>
 
-<div class="btn-toolbar">
-  <div class="btn-group">
-    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-plus"></i> New <span class="caret"></span></a>
-    <ul class="dropdown-menu">
-      {% for ntype in node_registry.values() %}
-        <li><a href="{{ url_for('node_new', website=website.name, folder=folder.name, type=ntype.name) }}">{{ ntype.title }}</a></li>
-      {% endfor %}
-    </ul>
-  </div>
-  <div class="btn-group">
-    {% if folder.name == '' -%}
-      <a class="btn" href="{{ url_for('website_edit', website=website.name) }}"><i class="icon-pencil"></i> Settings</a>
-    {%- else -%}
-      <a class="btn" href="{{ url_for('folder_edit', website=website.name, folder=folder.name) }}"><i class="icon-pencil"></i> Edit folder</a>
-      <a class="btn" href="{{ url_for('folder_delete', website=website.name, folder=folder.name) }}"><i class="icon-trash"></i> Delete</a>
-    {%- endif %}
-      <a class="btn" href="{{ url_for('folder_export', website=website.name, folder=folder.name) }}"><i class="icon-download-alt"></i> Export</a>
-      <a class="btn" href="#import-modal" data-toggle="modal"><i class="icon-upload-alt"></i> Import</a>
-  </div>
-  <div class="btn-group">
-    <a class="btn" href="{{ folder.url_for('view') }}" target="_blank"><i class="icon-eye-open"></i> View</a>
-  </div>
-</div>
-
-<ul id="folder-listing" class="grid container-fluid">
-  <li class="row-fluid header">
+<ul id="folder-listing-header" class="grid container-fluid">
+  <li class="row-fluid header shadow-bottom">
     <div class="span2">Name</div>
     <div class="span4">Title</div>
     <div class="span2">User</div>
     <div class="span2">Type</div>
     <div class="span2">Published</div>
   </li>
+</ul>
+<ul id="folder-listing" class="grid container-fluid">
   {% for node in folder.nodes -%}
     {% with -%}
       <li class="row-fluid item" data-type="{{ node.type }}">

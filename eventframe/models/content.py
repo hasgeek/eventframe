@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from coaster import parse_isoformat
-from flask import Markup
+from flask import Markup, url_for
 import requests
 from requests.exceptions import ConnectionError
 from sqlalchemy.ext.declarative import declared_attr
@@ -200,6 +200,20 @@ class ContentMixin(NodeMixin):
         revision.description = data['description']
         revision.content = data['content']
         revision.template = data['template']
+
+    def url_for(self, action='view'):
+        if action == 'publish':
+            return url_for('node_publish',
+                website=self.folder.website.name,
+                folder=self.folder.name,
+                node=self.name)
+        elif action == 'unpublish':
+            return url_for('node_unpublish',
+                website=self.folder.website.name,
+                folder=self.folder.name,
+                node=self.name)
+        else:
+            return super(ContentMixin, self).url_for(action)
 
 
 class Page(ContentMixin, Node):
