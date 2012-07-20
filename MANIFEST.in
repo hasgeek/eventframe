@@ -1,0 +1,5 @@
+include README.md
+include requirements.txt
+recursive-include eventframe/templates *
+recursive-include eventframe/static *
+prune eventframe/static/.webassets-cache
