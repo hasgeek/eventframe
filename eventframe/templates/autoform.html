@@ -14,7 +14,7 @@
     {%- for tab in tabs %}
       <li {%- if tab['active'] %} class="active" {%- endif %}><a href="{{ tab['url'] }}">{{ tab['title'] }}</a></li>
     {%- else %}
-      <li class="active"><a href="#">Edit</a></li>
+      <li class="active"><a href="#">{% if form.edit_obj %}Edit{% else %}New{% endif %}</a></li>
     {%- endfor %}
   </ul>
   {{ renderform(form=form, formid=formid, submit=submit, message=message, cancel_url=cancel_url, multipart=multipart) }}
