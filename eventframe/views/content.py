@@ -46,11 +46,14 @@ class ContentHandler(AutoFormHandler):
     form_class = ContentForm
 
     def edit_tabs(self):
-        return [
-            {'title': u"Edit", 'url': self.node.url_for('edit'), 'active': True},
-            {'title': u"Publish", 'url': self.node.url_for('publish')},
-            {'title': u"Unpublish", 'url': self.node.url_for('unpublish')},
-            ]
+        if self.node:
+            return [
+                {'title': u"Edit", 'url': self.node.url_for('edit'), 'active': True},
+                {'title': u"Publish", 'url': self.node.url_for('publish')},
+                {'title': u"Unpublish", 'url': self.node.url_for('unpublish')},
+                ]
+        else:
+            return []
 
     def make_form(self):
         # TODO: Add support for editing a specific revision
