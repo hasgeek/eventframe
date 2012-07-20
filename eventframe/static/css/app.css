@@ -11,10 +11,10 @@ header #page-header h1 {
 }
 
 .shadow-bottom {
-  -moz-box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
-  -o-box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 3px 5px -2px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 3px 5px -2px rgba(0, 0, 0, 0.1);
+  -o-box-shadow: 0 3px 5px -2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 5px -2px rgba(0, 0, 0, 0.1);
 }
 
 @media screen and (min-width: 768px) {
