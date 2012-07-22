@@ -12,8 +12,8 @@ from eventframe.views.content import NodeHandler, ContentHandler
 class EventHandler(ContentHandler):
     form_class = EventForm
     model = Event
-    title_new = u"New participant list"
-    title_edit = u"Edit participant list"
+    title_new = u"New event"
+    title_edit = u"Edit event"
 
     actions = ['list']
 
