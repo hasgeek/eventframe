@@ -62,5 +62,5 @@ import eventframe.views.context
 import eventframe.views.content
 import eventframe.views.list
 import eventframe.views.map
-import eventframe.views.participantlist
+import eventframe.views.participant_list
 import eventframe.views.errorhandlers
