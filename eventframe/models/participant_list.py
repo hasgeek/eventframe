@@ -9,6 +9,7 @@ from eventframe.models.content import ContentMixin, Node
 __all__ = ['ParticipantList', 'Participant']
 
 
+# TODO: Implement import/export
 class ParticipantList(ContentMixin, Node):
     __tablename__ = 'participant_list'
 
@@ -22,6 +23,9 @@ class ParticipantList(ContentMixin, Node):
         Discard all participants.
         """
         self.participants = []
+
+    def has_user(self, user):
+        return Participant.query.filter_by(participant_list=self).filter_by(user=user).first() is not None
 
     def url_for(self, action='view'):
         if action in ['sync', 'list']:

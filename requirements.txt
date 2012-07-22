@@ -8,3 +8,4 @@ https://bitbucket.org/jace/flask-themes/get/tip.zip#egg=Flask-Themes
 requests
 simplejson
 pytz
+blinker

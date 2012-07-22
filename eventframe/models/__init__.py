@@ -10,4 +10,5 @@ from eventframe.models.website import *
 from eventframe.models.content import *
 from eventframe.models.list import *
 from eventframe.models.map import *
+from eventframe.models.event import *
 from eventframe.models.participant_list import *

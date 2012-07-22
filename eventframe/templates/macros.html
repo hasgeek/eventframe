@@ -1,5 +1,5 @@
 {% macro edit_tabs(tabs, website, folder, form=None) %}
-  <ul id="edit-tabs" class="nav nav-tabs">
+  <ul id="edit-tabs" class="nav nav-tabs no-print">
     <li>
       {%- if folder -%}
         <a href="{{ folder.url_for('list') }}">&larr; Folder</a>

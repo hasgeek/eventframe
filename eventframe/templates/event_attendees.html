@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% from "macros.html" import edit_tabs %}
+{% block title %}Event attendees{% endblock %}
+{% block headline %}{% endblock %}
+{% block content %}
+  {{ edit_tabs(tabs, g.website, g.folder) }}
+  <ul class="grid container-fluid">
+    <li class="row-fluid header">
+      <div class="span10">Name</div>
+      <div class="span2">Status</div>
+    </li>
+    {% for attendee in attendees -%}
+      <li class="row-fluid item">
+        <div class="span10">{{ attendee.user.fullname }}</div>
+        <div class="span2">{{ attendee.status }}</div>
+      </li>
+    {%- endfor %}
+  </ul>
+{% endblock %}

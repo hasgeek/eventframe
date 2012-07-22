@@ -68,8 +68,7 @@ def feedquery():
 
 
 def rootfeed(website, limit=20):
-    folder_ids = [i[0] for i in db.session.query(Folder.id).filter_by(website=website).all()]
-    query = feedquery().filter(Node.folder_id.in_(folder_ids))
+    query = feedquery().filter(Node.folder_id.in_(website.folder_ids()))
     if limit:
         query = query.limit(limit)
     return query.all()
@@ -143,7 +142,7 @@ def path_handler(website, path):
             node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
         else:
             folder = Folder.query.filter_by(website=website, name=u'').first_or_404()
-            node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
+            node = Node.query.filter_by(folder=folder, name=components[0]).first_or_404()
     else:
         folder = Folder.query.filter_by(website=website, name=components[0]).first_or_404()
         node = Node.query.filter_by(folder=folder, name=components[1]).first_or_404()
@@ -155,9 +154,11 @@ def path_handler(website, path):
             return node_registry[node.type].view_handler(eventapp, website, folder, node).POST()
     else:
         # Now we come to the core of it: find a node and see if has a url_map and view handler.
-        # Delegate if yes, raise a 404 if no.
+        # Delegate if yes, raise a 404 if no. We can only get here with named folders and nodes.
         if node_registry[node.type].view_url_map is None or node_registry[node.type].view_handler is None:
             abort(404)
         else:
             urls = node_registry[node.type].view_url_map.bind_to_environ(request)
-            return urls.dispatch(lambda e, v: getattr(node_registry[node.type].view_handler, e)(**v))
+            view_handler = node_registry[node.type].view_handler(eventapp, website, folder, node)
+            return urls.dispatch(lambda e, v: getattr(view_handler, e)(**v),
+                path_info='/'.join(components[2:]))

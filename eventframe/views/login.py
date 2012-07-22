@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from flask import g, request, Response, redirect, flash, abort
+from flask import g, request, Response, redirect, flash, abort, url_for
 from flask.ext.lastuser import LastUser
 from flask.ext.lastuser.sqlalchemy import UserManager
 from coaster.views import get_next_url
 
 from eventframe import app
+from eventframe.signals import signal_login, signal_logout
 from eventframe.models import db, User, LoginCode
 
 lastuser = LastUser(app)
@@ -29,20 +30,40 @@ def login_event():
 @app.route('/login')
 @lastuser.login_handler
 def login():
-    return {'scope': 'id'}
+    return {'scope': 'id email'}
+
+
+@app.route('/logout/event')
+def logout_event():
+    if 'code' in request.args:
+        code = LoginCode.query.filter_by(code=request.args['code']).first()
+        if code:
+            # Redirect to event website
+            return redirect(code.return_url + '?code=' + code.code, code=302)
+        else:
+            return url_for('index')
 
 
 @app.route('/logout')
 @lastuser.logout_handler
 def logout():
-    flash(u"You are now logged out", category='success')
-    return get_next_url()
+    code = None
+    if 'code' in request.args:
+        code = LoginCode.query.filter_by(code=request.args['code']).first()
+    if code:
+        next = url_for('logout_event', code=code.code)
+    else:
+        next = get_next_url()
+        flash(u"You are now logged out", category='success')
+    signal_logout.send(app, user=g.user)
+    return next
 
 
 @app.route('/login/redirect')
 @lastuser.auth_handler
 def lastuserauth():
     # Save the user object
+    signal_login.send(app, user=g.user)
     db.session.commit()
     return redirect(get_next_url())
 

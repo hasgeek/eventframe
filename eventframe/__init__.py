@@ -9,6 +9,7 @@ from flask.ext.themes import setup_themes
 from baseframe import baseframe, baseframe_js, baseframe_css
 from coaster.app import configure
 from eventframe.assets import ThemeAwareEnvironment, load_theme_assets
+import eventframe.signals
 
 
 # First, create a domain dispatcher that knows where to send each request

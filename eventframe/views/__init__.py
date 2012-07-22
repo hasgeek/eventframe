@@ -60,6 +60,7 @@ import eventframe.views.eventlogin
 import eventframe.views.admin
 import eventframe.views.context
 import eventframe.views.content
+import eventframe.views.event
 import eventframe.views.list
 import eventframe.views.map
 import eventframe.views.participant_list

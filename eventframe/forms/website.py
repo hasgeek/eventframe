@@ -3,10 +3,13 @@
 import simplejson as json
 from coaster import make_name
 import flask.ext.wtf as wtf
-from baseframe.forms import Form, RichTextField
+from baseframe.forms import Form, RichTextField, DateTimeField
+from pytz import common_timezones
 
 __all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportForm', 'RedirectForm',
-    'ConfirmForm', 'ListForm', 'FunnelLinkForm', 'MapForm', 'ParticipantListForm']
+    'ConfirmForm', 'ListForm', 'FunnelLinkForm', 'MapForm', 'ParticipantListForm', 'EventForm']
+
+timezone_list = [(tz, tz) for tz in common_timezones]
 
 
 def valid_name(form, field):
@@ -105,7 +108,7 @@ class ContentForm(Form):
     content = RichTextField(u"Page content", linkify=False)
     template = wtf.TextField("Template", validators=[wtf.Required()], default='page.html',
         description=u"Template with which this page will be rendered.")
-    properties = DictField("Properties")
+    properties = DictField(u"Properties")
 
     def validate_previous_id(self, field):
         if not field.data:
@@ -124,7 +127,7 @@ class ContentForm(Form):
 class FunnelLinkForm(ContentForm):
     funnel_name = wtf.TextField(u"Funnel name", validators=[wtf.Required()],
         description=u"URL name of the event in the HasGeek funnel")
-    properties = DictField("Properties")
+    properties = DictField(u"Properties")
 
 
 class FragmentForm(Form):
@@ -135,7 +138,7 @@ class FragmentForm(Form):
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
     content = RichTextField(u"Page content", linkify=False)
-    properties = DictField("Properties")
+    properties = DictField(u"Properties")
 
     def validate_previous_id(self, field):
         if not field.data:
@@ -144,7 +147,7 @@ class FragmentForm(Form):
             try:
                 field.data = int(field.data)
             except ValueError:
-                raise wtf.ValidationError("Unknown previous revision")
+                raise wtf.ValidationError(u"Unknown previous revision")
 
     def validate_name(self, field):
         # TODO
@@ -154,8 +157,8 @@ class FragmentForm(Form):
 class RedirectForm(Form):
     name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name])
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
-    redirect_url = wtf.TextField("Redirect URL", validators=[wtf.Required()])
-    properties = DictField("Properties")
+    redirect_url = wtf.TextField(u"Redirect URL", validators=[wtf.Required()])
+    properties = DictField(u"Properties")
 
     def validate_name(self, field):
         # TODO
@@ -178,7 +181,7 @@ class ListForm(Form):
     list = wtf.TextAreaField('Items', validators=[wtf.Required()],
         description=u'Enter each row as a JSON array with ["name", title", "url", "folder/node"]. '
             u'For nodes in the root folder, use "/node". To not include a node, use "".')
-    properties = DictField("Properties")
+    properties = DictField(u"Properties")
 
 
 class MapForm(Form):
@@ -188,13 +191,13 @@ class MapForm(Form):
         description=u'Enter each row as a JSON object with name, title, url, '
             u'latitude, longitude, zoomlevel and marker. '
             u'The URL, zoomlevel and marker can be null, others cannot.')
-    properties = DictField("Properties")
+    properties = DictField(u"Properties")
 
 
 class FileFolderForm(Form):
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
-    properties = DictField("Properties")
+    properties = DictField(u"Properties")
 
 
 class ParticipantListForm(ContentForm):
@@ -208,4 +211,19 @@ class ParticipantListForm(ContentForm):
     participant_template = wtf.TextField("Participant template",
         validators=[wtf.Required()], default='participant.html',
         description=u"Template with which a participant’s directory entry will be rendered.")
-    properties = DictField("Properties")
+    properties = DictField(u"Properties")
+
+
+class EventForm(ContentForm):
+    start_datetime = DateTimeField(u"Start date/time", validators=[wtf.Required()])
+    end_datetime = DateTimeField(u"End date/time", validators=[wtf.Required()])
+    timezone = wtf.SelectField(u"Timezone", choices=timezone_list, validators=[wtf.Required()])
+    location_name = wtf.TextField(u"Location name", validators=[wtf.Required()])
+    location_address = wtf.TextField(u"Address", validators=[wtf.Required()])
+    map = wtf.QuerySelectField(u"Map", get_label='title', allow_blank=True)
+    mapmarker = wtf.TextField(u"Map marker")
+    capacity = wtf.IntegerField(u"Capacity", validators=[wtf.Required()])
+    allow_waitlisting = wtf.BooleanField(u"Allow wait-listing if over capacity", default=False)
+    allow_maybe = wtf.BooleanField(u"Allow “Maybe” responses", default=True)
+    participant_list = wtf.QuerySelectField(u"Participant list", get_label='title', allow_blank=True)
+    properties = DictField(u"Properties")

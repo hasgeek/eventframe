@@ -41,6 +41,9 @@ class Website(BaseNameMixin, db.Model):
     def __repr__(self):
         return u'<Website %s "%s">' % (self.name, self.title)
 
+    def folder_ids(self):
+        return [i[0] for i in db.session.query(Folder.id).filter_by(website=self).all()]
+
     def url_for(self, action='view'):
         if action == 'view':  # View in event app
             return url_for('index')

@@ -3,13 +3,17 @@
 import requests
 from flask import request, Response, stream_with_context, url_for, render_template
 from coaster import parse_isoformat
+from eventframe import eventapp
 from eventframe.models import db, ParticipantList, Participant
 from eventframe.forms import ParticipantListForm, ConfirmForm
+from eventframe.signals import signal_login
 from eventframe.views import node_registry
+from eventframe.views.login import lastuser
 from eventframe.views.content import ContentHandler
 from eventframe.views.shared import render_form, stream_template
 
 
+# TODO: Implement view handler and url_map
 class ParticipantListHandler(ContentHandler):
     form_class = ParticipantListForm
     model = ParticipantList
@@ -130,6 +134,8 @@ class ParticipantListHandler(ContentHandler):
             for key, value in syncinfo.items():
                 if getattr(participant, key) != value:
                     setattr(participant, key, value)
+                    if 'key' == 'email':
+                        participant.user = None
                     edited = True
             if edited:
                 if participant.id is None:
@@ -146,4 +152,15 @@ class ParticipantListHandler(ContentHandler):
         db.session.commit()
         yield '\nAll done.'
 
-node_registry.register(ParticipantList, ParticipantListHandler, render=False)
+node_registry.register(ParticipantList, ParticipantListHandler, render=True)
+
+
+@signal_login.connect_via(eventapp)
+def login_watcher(sender, user, **kwargs):
+    emails = lastuser.user_emails(user)
+    # Find all Participant records that have a matching email address and link them to this user
+    participants = Participant.query.filter(Participant.email.in_(emails)).all()
+    # Link user to participants
+    for p in participants:
+        if p.user != user:
+            p.user = user
