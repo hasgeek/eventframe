@@ -5,7 +5,7 @@ from coaster.views import load_models
 from baseframe.forms import render_redirect, render_delete_sqla
 from eventframe import app
 from eventframe.views import NodeHandler, node_registry
-from eventframe.forms import ContentForm, FragmentForm, RedirectForm, PublishForm, FunnelLinkForm
+from eventframe.forms import ContentForm, FragmentForm, RedirectForm, ConfirmForm, FunnelLinkForm
 from eventframe.models import db, Website, Folder, Node, Page, Post, Fragment, Redirect, FunnelLink
 from eventframe.views.login import lastuser
 from eventframe.views.shared import render_form
@@ -17,12 +17,13 @@ class AutoFormHandler(NodeHandler):
 
     def __init__(self, app, website, folder, node):
         super(AutoFormHandler, self).__init__(app, website, folder, node)
-        self.form = self.make_form()
 
     def GET(self):
+        self.form = self.make_form()
         return self.render_form()
 
     def POST(self):
+        self.form = self.make_form()
         if self.form.validate_on_submit():
             return self.process_form()
         return self.render_form()
@@ -39,7 +40,7 @@ class AutoFormHandler(NodeHandler):
     def render_form(self):
         return render_form(form=self.form, title=self.title_edit if self.node else self.title_new, submit=u"Save",
             cancel_url=url_for('folder', website=self.website.name, folder=self.folder.name),
-            tabs=self.edit_tabs(), ajax=True)
+            tabs=self.edit_tabs(), node=self.node, ajax=True)
 
 
 class ContentHandler(AutoFormHandler):
@@ -48,9 +49,9 @@ class ContentHandler(AutoFormHandler):
     def edit_tabs(self):
         if self.node:
             return [
-                {'title': u"Edit", 'url': self.node.url_for('edit'), 'active': True},
-                {'title': u"Publish", 'url': self.node.url_for('publish')},
-                {'title': u"Unpublish", 'url': self.node.url_for('unpublish')},
+                {'title': u"Edit", 'url': self.node.url_for('edit'), 'active': self.action == 'edit'},
+                {'title': u"Publish", 'url': self.node.url_for('publish'), 'active': self.action == 'publish'},
+                {'title': u"Unpublish", 'url': self.node.url_for('unpublish'), 'active': self.action == 'unpublish'},
                 ]
         else:
             return []
@@ -229,6 +230,36 @@ def node_edit(website, folder, node):
         abort(405)
 
 
+@app.route('/<website>/<folder>/<node>/do/<action>', methods=['GET', 'POST'])
+@app.route('/<website>/_root/<node>/do/<action>', defaults={'folder': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/<folder>/_index/do/<action>', defaults={'node': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/_index/do/<action>', defaults={'folder': u'', 'node': u''}, methods=['GET', 'POST'])
+@lastuser.requires_permission('siteadmin')
+@load_models(
+    (Website, {'name': 'website'}, 'website'),
+    (Folder, {'name': 'folder', 'website': 'website'}, 'folder'),
+    (Node, {'name': 'node', 'folder': 'folder'}, 'node'),
+    kwargs=True,
+    )
+def node_action(website, folder, node, kwargs):
+    action = kwargs['action']
+    g.website = website
+    g.folder = folder
+    record = node_registry[node.type]
+    handler_class = record.edit_handler
+    if handler_class is None:
+        abort(404)
+    handler = handler_class(app, website, folder, node)
+    if action not in handler.actions:
+        abort(404)
+    if not hasattr(handler, action):
+        abort(404)
+    method = getattr(handler, action)
+    if not callable(method):
+        abort(404)
+    return method()
+
+
 @app.route('/<website>/<folder>/<node>/_delete', methods=['GET', 'POST'])
 @app.route('/<website>/_root/<node>/_delete', defaults={'folder': u''}, methods=['GET', 'POST'])
 @app.route('/<website>/<folder>/_index/_delete', defaults={'node': u''}, methods=['GET', 'POST'])
@@ -264,14 +295,15 @@ def node_publish(website, folder, node):
     g.folder = folder
     if not (hasattr(node, 'publish') and callable(node.publish)):
         abort(404)
-    form = PublishForm(obj=node)
+    form = ConfirmForm(obj=node)
     if form.validate_on_submit():
         node.publish()
         db.session.commit()
         flash(u"Published '%s'" % node.title, 'success')
         return render_redirect(url_for('folder', website=folder.website.name, folder=folder.name), code=303)
     return render_form(form=form, title="Publish node", submit=u"Publish",
-            cancel_url=url_for('folder', website=folder.website.name, folder=folder.name))
+        cancel_url=url_for('folder', website=folder.website.name, folder=folder.name),
+        node=node)
 
 
 # Temporary publish handler that needs to be rolled into the edit handler
@@ -290,11 +322,12 @@ def node_unpublish(website, folder, node):
     g.folder = folder
     if not (hasattr(node, 'unpublish') and callable(node.unpublish)):
         abort(404)
-    form = PublishForm(obj=node)
+    form = ConfirmForm(obj=node)
     if form.validate_on_submit():
         node.unpublish()
         db.session.commit()
         flash(u"Unpublished '%s'" % node.title, 'success')
         return render_redirect(url_for('folder', website=folder.website.name, folder=folder.name), code=303)
     return render_form(form=form, title="Unpublish node", submit=u"Unpublish",
-            cancel_url=url_for('folder', website=folder.website.name, folder=folder.name))
+        cancel_url=url_for('folder', website=folder.website.name, folder=folder.name),
+        node=node)

@@ -12,12 +12,14 @@ except ImportError:
 class NodeHandler(object):
     form = None
     model = None
+    actions = []
 
     def __init__(self, app, website, folder, node):
         self.app = app
         self.website = website
         self.folder = folder
         self.node = node
+        self.action = 'edit'
 
     # Called if the node is directly called
     def GET(self, *args, **kwargs):
@@ -60,4 +62,5 @@ import eventframe.views.context
 import eventframe.views.content
 import eventframe.views.list
 import eventframe.views.map
+import eventframe.views.participantlist
 import eventframe.views.errorhandlers

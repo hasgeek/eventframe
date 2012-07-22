@@ -1,0 +1,16 @@
+{% macro edit_tabs(tabs, website, folder, form=None) %}
+  <ul id="edit-tabs" class="nav nav-tabs">
+    <li>
+      {%- if folder -%}
+        <a href="{{ folder.url_for('list') }}">&larr; Folder</a>
+      {%- else -%}
+        <a href="{{ website.url_for('list') }}">&larr; Website</a>
+      {%- endif -%}
+    </li>
+    {%- for tab in tabs %}
+      <li {%- if tab['active'] %} class="active" {%- endif %}><a href="{{ tab['url'] }}">{{ tab['title'] }}</a></li>
+    {%- else %}
+      <li class="active"><a href="#">{% if form.edit_obj %}Edit{% else %}New{% endif %}</a></li>
+    {%- endfor %}
+  </ul>
+{% endmacro %}

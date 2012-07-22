@@ -6,7 +6,7 @@ import flask.ext.wtf as wtf
 from baseframe.forms import Form, RichTextField
 
 __all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportForm', 'RedirectForm',
-    'PublishForm', 'ListForm', 'FunnelLinkForm', 'MapForm']
+    'ConfirmForm', 'ListForm', 'FunnelLinkForm', 'MapForm', 'ParticipantListForm']
 
 
 def valid_name(form, field):
@@ -168,7 +168,7 @@ class ImportForm(Form):
         description=u"Nodes that are newer locally will not be imported")
 
 
-class PublishForm(Form):
+class ConfirmForm(Form):
     pass  # Only needed for CSRF confirmation
 
 
@@ -194,4 +194,18 @@ class MapForm(Form):
 class FileFolderForm(Form):
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
+    properties = DictField("Properties")
+
+
+class ParticipantListForm(ContentForm):
+    source = wtf.SelectField(u"Data Source", choices=[
+        ('', ''), ('doattend', 'DoAttend')],
+        description=u"Source from which the participant list will be retrieved.")
+    sourceid = wtf.TextField(u"Event id",
+        description=u"Id of this event at the selected data source.")
+    api_key = wtf.TextField(u"API Key",
+        description=u"API key to retrieve data from the selected data source.")
+    participant_template = wtf.TextField("Participant template",
+        validators=[wtf.Required()], default='participant.html',
+        description=u"Template with which a participant’s directory entry will be rendered.")
     properties = DictField("Properties")

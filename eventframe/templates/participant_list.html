@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% from "macros.html" import edit_tabs %}
+{% block headline %}{% endblock %}
+{% block content %}
+  {{ edit_tabs(tabs, g.website, g.folder) }}
+  <ul class="grid container-fluid">
+    <li class="row-fluid header">
+      <div class="span2">Ticket</div>
+      <div class="span4">Name</div>
+      <div class="span4">Company</div>
+      <div class="span1">Listed</div>
+      <div class="span1">Linked</div>
+    </li>
+    {% for participant in participants -%}
+      <li class="row-fluid item">
+        <div class="span2">{{ participant.ticket }}</div>
+        <div class="span4">{{ participant.fullname }}</div>
+        <div class="span4">{{ participant.company }}</div>
+        <div class="span1">{{ participant.is_listed }}</div>
+        <div class="span1">{{ participant.user }}</div>
+      </li>
+    {%- endfor %}
+  </ul>
+{% endblock %}

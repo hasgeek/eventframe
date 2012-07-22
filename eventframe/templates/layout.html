@@ -5,9 +5,10 @@
   {{ networkbar(siteid='events', login=true) }}
   <div id="page-header" class="container{% if not folder %} shadow-bottom{% endif %}">
     <h1>
-      <a href="{{ url_for('index') }}"><i class="icon-home"></i></a>
+      <a href="{{ url_for('index') }}" title="Home"><i class="icon-home"></i></a>
       {%- if g.website %} &mdash; <a href="{{ url_for('website', website=g.website.name) }}">{{ g.website.title }}</a>{% endif %}
       {%- if g.folder and g.folder.name != '' %} &mdash; <a href="{{ url_for('folder', website=g.website.name, folder=g.folder.name) }}">{{ g.folder.title or g.folder.name }}</a>{% endif %}
+      {%- if node %} &mdash; {{ node.title }}{% endif %}
     </h1>
   </div>
 </header>

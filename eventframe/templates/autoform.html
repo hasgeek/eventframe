@@ -1,22 +1,10 @@
 {% extends "layout.html" %}
 {% from "baseframe/forms.html" import renderform, ajaxform, richtext_editor %}
+{% from "macros.html" import edit_tabs %}
 
 {% block headline %}{% endblock %}
 {% block content %}
-  <ul id="edit-tabs" class="nav nav-tabs">
-    <li>
-      {%- if g.folder -%}
-        <a href="{{ g.folder.url_for('list') }}">&larr; Folder</a>
-      {%- else -%}
-        <a href="{{ g.website.url_for('list') }}">&larr; Website</a>
-      {%- endif -%}
-    </li>
-    {%- for tab in tabs %}
-      <li {%- if tab['active'] %} class="active" {%- endif %}><a href="{{ tab['url'] }}">{{ tab['title'] }}</a></li>
-    {%- else %}
-      <li class="active"><a href="#">{% if form.edit_obj %}Edit{% else %}New{% endif %}</a></li>
-    {%- endfor %}
-  </ul>
+  {{ edit_tabs(tabs, g.website, g.folder, form) }}
   {{ renderform(form=form, formid=formid, submit=submit, message=message, cancel_url=cancel_url, multipart=multipart) }}
 {% endblock %}
 

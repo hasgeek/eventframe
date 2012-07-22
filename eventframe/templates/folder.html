@@ -55,19 +55,17 @@
 </ul>
 <ul id="folder-listing" class="grid container-fluid">
   {% for node in folder.nodes -%}
-    {% with -%}
-      <li class="row-fluid item" data-type="{{ node.type }}">
-        <div class="span2"><a href="{{
-            url_for('node_edit', website=website.name, folder=folder.name, node=node.name)
-            }}" title="{{ node.name or '(index)' }}">{{ node.name or '(index)' }}</a></div>
-        <div class="span4"><a href="{{
-            url_for('node_edit', website=website.name, folder=folder.name, node=node.name)
-            }}" title="{{ node.title }}">{{ node.title }}</a></div>
-        <div class="span2">{{ node.user.fullname }}</div>
-        <div class="span2">{{ node.__title__ }}</div>
-        <div class="span2">{{ node.published_at|longdate }}</div>
-      </li>
-    {%- endwith %}
+    <li class="row-fluid item" data-type="{{ node.type }}">
+      <div class="span2"><a href="{{
+          url_for('node_edit', website=website.name, folder=folder.name, node=node.name)
+          }}" title="{{ node.name or '(index)' }}">{{ node.name or '(index)' }}</a></div>
+      <div class="span4"><a href="{{
+          url_for('node_edit', website=website.name, folder=folder.name, node=node.name)
+          }}" title="{{ node.title }}">{{ node.title }}</a></div>
+      <div class="span2">{{ node.user.fullname }}</div>
+      <div class="span2">{{ node.__title__ }}</div>
+      <div class="span2">{{ node.published_at|longdate }}</div>
+    </li>
   {%- endfor %}
 </ul>
 
