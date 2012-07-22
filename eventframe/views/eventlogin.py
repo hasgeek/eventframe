@@ -18,7 +18,7 @@ def login():
         scheme = 'https://'
     else:
         scheme = 'http://'
-    return redirect(urljoin(scheme + app.config['ADMIN_HOSTS'][0], '/login/event?code=' + code.code))
+    return redirect(urljoin(scheme + app.config['LOGIN_HOST'], '/login/event?code=' + code.code))
 
 
 @eventapp.route('/login/redirect')

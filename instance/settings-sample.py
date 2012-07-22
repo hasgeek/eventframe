@@ -5,6 +5,8 @@ SITE_TITLE = 'HasGeek Eventframe'
 SITE_ID = 'events'
 #: Admin domains. The first is considered primary
 ADMIN_HOSTS = ['eventframe.hasgeek.com', 'efdev.hasgeek.in']
+#: Login host for event apps. This is the admin host and optional port number
+LOGIN_HOST = 'eventframe.hasgeek.com:443'
 #: Using SSL?
 USE_SSL = True
 #: Database backend

@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% from "macros.html" import edit_tabs %}
+{% block title %}List of participants{% endblock %}
 {% block headline %}{% endblock %}
 {% block content %}
   {{ edit_tabs(tabs, g.website, g.folder) }}
