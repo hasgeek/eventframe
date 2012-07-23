@@ -6,12 +6,14 @@
   {{ edit_tabs(tabs, g.website, g.folder) }}
   <ul class="grid container-fluid">
     <li class="row-fluid header">
-      <div class="span10">Name</div>
+      <div class="span1">#</div>
+      <div class="span9">Name</div>
       <div class="span2">Status</div>
     </li>
     {% for attendee in attendees -%}
       <li class="row-fluid item">
-        <div class="span10">{{ attendee.user.fullname }}</div>
+        <div class="span1">{{ loop.index }}</div>
+        <div class="span9">{{ attendee.user.fullname }}</div>
         <div class="span2">{{ attendee.status }}</div>
       </li>
     {%- endfor %}
