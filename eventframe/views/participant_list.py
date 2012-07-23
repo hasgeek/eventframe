@@ -129,7 +129,7 @@ class ParticipantListHandler(ContentHandler):
                 elif key == 'City':
                     syncinfo['city'] = value.strip() if isinstance(value, basestring) else value
                 elif key == 'T-shirt size':
-                    syncinfo['tshirt_size'] = value.strip() if isinstance(value, basestring) else value
+                    syncinfo['tshirt_size'] = value.split('-', 1)[0].strip() if isinstance(value, basestring) else value
             edited = False
             for key, value in syncinfo.items():
                 if getattr(participant, key) != value:
