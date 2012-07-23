@@ -80,9 +80,9 @@ class Event(ContentMixin, Node):
         attendee = EventAttendee.query.filter_by(event=self, user=user).first()
         if not attendee:
             attendee = EventAttendee(event=self, user=user)
-        if not self.has_capacity():
+        if status == u'Y' and not self.has_capacity():
             if self.allow_waitlisting:
-                attendee.status = 'W'
+                status = u'W'
             else:
                 raise ValueError("This event is over capacity")
         db.session.add(attendee)
