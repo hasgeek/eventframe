@@ -43,6 +43,9 @@ def login_return():
 def logout():
     code = LoginCode(next_url=get_next_url(external=False, referrer=True),
         return_url=url_for('logout_return', _external=True))
+    session.pop('userid', None)
+    signal_logout.send(eventapp, user=g.user)
+    g.user = None
     db.session.add(code)
     db.session.commit()
     if app.config.get('USE_SSL'):
@@ -59,9 +62,6 @@ def logout_return():
         if code:
             db.session.delete(code)
             db.session.commit()
-    session.pop('userid', None)
-    signal_logout.send(eventapp, user=g.user)
-    g.user = None
     return redirect(get_next_url(external=False, referrer=True))
 
 
