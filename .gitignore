@@ -19,3 +19,5 @@ instance/development.py
 baseframe-packed.css
 baseframe-packed.js
 error.log
+packed.js
+packed.css

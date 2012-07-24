@@ -6,7 +6,7 @@ from threading import Lock
 from flask import Flask
 from flask.ext.assets import Environment, Bundle
 from flask.ext.themes import setup_themes
-from baseframe import baseframe, baseframe_js, baseframe_css
+from baseframe import baseframe, baseframe_js, baseframe_css, toastr_js, toastr_css
 from coaster.app import configure
 from eventframe.assets import ThemeAwareEnvironment, load_theme_assets
 import eventframe.signals
@@ -60,9 +60,12 @@ eventapp.register_blueprint(baseframe)
 assets = Environment(app)
 eventassets = ThemeAwareEnvironment(eventapp)
 
-js = Bundle(baseframe_js)
-css = Bundle(baseframe_css,
-             'css/app.css')
+js = Bundle(baseframe_js, toastr_js,
+    filters='jsmin', output='js/packed.js')
+
+css = Bundle(baseframe_css, toastr_css, 'css/app.css',
+    filters='cssmin', output='css/packed.css')
+
 assets.register('js_all', js)
 assets.register('css_all', css)
 eventassets.register('js_baseframe', baseframe_js)
