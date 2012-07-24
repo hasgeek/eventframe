@@ -159,8 +159,9 @@ node_registry.register(ParticipantList, ParticipantListHandler, render=True)
 def login_watcher(sender, user, **kwargs):
     emails = lastuser.user_emails(user)
     # Find all Participant records that have a matching email address and link them to this user
-    participants = Participant.query.filter(Participant.email.in_(emails)).all()
-    # Link user to participants
-    for p in participants:
-        if p.user != user:
-            p.user = user
+    if emails:
+        participants = Participant.query.filter(Participant.email.in_(emails)).all()
+        # Link user to participants
+        for p in participants:
+            if p.user != user:
+                p.user = user
