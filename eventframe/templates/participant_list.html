@@ -6,21 +6,32 @@
   {{ edit_tabs(tabs, g.website, g.folder) }}
   <ul class="grid container-fluid">
     <li class="row-fluid header">
+      <div class="span1">#</div>
       <div class="span2">Ticket</div>
       <div class="span3">Name</div>
       <div class="span3">Company</div>
       <div class="span2">Ticket Type</div>
-      <div class="span1">Listed</div>
-      <div class="span1">Linked</div>
+      <div class="span1"><i class="icon-list-ul"></i> <i class="icon-user"></i></div>
     </li>
     {% for participant in participants -%}
       <li class="row-fluid item">
+        <div class="span1">{{ loop.index }}</div>
         <div class="span2">{{ participant.ticket }}</div>
         <div class="span3">{{ participant.fullname }}</div>
         <div class="span3">{{ participant.company }}</div>
         <div class="span2">{{ participant.ticket_type }}</div>
-        <div class="span1">{{ participant.is_listed }}</div>
-        <div class="span1">{{ participant.user and 'Yes' or 'No' }}</div>
+        <div class="span1">
+          {%- if participant.is_listed -%}
+            <i class="icon-list-ul"></i>
+          {%- else -%}
+            <i class="icon-blank"></i>
+          {%- endif %} {% if participant.user -%}
+            <i class="icon-user"></i>
+          {%- else -%}
+            <i class="icon-blank"></i>
+          {%- endif -%}
+        </div>
+        
       </li>
     {%- endfor %}
   </ul>
