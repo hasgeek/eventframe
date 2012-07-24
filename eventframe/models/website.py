@@ -73,6 +73,8 @@ class LoginCode(BaseMixin, db.Model):
     __tablename__ = 'logincode'
     #: Tracking code to enable users to login to an event website
     code = db.Column(db.Unicode(22), nullable=False, unique=True)
+    #: Access scope requested
+    scope = db.Column(db.Unicode(250), nullable=False, default=u'')
     #: User who logged in
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, default=None)
     user = db.relationship(User)

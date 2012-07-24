@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import urlparse
+
 from flask import g, request, Response, redirect, flash, abort, url_for
 from flask.ext.lastuser import LastUser
 from flask.ext.lastuser.sqlalchemy import UserManager
-from coaster.views import get_next_url
+from coaster.views import get_next_url, get_current_url
 
 from eventframe import app
 from eventframe.signals import signal_login, signal_logout
@@ -14,23 +16,41 @@ lastuser.init_usermanager(UserManager(db, User))
 
 
 @app.route('/login/event')
-@lastuser.requires_login
 def login_event():
     if 'code' in request.args:
         code = LoginCode.query.filter_by(code=request.args['code']).first()
         if code and not code.user:
+            if not g.user:
+                return login(scope=code.scope, next=get_current_url())
+            # Check for scope expansion
+            has_scope = set(g.user.lastuser_token_scope.split(' '))
+            need_scope = set(code.scope.split(' '))
+            if '' in need_scope:
+                need_scope.remove('')
+            if need_scope - has_scope != set([]):
+                # Need additional scope. Send user to Lastuser for access rights
+                return login(scope=code.scope, next=get_current_url())
             code.user = g.user
             db.session.commit()
             # Redirect to event website
-            return redirect(code.return_url + '?code=' + code.code, code=302)
-        else:
-            abort(403)
+            if urlparse.urlsplit(code.return_url).query:
+                return redirect(code.return_url + '&code=' + code.code, code=302)
+            else:
+                return redirect(code.return_url + '?code=' + code.code, code=302)
+        elif code:
+            db.session.delete(code)
+            db.session.commit()
+    abort(403)
 
 
 @app.route('/login')
 @lastuser.login_handler
-def login():
-    return {'scope': 'id email'}
+def login(scope=None, next=None):
+    basescope = 'id email'
+    if scope:
+        basescope = ' '.join(set(basescope.split(' ')) | set(scope.split(' ')))
+
+    return {'scope': basescope, 'next': next}
 
 
 @app.route('/logout/event')
@@ -39,7 +59,10 @@ def logout_event():
         code = LoginCode.query.filter_by(code=request.args['code']).first()
         if code:
             # Redirect to event website
-            return redirect(code.return_url + '?code=' + code.code, code=302)
+            if urlparse.urlsplit(code.return_url).query:
+                return redirect(code.return_url + '&code=' + code.code, code=302)
+            else:
+                return redirect(code.return_url + '?code=' + code.code, code=302)
         else:
             return url_for('index')
 
