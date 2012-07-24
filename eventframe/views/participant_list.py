@@ -64,6 +64,7 @@ class ParticipantListHandler(ContentHandler):
             return Response(stream_template('stream.html',
                 stream=stream_with_context(self._sync()),
                 tabs=self.edit_tabs(),
+                node=self.node,
                 title="Syncing participants..."))
 
         return render_form(form=self.form, title="Sync participant list", submit=u"Sync", tabs=self.edit_tabs(),
