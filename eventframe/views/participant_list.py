@@ -148,7 +148,7 @@ class ParticipantListHandler(ContentHandler):
         for ticket in removed_tickets:
             participant = by_ticket.get(ticket)
             if participant:
-                yield "Removed participant (%s): %s\n" % (ticket, participant.fullname)
+                yield "Removed participant (#%s): %s\n" % (ticket, participant.fullname)
                 db.session.delete(participant)
         db.session.commit()
         yield '\nAll done.'

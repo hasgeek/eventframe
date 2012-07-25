@@ -7,13 +7,15 @@
   <ul class="grid container-fluid">
     <li class="row-fluid header">
       <div class="span1">#</div>
-      <div class="span9">Name</div>
+      <div class="span5">Name</div>
+      <div class="span4">Email</div>
       <div class="span2">Status</div>
     </li>
     {% for attendee in attendees -%}
       <li class="row-fluid item">
         <div class="span1">{{ loop.index }}</div>
-        <div class="span9">{{ attendee.user.fullname }}</div>
+        <div class="span5">{{ attendee.user.fullname }}</div>
+        <div class="span4">{{ attendee.user.email }}</div>
         <div class="span2">{{ attendee.status }}</div>
       </li>
     {%- endfor %}
