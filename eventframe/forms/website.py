@@ -11,6 +11,13 @@ __all__ = ['WebsiteForm', 'FolderForm', 'ContentForm', 'FragmentForm', 'ImportFo
 
 timezone_list = [(tz, tz) for tz in common_timezones]
 
+richtext_buttons1 = "bold,italic,|,sup,sub,|,bullist,numlist,|,link,unlink,|,blockquote,image,|,removeformat,code"
+richtext_valid_elements = "p,br,strong/b,em/i,sup,sub,h3,h4,h5,h6,ul,ol,li,a[!href|title|target],blockquote,code,img[!src|alt|class|width|height|align]"
+richtext_sanitize_tags = ['p', 'br', 'strong', 'em', 'sup', 'sub', 'h3', 'h4', 'h5', 'h6',
+                'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'img']
+richtext_sanitize_attributes = {'a': ['href', 'title', 'target'],
+                                'img': ['src', 'alt', 'class', 'width', 'height', 'align']}
+
 
 def valid_name(form, field):
     field.data = make_name(field.data)
@@ -105,7 +112,11 @@ class ContentForm(Form):
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name])
     description = wtf.TextAreaField(u"Summary", description=u"Summary of this page")
-    content = RichTextField(u"Page content", linkify=False)
+    content = RichTextField(u"Page content", linkify=False,
+        buttons1=richtext_buttons1,
+        valid_elements=richtext_valid_elements,
+        sanitize_tags=richtext_sanitize_tags,
+        sanitize_attributes=richtext_sanitize_attributes)
     template = wtf.TextField("Template", validators=[wtf.Required()], default='page.html',
         description=u"Template with which this page will be rendered.")
     properties = DictField(u"Properties")
@@ -137,7 +148,11 @@ class FragmentForm(Form):
     previous_id = wtf.HiddenField(u"Previous revision")
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
-    content = RichTextField(u"Page content", linkify=False)
+    content = RichTextField(u"Page content", linkify=False,
+        buttons1=richtext_buttons1,
+        valid_elements=richtext_valid_elements,
+        sanitize_tags=richtext_sanitize_tags,
+        sanitize_attributes=richtext_sanitize_attributes)
     properties = DictField(u"Properties")
 
     def validate_previous_id(self, field):
