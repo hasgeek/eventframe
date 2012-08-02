@@ -3,8 +3,10 @@
     <li>
       {%- if folder -%}
         <a href="{{ folder.url_for('list') }}">&larr; Folder</a>
-      {%- else -%}
+      {%- elif website -%}
         <a href="{{ website.url_for('list') }}">&larr; Website</a>
+      {%- else -%}
+        <a href="{{ url_for('index') }}">&larr; Back</a>
       {%- endif -%}
     </li>
     {%- for tab in tabs %}

@@ -28,6 +28,7 @@
               {%- for website in websites %}
                 <li><a href="{{ website.url_for('list') }}">{{ website.title }}</a></li>
               {%- endfor %}
+              <li><a href="{{ url_for('website_new') }}">New website...</a></li>
             {%- else %}
               {%- for website in websites %}
                 <li><a href="{{ website.url }}">{{ website.title }}</a></li>
