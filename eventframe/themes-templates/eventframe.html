@@ -64,10 +64,13 @@
     <!-- headerbox -->
     {% block headerbox -%}
     <header>
-      {{ networkbar(siteid='events', login=config['LASTUSER_CLIENT_ID'] and true or false) }}
+      {% block networkbar %}{{ networkbar(siteid='events', login=config['LASTUSER_CLIENT_ID'] and true or false) }}{% endblock %}
       <div id="page-header" class="container">
-        <div id="logo"><a href="{{ url_for('index') }}" title="Home">{{ website.title }}</a></div>
+        {% block logo -%}
+          <div id="logo"><a href="{{ url_for('index') }}" title="Home">{{ website.title }}</a></div>
+        {%- endblock %}
       </div>
+      {% block header %}{% endblock %}
     </header>
     {%- endblock %}
     <!-- /headerbox -->
