@@ -182,9 +182,9 @@
       if (count == 1) {
         var nodeid = checked.attr('value'),
             title = $('[data-nodeid="' + nodeid + '"]').find('.node-title').html();
-        modal.find(".modal-body").html('<p>Really delete “' + title + '”?');
+        modal.find(".modal-body").html('<p>Really delete “' + title + '”? There is no undo.</p>');
       } else {
-        modal.find(".modal-body").html('<p>Really delete ' + count + ' items?</p>');
+        modal.find(".modal-body").html('<p>Really delete ' + count + ' items? There is no undo.</p>');
       }
       modal.modal();
       e.preventDefault();
