@@ -4,9 +4,9 @@
 Admin views
 """
 
-from coaster import parse_isoformat
+from coaster import parse_isoformat, newid, make_name
 from coaster.views import load_model, load_models
-from flask import g, flash, url_for, render_template, request, Response
+from flask import g, flash, url_for, render_template, request, Response, session
 import simplejson as json
 from flask.ext.themes import get_themes_list
 from baseframe.forms import render_redirect, render_delete_sqla
@@ -103,6 +103,33 @@ def folder_edit(website, folder):
         cancel_url=url_for('folder', website=website.name, folder=folder.name), ajax=True)
 
 
+def clipboard_paste(folder, nodeids, action):
+    nodes = Node.query.filter(Node.uuid.in_(nodeids)).all()
+    returnids = []
+    nameconflicts = dict(db.session.query(Node.name, Node.id).filter_by(folder=folder).all())
+    print "Nodes", nodes, [node.uuid for node in nodes]
+    print "Name conflicts", nameconflicts
+    for node in nodes:
+        if action == 'cut':
+            # Move the node
+            node.folder = folder
+        elif action == 'copy':
+            # Copy and paste data
+            data = node.as_json()
+            newnode = node.__class__(folder=folder)
+            newnode.user = g.user
+            newnode.import_from(data)
+            newnode.import_from_internal(data)
+            newnode.uuid = newid()  # import_from will copy the UUID. Regenerate it.
+            node = newnode  # For the namecheck below
+        # If the name conflicts, give it a new name. maxlength=250 from coaster.sqlalchemy
+        returnids.append(node.uuid)
+        if node.name in nameconflicts:
+            if node.id != nameconflicts[node.name]:
+                node.name = make_name(node.name, maxlength=250, checkused=lambda n: n in nameconflicts)
+    return returnids
+
+
 @app.route('/<website>/<folder>', methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 @load_models(
@@ -112,8 +139,46 @@ def folder_edit(website, folder):
 def folder(website, folder):
     g.website = website
     g.folder = folder
+    highlight = set()
+    cutlist = set()
+    if request.method == 'POST' and 'action' in request.form:
+        action = request.form['action']
+        if action in ['cut', 'copy']:
+            session['clipboard'] = request.form.getlist('nodeid')
+            session['clipboard_type'] = action
+            if action == 'cut':
+                cutlist.update(request.form.getlist('nodeid'))
+        elif action == 'paste':
+            if 'clipboard' in session:
+                clip_action = session.get('clipboard_type')
+                if clip_action == 'cut':
+                    highlight.update(clipboard_paste(folder, session['clipboard'], clip_action))
+                    db.session.commit()
+                elif clip_action == 'copy':
+                    highlight.update(clipboard_paste(folder, session['clipboard'], clip_action))
+                    db.session.commit()
+                else:
+                    flash(u"Unknown clipboard action requested", "error")
+            else:
+                flash(u"Nothing to paste", "error")
+            session.pop('clipboard', None)
+            session.pop('clipboard_type', None)
+        elif action == 'delete':
+            # Delete items
+            nodes = Node.query.filter(Node.uuid.in_(request.form.getlist('nodeid'))).all()
+            for node in nodes:
+                db.session.delete(node)
+            if len(nodes) == 1:
+                flash(u"“%s” has been deleted" % nodes[0].title, "success")
+            else:
+                flash(u"%d items have been deleted" % len(nodes), "success")
+            db.session.commit()
+        elif action == 'rename':
+            flash("Rename hasn't been implemented yet", "info")
+
     return render_template('folder.html', website=website, folder=folder,
-        node_registry=node_registry, importform=ImportForm())
+        node_registry=node_registry, importform=ImportForm(),
+        highlight=highlight, cutlist=cutlist)
 
 
 @app.route('/<website>/', methods=['GET', 'POST'])
