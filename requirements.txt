@@ -4,7 +4,7 @@ https://github.com/hasgeek/coaster/zipball/master#egg=coaster
 https://github.com/hasgeek/baseframe/zipball/master#egg=baseframe
 Flask-SQLAlchemy
 https://github.com/hasgeek/flask-lastuser/zipball/master#egg=Flask-Lastuser
-https://bitbucket.org/jace/flask-themes/get/tip.zip#egg=Flask-Themes
+https://github.com/jace/flask-themes/tarball/master#egg=Flask-Themes
 requests
 simplejson
 pytz
