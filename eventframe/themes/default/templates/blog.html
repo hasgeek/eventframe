@@ -1,0 +1,24 @@
+{% extends theme("layout.html") %}
+
+{% block title %}{{ node.title }}{% endblock %}
+{% block description %}{{ node.description }}{% endblock %}
+
+{% block content %}
+<div class="description">
+  {{ node.content }}
+</div>
+<div class="row blog">
+  <div class="span7">
+    {% for post in feed() -%}
+      <h2>
+        <a href="{{ url_for('node', folder=post.folder.name, node=post.name) }}">{{ post.title }}</a>
+        <small>{{ post.published_at|longdate }}</small>
+      </h2>
+      {{ post.content }}
+      {#- <p class="author">{{ post.user.fullname }}</p> #}
+    {%- else -%}
+      <p>(No blog entries have been written so far)</p>
+    {%- endfor %}
+  </div>
+</div>
+{% endblock %}
