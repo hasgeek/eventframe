@@ -35,7 +35,7 @@ def node(website, folder, node):
     elif node_registry[nodeob.type].render:
         theme = get_theme(folderob.theme)
         return render_theme_template(theme, nodeob.template,
-            website=folder.website, folder=folderob, title=nodeob.title, node=nodeob, _fallback=False)
+            website=folderob.website, folder=folderob, title=nodeob.title, node=nodeob, _fallback=False)
     else:
         abort(404)  # We don't know how to render anything else
 
