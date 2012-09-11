@@ -106,8 +106,6 @@ def clipboard_paste(folder, nodeids, action):
     nodes = Node.query.filter(Node.uuid.in_(nodeids)).all()
     returnids = []
     nameconflicts = dict(db.session.query(Node.name, Node.id).filter_by(folder=folder).all())
-    print "Nodes", nodes, [node.uuid for node in nodes]
-    print "Name conflicts", nameconflicts
     for node in nodes:
         if action == 'cut':
             # Move the node
