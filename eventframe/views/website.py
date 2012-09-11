@@ -55,7 +55,7 @@ def path_handler(website, path):
     if len(components) > 2 and components[-1] == u'':
         # We got a trailing slash and it's not a folder. Pop it.
         components.pop(-1)
-        return redirect(request.script_root + u'/'.join(components))
+        return redirect(request.script_root + u'/' + u'/'.join(components))
     # Now what do we have?
     # A: /
     # B: /folder/ or /node/
@@ -75,6 +75,9 @@ def path_handler(website, path):
     else:
         folder = Folder.query.filter_by(website=website, name=components[0]).first_or_404()
         node = Node.query.filter_by(folder=folder, name=components[1]).first_or_404()
+    # For the context processor to pick up theme for this request
+    # and for the nodehelper to know the current folder
+    g.folder = folder
     if len(components) <= 2 and request.method == 'POST':
         # This is a POST request on the node. Does it take POST?
         if node_registry[node.type].view_handler is None:
