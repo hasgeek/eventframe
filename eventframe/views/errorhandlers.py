@@ -2,7 +2,7 @@
 
 from flask.ext.themes import get_theme, render_theme_template
 from eventframe import eventapp
-from eventframe.views.website import get_website
+from eventframe.nodes import get_website
 
 
 @eventapp.errorhandler(404)

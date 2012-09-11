@@ -3,16 +3,11 @@
 import urlparse
 
 from flask import g, request, Response, redirect, flash, abort, url_for
-from flask.ext.lastuser import LastUser
-from flask.ext.lastuser.sqlalchemy import UserManager
 from coaster.views import get_next_url, get_current_url
 
-from eventframe import app
+from eventframe import app, lastuser
 from eventframe.signals import signal_login, signal_logout
-from eventframe.models import db, User, LoginCode
-
-lastuser = LastUser(app)
-lastuser.init_usermanager(UserManager(db, User))
+from eventframe.models import db, LoginCode
 
 
 @app.route('/login/event')

@@ -3,10 +3,11 @@
 from flask import request, url_for, flash
 import simplejson as json
 from baseframe.forms import render_redirect
-from eventframe.models import db, Map
-from eventframe.forms import MapForm
-from eventframe.views import node_registry
-from eventframe.views.content import AutoFormHandler
+from eventframe.nodes import db, AutoFormHandler
+from eventframe.nodes.map.models import Map
+from eventframe.nodes.map.forms import MapForm
+
+__all__ = ['MapHandler', 'register']
 
 
 class MapHandler(AutoFormHandler):
@@ -30,4 +31,6 @@ class MapHandler(AutoFormHandler):
         db.session.commit()
         return render_redirect(url_for('folder', website=self.website.name, folder=self.folder.name), code=303)
 
-node_registry.register(Map, MapHandler, render=False)
+
+def register(registry):
+    registry.register(Map, MapHandler, render=False)

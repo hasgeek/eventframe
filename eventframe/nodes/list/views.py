@@ -3,10 +3,11 @@
 from flask import request, url_for, flash
 import simplejson as json
 from baseframe.forms import render_redirect
-from eventframe.models import db, List
-from eventframe.forms import ListForm
-from eventframe.views import node_registry
-from eventframe.views.content import AutoFormHandler
+from eventframe.nodes import db, AutoFormHandler
+from eventframe.nodes.list.models import List
+from eventframe.nodes.list.forms import ListForm
+
+__all__ = ['ListHandler', 'register']
 
 
 class ListHandler(AutoFormHandler):
@@ -30,4 +31,6 @@ class ListHandler(AutoFormHandler):
         db.session.commit()
         return render_redirect(url_for('folder', website=self.website.name, folder=self.folder.name), code=303)
 
-node_registry.register(List, ListHandler, render=False)
+
+def register(registry):
+    registry.register(List, ListHandler, render=False)

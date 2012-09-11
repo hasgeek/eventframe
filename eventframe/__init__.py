@@ -6,6 +6,8 @@ from threading import Lock
 from flask import Flask
 from flask.ext.assets import Environment, Bundle
 from flask.ext.themes import setup_themes
+from flask.ext.lastuser import Lastuser
+from flask.ext.lastuser.sqlalchemy import UserManager
 from baseframe import baseframe, baseframe_js, baseframe_css, toastr_js, toastr_css
 from coaster.app import configure
 from eventframe.assets import ThemeAwareEnvironment, load_theme_assets
@@ -39,6 +41,7 @@ class DomainDispatcher(object):
 
 app = Flask(__name__, instance_relative_config=True)
 eventapp = Flask(__name__, instance_relative_config=True, template_folder='themes-templates')
+lastuser = Lastuser()
 configure(app, 'ENVIRONMENT')
 configure(eventapp, 'ENVIRONMENT')
 
@@ -47,9 +50,13 @@ configure(eventapp, 'ENVIRONMENT')
 
 import eventframe.models
 import eventframe.views
+import eventframe.nodes
+eventframe.nodes.init()
 
 eventframe.models.db.init_app(app)
 eventframe.models.db.init_app(eventapp)
+lastuser.init_app(app)
+lastuser.init_usermanager(UserManager(eventframe.models.db, eventframe.models.User))
 
 
 # Fourth, setup baseframe, assets and theme assets on both apps
@@ -77,3 +84,7 @@ for theme in eventapp.theme_manager.list_themes():
     load_theme_assets(eventassets, theme)
 
 application = DomainDispatcher(app.config['ADMIN_HOSTS'], app, eventapp)
+
+
+def init_for(env):
+    pass

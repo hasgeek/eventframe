@@ -3,10 +3,15 @@
 from werkzeug.routing import Map as UrlMap, Rule as UrlRule
 from flask import g, request, render_template, abort, Markup, flash, redirect, escape
 from flask.ext.themes import get_theme, render_theme_template
-from eventframe.models import db, Event, Map, ParticipantList
-from eventframe.forms import EventForm, ConfirmForm
-from eventframe.views import node_registry
-from eventframe.views.content import NodeHandler, ContentHandler
+from eventframe.forms import ConfirmForm
+from eventframe.nodes import db, NodeHandler
+from eventframe.nodes.content import ContentHandler
+from eventframe.nodes.map import Map
+from eventframe.nodes.participant_list import ParticipantList
+from eventframe.nodes.event.models import Event
+from eventframe.nodes.event.forms import EventForm
+
+__all__ = ['EventHandler', 'EventViewHandler', 'register']
 
 
 class EventHandler(ContentHandler):
@@ -108,4 +113,6 @@ url_map = UrlMap([
     UrlRule('/rsvp', endpoint='rsvp', methods=['POST'])
     ])
 
-node_registry.register(Event, EventHandler, view_handler=EventViewHandler, view_url_map=url_map, render=True)
+
+def register(registry):
+    registry.register(Event, EventHandler, view_handler=EventViewHandler, view_url_map=url_map, render=True)

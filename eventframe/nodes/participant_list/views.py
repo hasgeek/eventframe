@@ -3,14 +3,15 @@
 import requests
 from flask import request, Response, stream_with_context, url_for, render_template
 from coaster import parse_isoformat
-from eventframe import eventapp
-from eventframe.models import db, ParticipantList, Participant
-from eventframe.forms import ParticipantListForm, ConfirmForm
+from eventframe import eventapp, lastuser
 from eventframe.signals import signal_login
-from eventframe.views import node_registry
-from eventframe.views.login import lastuser
-from eventframe.views.content import ContentHandler
-from eventframe.views.shared import render_form, stream_template
+from eventframe.forms import ConfirmForm
+from eventframe.nodes import db, render_form, stream_template
+from eventframe.nodes.content import ContentHandler
+from eventframe.nodes.participant_list.models import ParticipantList, Participant
+from eventframe.nodes.participant_list.forms import ParticipantListForm
+
+__all__ = ['ParticipantListHandler', 'register']
 
 
 # TODO: Implement view handler and url_map
@@ -153,8 +154,6 @@ class ParticipantListHandler(ContentHandler):
         db.session.commit()
         yield '\nAll done.'
 
-node_registry.register(ParticipantList, ParticipantListHandler, render=True)
-
 
 @signal_login.connect_via(eventapp)
 def login_watcher(sender, user, **kwargs):
@@ -166,3 +165,7 @@ def login_watcher(sender, user, **kwargs):
         for p in participants:
             if p.user != user:
                 p.user = user
+
+
+def register(registry):
+    registry.register(ParticipantList, ParticipantListHandler, render=True)

@@ -2,8 +2,9 @@
 
 from datetime import datetime
 from sqlalchemy.ext.orderinglist import ordering_list
-from eventframe.models import db, BaseScopedNameMixin
-from eventframe.models.website import NodeMixin, Node
+from eventframe.nodes import db, BaseScopedNameMixin, NodeMixin, Node
+
+__all__ = ['Map', 'MapItem']
 
 
 class MapItem(BaseScopedNameMixin, db.Model):

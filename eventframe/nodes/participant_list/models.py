@@ -2,11 +2,11 @@
 
 from flask import url_for
 from coaster import newsecret
-from eventframe.models import db, BaseMixin
-from eventframe.models.user import User
-from eventframe.models.content import ContentMixin, Node
+from eventframe.nodes import User
+from eventframe.nodes import db, BaseMixin, Node
+from eventframe.nodes.content import ContentMixin
 
-__all__ = ['ParticipantList', 'Participant']
+__all__ = ['Participant', 'ParticipantList']
 
 
 # TODO: Implement import/export

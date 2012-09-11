@@ -2,11 +2,11 @@
 
 from pytz import utc, timezone
 from flask import url_for
-from eventframe.models import db, BaseMixin
-from eventframe.models.user import User
-from eventframe.models.content import ContentMixin, Node
-from eventframe.models.map import Map
-from eventframe.models.participant_list import ParticipantList
+from eventframe.models import db, BaseMixin, User
+from eventframe.nodes import Node
+from eventframe.nodes.content import ContentMixin
+from eventframe.nodes.map import Map
+from eventframe.nodes.participant_list import ParticipantList
 
 __all__ = ['Event', 'EventAttendee']
 

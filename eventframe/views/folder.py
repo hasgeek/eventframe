@@ -14,9 +14,8 @@ from baseframe.forms import render_redirect, render_delete_sqla
 from eventframe import app
 from eventframe.models import db, User, Website, Folder, Node
 from eventframe.forms import WebsiteForm, FolderForm, ImportForm
-from eventframe.views import node_registry
+from eventframe.nodes import node_registry, render_form
 from eventframe.views.login import lastuser
-from eventframe.views.shared import render_form
 
 
 @app.route('/_new', methods=['GET', 'POST'])

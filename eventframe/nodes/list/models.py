@@ -2,8 +2,9 @@
 
 from datetime import datetime
 from sqlalchemy.ext.orderinglist import ordering_list
-from eventframe.models import db, BaseMixin
-from eventframe.models.website import Folder, NodeMixin, Node
+from eventframe.nodes import db, BaseMixin, Folder, NodeMixin, Node
+
+__all__ = ['List', 'ListItem']
 
 
 class ListItem(BaseMixin, db.Model):
