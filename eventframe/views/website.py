@@ -3,7 +3,6 @@
 from werkzeug.exceptions import NotFound
 from flask import g, request, abort, redirect
 from flask.ext.themes import get_theme, render_theme_template
-from coaster.views import load_models
 from eventframe import eventapp
 from eventframe.nodes import node_registry, get_website
 from eventframe.models import Folder, Node
@@ -16,21 +15,27 @@ def index():
 
 @eventapp.route('/<folder>/<node>')
 @get_website
-@load_models(
-    (Folder, {'name': 'folder', 'website': 'website'}, 'folder'),
-    (Node, {'name': 'node', 'folder': 'folder'}, 'node')
-    )
-def node(folder, node):
+def node(website, folder, node):
+    folderob = Folder.query.filter_by(name=folder, website=website).first()
+    if folderob is None:
+        # Are we handling a /node/custom_url case?
+        folderob = Folder.query.filter_by(name=u'', website=website).first_or_404()
+        nodeob = Node.query.filter_by(name=folder, folder=folderob).first_or_404()
+        # The node exists. Let the path handler figure out what to do with it
+        return path_handler(path=u'/' + nodeob.name + u'/' + node)
+    else:
+        nodeob = Node.query.filter_by(name=node, folder=folderob).first_or_404()
+
     # For the context processor to pick up theme for this request
     # and for the nodehelper to know the current folder
-    g.folder = folder
-    if node_registry[node.type].view_handler is not None:
+    g.folder = folderob
+    if node_registry[nodeob.type].view_handler is not None:
         # This node type is capable of rendering itself
-        return node_registry[node.type].view_handler(eventapp, folder.website, folder, node).GET()
-    elif node_registry[node.type].render:
-        theme = get_theme(folder.theme)
-        return render_theme_template(theme, node.template,
-            website=folder.website, folder=folder, title=node.title, node=node, _fallback=False)
+        return node_registry[nodeob.type].view_handler(eventapp, folderob.website, folderob, nodeob).GET()
+    elif node_registry[nodeob.type].render:
+        theme = get_theme(folderob.theme)
+        return render_theme_template(theme, nodeob.template,
+            website=folder.website, folder=folderob, title=nodeob.title, node=nodeob, _fallback=False)
     else:
         abort(404)  # We don't know how to render anything else
 
@@ -49,6 +54,7 @@ def folder(website, folder):
 def path_handler(website, path):
     """Handles paths for nodes with internal items."""
     components = path.split('/')
+    pathcomponents = []
     if components[0] == u'':
         # We had a / prefix. Discard it.
         components.pop(0)
@@ -60,12 +66,14 @@ def path_handler(website, path):
     # A: /
     # B: /folder/ or /node/
     # C: /folder/node
+    # D: /node/custom where custom can have many segments
+    # E: /folder/node/custom where custom can have many segments
     if len(components) == 0:
-        # Render (root)/(index) [both named '']
+        # A: Render (root)/(index) [both named '']
         folder = Folder.query.filter_by(website=website, name=u'').first_or_404()
         node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
     elif len(components) == 1:
-        # Could be a folder or node:
+        # B: Could be a folder or node:
         folder = Folder.query.filter_by(website=website, name=components[0]).first()
         if folder is not None:
             node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
@@ -73,12 +81,21 @@ def path_handler(website, path):
             folder = Folder.query.filter_by(website=website, name=u'').first_or_404()
             node = Node.query.filter_by(folder=folder, name=components[0]).first_or_404()
     else:
-        folder = Folder.query.filter_by(website=website, name=components[0]).first_or_404()
-        node = Node.query.filter_by(folder=folder, name=components[1]).first_or_404()
+        folder = Folder.query.filter_by(website=website, name=components[0]).first()
+        if folder is not None:
+            # C: folder/node or E: folder/node/custom
+            node = Node.query.filter_by(folder=folder, name=components[1]).first_or_404()
+            pathcomponents = components[2:]
+        else:
+            # D: node/custom
+            folder = Folder.query.filter_by(website=website, name=u'').first_or_404()
+            node = Node.query.filter_by(folder=folder, name=components[0]).first_or_404()
+            pathcomponents = components[1:]
+
     # For the context processor to pick up theme for this request
     # and for the nodehelper to know the current folder
     g.folder = folder
-    if len(components) <= 2 and request.method == 'POST':
+    if len(pathcomponents) == 0 and request.method == 'POST':
         # This is a POST request on the node. Does it take POST?
         if node_registry[node.type].view_handler is None:
             abort(405)
@@ -93,4 +110,4 @@ def path_handler(website, path):
             urls = node_registry[node.type].view_url_map.bind_to_environ(request)
             view_handler = node_registry[node.type].view_handler(eventapp, website, folder, node)
             return urls.dispatch(lambda e, v: getattr(view_handler, e)(**v),
-                path_info='/'.join(components[2:]))
+                path_info='/'.join(pathcomponents))
