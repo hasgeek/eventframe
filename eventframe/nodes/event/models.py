@@ -98,7 +98,11 @@ class Event(ContentMixin, Node):
 
     def url_for(self, action='view'):
         if action == 'rsvp':
-            return super(Event, self).url_for('view') + '/rsvp'
+            base = super(Event, self).url_for('view')
+            if base.endswith('/'):
+                return base + 'rsvp'
+            else:
+                return base + '/rsvp'
         elif action == 'list':
             return url_for('node_action',
                 website=self.folder.website.name,
