@@ -1,25 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from pytz import utc, timezone
+from pytz import utc
 from flask import g
 from eventframe import app, eventapp
 from eventframe.models import Folder, Node
 from eventframe.nodes.post import rootfeed, folderfeed
 from eventframe.nodes.fragment import Fragment
 
-tz = timezone(eventapp.config['TIMEZONE'])
-
 
 @app.template_filter('shortdate')
 @eventapp.template_filter('shortdate')
 def shortdate(date):
-    return utc.localize(date).astimezone(tz).strftime('%b %e')
+    return utc.localize(date).astimezone(app.config['tz']).strftime('%b %e')
 
 
 @app.template_filter('longdate')
 @eventapp.template_filter('longdate')
 def longdate(date):
-    return utc.localize(date).astimezone(tz).strftime('%B %e, %Y')
+    return utc.localize(date).astimezone(app.config['tz']).strftime('%B %e, %Y')
 
 
 def feedhelper(folder=None, limit=20):

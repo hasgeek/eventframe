@@ -3,13 +3,14 @@
 # The imports in this file are order-sensitive
 
 from threading import Lock
+from pytz import timezone
 from flask import Flask
 from flask.ext.assets import Environment, Bundle
 from flask.ext.themes import setup_themes
 from flask.ext.lastuser import Lastuser
 from flask.ext.lastuser.sqlalchemy import UserManager
 from baseframe import baseframe, baseframe_js, baseframe_css, toastr_js, toastr_css
-from coaster.app import configure
+import coaster.app
 from eventframe.assets import ThemeAwareEnvironment, load_theme_assets
 import eventframe.signals
 
@@ -37,26 +38,19 @@ class DomainDispatcher(object):
         return app(environ, start_response)
 
 
-# Second, make the main and event apps and configure them
+# Second, make the main and event apps
 
 app = Flask(__name__, instance_relative_config=True)
 eventapp = Flask(__name__, instance_relative_config=True, template_folder='themes-templates')
 lastuser = Lastuser()
-configure(app, 'ENVIRONMENT')
-configure(eventapp, 'ENVIRONMENT')
 
 
-# Third, after config, import and configure the models and views
+# Third, import models, nodes and views
 
 import eventframe.models
-import eventframe.views
 import eventframe.nodes
 eventframe.nodes.init()
-
-eventframe.models.db.init_app(app)
-eventframe.models.db.init_app(eventapp)
-lastuser.init_app(app)
-lastuser.init_usermanager(UserManager(eventframe.models.db, eventframe.models.User))
+import eventframe.views
 
 
 # Fourth, setup baseframe, assets and theme assets on both apps
@@ -73,18 +67,23 @@ js = Bundle(baseframe_js, toastr_js,
 css = Bundle(baseframe_css, toastr_css, 'css/app.css',
     filters='cssmin', output='css/packed.css')
 
-assets.register('js_all', js)
-assets.register('css_all', css)
-eventassets.register('js_baseframe', baseframe_js)
-eventassets.register('css_baseframe', baseframe_css)
-
-setup_themes(eventapp, app_identifier='eventframe')
-setup_themes(app, app_identifier='eventframe')  # To list themes in the admin views
-for theme in eventapp.theme_manager.list_themes():
-    load_theme_assets(eventassets, theme)
-
-application = DomainDispatcher(app.config['ADMIN_HOSTS'], app, eventapp)
-
 
 def init_for(env):
-    pass
+    coaster.app.init_app(app, env)
+    coaster.app.init_app(eventapp, env)
+    app.config['tz'] = timezone(eventapp.config['TIMEZONE'])
+    eventframe.models.db.init_app(app)
+    eventframe.models.db.init_app(eventapp)
+    lastuser.init_app(app)
+    lastuser.init_usermanager(UserManager(eventframe.models.db, eventframe.models.User))
+    assets.register('js_all', js)
+    assets.register('css_all', css)
+    eventassets.register('js_baseframe', baseframe_js)
+    eventassets.register('css_baseframe', baseframe_css)
+
+    setup_themes(eventapp, app_identifier='eventframe')
+    setup_themes(app, app_identifier='eventframe')  # To list themes in the admin views
+    for theme in eventapp.theme_manager.list_themes():
+        load_theme_assets(eventassets, theme)
+
+    return DomainDispatcher(app.config['ADMIN_HOSTS'], app, eventapp)
