@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import os.path
 from werkzeug.exceptions import NotFound
-from flask import g, request, abort, redirect
+from flask import g, request, abort, redirect, send_file
 from flask.ext.themes import get_theme, render_theme_template
+from baseframe import favicon as baseframe_favicon
 from eventframe import eventapp
 from eventframe.nodes import node_registry, get_website
 from eventframe.models import Folder, Node
@@ -13,6 +15,18 @@ def index():
     return node(folder=u'', node=u'')
 
 
+@eventapp.route('/favicon.ico')
+@get_website
+def favicon(website):
+    theme = get_theme(website.theme)
+    favicon = theme.options.get('favicon')
+    if favicon:
+        return send_file(os.path.join(theme.static_path, favicon))
+    else:
+        return baseframe_favicon()
+
+
+# TODO: Deprecate this and move to path_handler
 @eventapp.route('/<folder>/<node>')
 @get_website
 def node(website, folder, node):
@@ -40,6 +54,7 @@ def node(website, folder, node):
         abort(404)  # We don't know how to render anything else
 
 
+# TODO: Deprecate this and move to path_handler
 @eventapp.route('/<folder>/')
 @get_website
 def folder(website, folder):
