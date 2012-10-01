@@ -10,7 +10,7 @@ from flask.ext.themes import setup_themes
 from flask.ext.lastuser import Lastuser
 from flask.ext.lastuser.sqlalchemy import UserManager
 from baseframe import baseframe, baseframe_js, baseframe_css, toastr_js, toastr_css
-import coaster.app
+from coaster.app import SandboxedFlask, init_app
 from eventframe.assets import ThemeAwareEnvironment, load_theme_assets
 import eventframe.signals
 
@@ -41,7 +41,7 @@ class DomainDispatcher(object):
 # Second, make the main and event apps
 
 app = Flask(__name__, instance_relative_config=True)
-eventapp = Flask(__name__, instance_relative_config=True, template_folder='themes-templates')
+eventapp = SandboxedFlask(__name__, instance_relative_config=True, template_folder='themes-templates')
 lastuser = Lastuser()
 
 
@@ -69,8 +69,8 @@ css = Bundle(baseframe_css, toastr_css, 'css/app.css',
 
 
 def init_for(env):
-    coaster.app.init_app(app, env)
-    coaster.app.init_app(eventapp, env)
+    init_app(app, env)
+    init_app(eventapp, env)
     app.config['tz'] = timezone(eventapp.config['TIMEZONE'])
     eventframe.models.db.init_app(app)
     eventframe.models.db.init_app(eventapp)
