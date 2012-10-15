@@ -8,13 +8,17 @@ from pytz import common_timezones
 
 __all__ = ['Form', 'RichTextField', 'DateTimeField', 'DictField',
     'WebsiteForm', 'FolderForm', 'ImportForm', 'ConfirmForm',
-    'timezone_list', 'richtext_buttons1', 'richtext_valid_elements', 'richtext_sanitize_tags',
-    'richtext_sanitize_attributes', 'valid_name']
+    'timezone_list', 'tinymce_options', 'richtext_sanitize_tags', 'richtext_sanitize_attributes',
+    'valid_name']
 
 timezone_list = [(tz, tz) for tz in common_timezones]
-
-richtext_buttons1 = "bold,italic,|,sup,sub,|,bullist,numlist,|,link,unlink,|,blockquote,image,|,removeformat,code"
-richtext_valid_elements = "p,br,strong/b,em/i,sup,sub,h3,h4,h5,h6,ul,ol,li,a[!href|title|target],blockquote,code,img[!src|alt|class|width|height|align]"
+tinymce_options = {
+    'plugins': "autoresize,autosave,fullscreen,inlinepopups,pagebreak,paste,table,wordcount",
+    'theme_advanced_buttons1': "bold,italic,|,sup,sub,|,bullist,numlist,|,link,unlink,|,blockquote,image,pagebreak,|,removeformat,code,|,fullscreen",
+    'theme_advanced_buttons2': "tablecontrols",
+    'theme_advanced_path': True,
+    'valid_elements': "p,br,strong/b,em/i,sup,sub,h1,h2,h3,h4,h5,h6,ul,ol,li,a[!href|title|target],blockquote,code,img[!src|alt|class|width|height|align],table[class],thead[class],tbody[class],tfoot[class],tr[class],th[class],td[class]"
+    }
 richtext_sanitize_tags = ['p', 'br', 'strong', 'em', 'sup', 'sub', 'h3', 'h4', 'h5', 'h6',
                 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'img']
 richtext_sanitize_attributes = {'a': ['href', 'title', 'target'],

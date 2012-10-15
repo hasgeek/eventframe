@@ -2,8 +2,7 @@
 
 import flask.ext.wtf as wtf
 from eventframe.forms import (Form, RichTextField, DictField, valid_name,
-    richtext_buttons1, richtext_valid_elements, richtext_sanitize_tags,
-    richtext_sanitize_attributes)
+    tinymce_options, richtext_sanitize_tags, richtext_sanitize_attributes)
 
 __all__ = ['FragmentForm']
 
@@ -16,8 +15,7 @@ class FragmentForm(Form):
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
     content = RichTextField(u"Page content", linkify=False,
-        buttons1=richtext_buttons1,
-        valid_elements=richtext_valid_elements,
+        tinymce_options=tinymce_options,
         sanitize_tags=richtext_sanitize_tags,
         sanitize_attributes=richtext_sanitize_attributes)
     properties = DictField(u"Properties")
