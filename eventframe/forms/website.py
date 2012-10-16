@@ -13,16 +13,28 @@ __all__ = ['Form', 'RichTextField', 'DateTimeField', 'DictField',
 
 timezone_list = [(tz, tz) for tz in common_timezones]
 tinymce_options = {
-    'plugins': "autoresize,autosave,fullscreen,inlinepopups,pagebreak,paste,table,wordcount",
-    'theme_advanced_buttons1': "bold,italic,|,sup,sub,|,bullist,numlist,|,link,unlink,|,blockquote,image,pagebreak,|,removeformat,code,|,fullscreen",
+    'plugins': "autosave,advlist,fullscreen,inlinepopups,pagebreak,paste,table,wordcount",
+    'theme_advanced_buttons1': "bold,italic,|,sup,sub,|,bullist,numlist,|,link,unlink,|,blockquote,image,|,removeformat,code,|,fullscreen",
     'theme_advanced_buttons2': "tablecontrols",
     'theme_advanced_path': True,
-    'valid_elements': "p,br,strong/b,em/i,sup,sub,h1,h2,h3,h4,h5,h6,ul,ol,li,a[!href|title|target],blockquote,code,img[!src|alt|class|width|height|align],table[class],thead[class],tbody[class],tfoot[class],tr[class],th[class],td[class]"
+    'valid_elements': "p,br,strong/b,em/i,sup,sub,h1,h2,h3,h4,h5,h6,ul,ol,li,a[!href|title|target|class],span[class],blockquote,pre,code,img[!src|alt|class|width|height|align],table[class],thead[class],tbody[class],tfoot[class],tr[class],th[class,colspan,rowspan],td[class,colspan,rowspan]",
+    'table_styles': "Table=table;Striped=table table-striped;Bordered=table table-bordered;Condensed=table table-condensed",
+    'table_cell_styles': "",
+    'table_row_styles': ""
     }
 richtext_sanitize_tags = ['p', 'br', 'strong', 'em', 'sup', 'sub', 'h3', 'h4', 'h5', 'h6',
-                'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'img']
-richtext_sanitize_attributes = {'a': ['href', 'title', 'target'],
-                                'img': ['src', 'alt', 'class', 'width', 'height', 'align']}
+                'ul', 'ol', 'li', 'a', 'span', 'blockquote', 'pre', 'code', 'img',
+                'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td']
+richtext_sanitize_attributes = {'a': ['href', 'title', 'target', 'class'],
+                                'span': ['class'],
+                                'img': ['src', 'alt', 'class', 'width', 'height', 'align'],
+                                'table': ['class'],
+                                'thead': ['class'],
+                                'tbody': ['class'],
+                                'tfoot': ['class'],
+                                'tr': ['class'],
+                                'th': ['class', 'colspan', 'rowspan'],
+                                'td': ['class', 'colspan', 'rowspan']}
 
 
 def valid_name(form, field):
