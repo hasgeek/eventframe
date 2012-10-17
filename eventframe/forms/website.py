@@ -17,7 +17,7 @@ tinymce_options = {
     'theme_advanced_buttons1': "bold,italic,|,sup,sub,|,bullist,numlist,|,link,unlink,|,blockquote,image,|,removeformat,code,|,fullscreen",
     'theme_advanced_buttons2': "tablecontrols",
     'theme_advanced_path': True,
-    'valid_elements': "p,br,strong/b,em/i,sup,sub,h1,h2,h3,h4,h5,h6,ul,ol,li,a[!href|title|target|class],span[class],blockquote,pre,code,img[!src|alt|class|width|height|align],table[class],thead[class],tbody[class],tfoot[class],tr[class],th[class,colspan,rowspan],td[class,colspan,rowspan]",
+    'valid_elements': "p,br,strong/b,em/i,sup,sub,h1,h2,h3,h4,h5,h6,ul,ol,li,a[!href|title|target|class],span[class],blockquote,pre,code,img[!src|alt|class|width|height|align],table[class],thead[class],tbody[class],tfoot[class],tr[class],th[class|colspan|rowspan],td[class|colspan|rowspan]",
     'table_styles': "Table=table;Striped=table table-striped;Bordered=table table-bordered;Condensed=table table-condensed",
     'table_cell_styles': "",
     'table_row_styles': ""
