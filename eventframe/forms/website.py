@@ -13,8 +13,8 @@ __all__ = ['Form', 'RichTextField', 'DateTimeField', 'DictField',
 
 timezone_list = [(tz, tz) for tz in common_timezones]
 tinymce_options = {
-    'plugins': "autosave,advlist,fullscreen,inlinepopups,pagebreak,paste,table,wordcount",
-    'theme_advanced_buttons1': "bold,italic,|,sup,sub,|,bullist,numlist,|,link,unlink,|,blockquote,image,|,removeformat,code,|,fullscreen",
+    'plugins': "autosave,advlist,fullscreen,inlinepopups,pagebreak,paste,searchreplace,table,wordcount",
+    'theme_advanced_buttons1': "bold,italic,|,sup,sub,|,bullist,numlist,|,link,unlink,|,blockquote,image,|,removeformat,code,|,search,replace,|,fullscreen",
     'theme_advanced_buttons2': "tablecontrols",
     'theme_advanced_path': True,
     'valid_elements': "p,br,strong/b,em/i,sup,sub,h1,h2,h3,h4,h5,h6,ul,ol,li,a[!href|title|target|class],span[class],blockquote,pre,code,img[!src|alt|class|width|height|align],table[class],thead[class],tbody[class],tfoot[class],tr[class],th[class|colspan|rowspan],td[class|colspan|rowspan]",
