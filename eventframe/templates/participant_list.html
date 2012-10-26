@@ -14,7 +14,7 @@
       <div class="span1"><i class="icon-list-ul"></i> <i class="icon-user"></i></div>
     </li>
     {% for participant in participants -%}
-      <li class="row-fluid item">
+      <li class="row-fluid item item-hover">
         <div class="span1">{{ loop.index }}</div>
         <div class="span2">{{ participant.ticket }}</div>
         <div class="span3">{{ participant.fullname }}</div>

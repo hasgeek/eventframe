@@ -75,7 +75,7 @@
   </ul>
   <ul id="folder-listing" class="grid container-fluid">
     {% for node in folder.nodes -%}
-      <li class="row-fluid item not-filtered
+      <li class="row-fluid item item-hover not-filtered
           {%- if node.uuid in highlight %} highlight {%- endif -%}
           {%- if node.uuid in cutlist %} cutnode {%- endif -%}" data-type="{{ node.type }}" data-nodeid="{{ node.uuid }}">
         <div class="span3"><input type="checkbox" name="nodeid" value="{{ node.uuid }}"> <a href="{{

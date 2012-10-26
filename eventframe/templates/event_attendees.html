@@ -12,7 +12,7 @@
       <div class="span2">Status</div>
     </li>
     {% for attendee in attendees -%}
-      <li class="row-fluid item">
+      <li class="row-fluid item item-hover">
         <div class="span1">{{ loop.index }}</div>
         <div class="span5">{{ attendee.user.fullname }}</div>
         <div class="span4">{{ attendee.user.email }}</div>
