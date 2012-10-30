@@ -35,7 +35,7 @@ richtext_sanitize_attributes = {'a': ['href', 'title', 'target', 'class'],
                                 'tr': ['class'],
                                 'th': ['class', 'colspan', 'rowspan'],
                                 'td': ['class', 'colspan', 'rowspan'],
-                                'iframe': ['src' 'class', 'width', 'height', 'frameborder', 'allowfullscreen']}
+                                'iframe': ['src', 'class', 'width', 'height', 'frameborder', 'allowfullscreen']}
 
 
 def valid_name(form, field):
