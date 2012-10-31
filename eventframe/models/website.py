@@ -192,6 +192,8 @@ class Node(BaseScopedNameMixin, db.Model):
     #: User who made this node
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, default=default_user_id)
     user = db.relationship(User)
+    #: Author as a nullable text field
+    author = db.Column(db.Unicode(40), nullable=True)
     #: Folder in which this node is located
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=False)
     folder = db.relationship(Folder,
@@ -229,6 +231,7 @@ class Node(BaseScopedNameMixin, db.Model):
             'uuid': self.uuid,
             'name': self.name,
             'title': self.title,
+            'author': self.author,
             'created_at': self.created_at.isoformat() + 'Z',
             'updated_at': self.updated_at.isoformat() + 'Z',
             'published_at': self.published_at.isoformat() + 'Z',
@@ -241,6 +244,7 @@ class Node(BaseScopedNameMixin, db.Model):
         self.uuid = data['uuid']
         self.name = data['name']
         self.title = data['title']
+        self.author = data.get('author')
         self.published_at = parse_isoformat(data['published_at'])
         self.properties = data['properties']
 

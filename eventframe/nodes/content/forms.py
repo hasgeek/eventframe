@@ -11,6 +11,8 @@ class ContentForm(Form):
     previous_id = wtf.HiddenField(u"Previous revision")
     title = wtf.TextField(u"Title", validators=[wtf.Required()])
     name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name])
+    author = wtf.TextField(u"Author (optional)", validators=[wtf.Length(max=40)],
+        description="Name of the author. Will default to your name if blank")
     description = wtf.TextAreaField(u"Summary", description=u"Summary of this page")
     content = RichTextField(u"Page content", linkify=False,
         tinymce_options=tinymce_options,
@@ -32,3 +34,7 @@ class ContentForm(Form):
     def validate_name(self, field):
         # TODO
         pass
+
+    def validate_author(self, field):
+        if not field.data:
+            field.data = None
