@@ -28,13 +28,15 @@ class ContentHandler(AutoFormHandler):
             if request.method == 'GET':
                 form.name.data = self.node.name
                 form.properties.data = self.node.properties
-                form.author.data = self.node.author
+                if hasattr(form, 'author'):
+                    form.author.data = self.node.author
             return form
         else:
             return self.form_class()
 
     def process_node(self):
-        self.node.author = self.form.author.data
+        if hasattr(self.form, 'author'):
+            self.node.author = self.form.author.data
 
     def process_form(self):
         if self.node is None:
