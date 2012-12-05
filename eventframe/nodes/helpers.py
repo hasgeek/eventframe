@@ -65,7 +65,7 @@ class AutoFormHandler(NodeHandler):
     def render_form(self):
         return render_form(form=self.form, title=self.title_edit if self.node else self.title_new, submit=u"Save",
             cancel_url=url_for('folder', website=self.website.name, folder=self.folder.name),
-            tabs=self.edit_tabs(), node=self.node, ajax=True)
+            tabs=self.edit_tabs(), node=self.node, ajax=False)
 
 
 class _RegistryItem(object):

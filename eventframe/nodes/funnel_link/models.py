@@ -42,6 +42,11 @@ class FunnelLink(ContentMixin, Node):
                 }
         return self._data_cached
 
+    def proposals_mapping(self):
+        if not hasattr(self, '_dict_cached'):
+            self._dict_cached = dict([(p['id'], p) for p in self.proposals()])
+        return self._dict_cached
+
     def sections(self):
         # Get data from Funnel and cache locally
         return self._data()['sections']

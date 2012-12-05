@@ -2,7 +2,7 @@
 
 from flask import g, flash, url_for, request
 from baseframe.forms import render_redirect
-from eventframe.nodes import db, AutoFormHandler
+from eventframe.nodes import db, Node, AutoFormHandler
 from eventframe.nodes.content.forms import ContentForm
 
 __all__ = ['ContentHandler']
@@ -61,7 +61,10 @@ class ContentHandler(AutoFormHandler):
             # There is no published version, so use title from the draft
             self.node.title = revision.title
         if not self.node.id and not self.node.name:
-            self.node.make_name()
+            # Is there already an index node in this folder?
+            index = db.session.query(Node.id).filter_by(folder=self.folder, name=u'').first()
+            if index is not None:
+                self.node.make_name()
         db.session.commit()
         # FIXME: Say created when created
         flash(u"Edited node '%s'." % self.node.title, 'success')

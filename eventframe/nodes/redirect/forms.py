@@ -13,5 +13,7 @@ class RedirectForm(Form):
     properties = DictField(u"Properties")
 
     def validate_name(self, field):
+        if field.data == u'/':
+            field.data = u''
         # TODO
         pass
