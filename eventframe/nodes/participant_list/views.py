@@ -84,7 +84,7 @@ class ParticipantListHandler(ContentHandler):
             self.node.sourceid, self.node.api_key)
         yield "Receiving data from DoAttend..."
         r = requests.get(data_url)
-        data = r.json
+        data = r.json() if callable(r.json) else r.json
         yield " OK\n"
         yield "Participant count: %d\n" % len(data['participants'])
         yield "Previously synced count: %d\n\n" % len(self.node.participants)

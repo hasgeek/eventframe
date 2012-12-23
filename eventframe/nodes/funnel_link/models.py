@@ -26,7 +26,8 @@ class FunnelLink(ContentMixin, Node):
         if not hasattr(self, '_data_cached'):
             # Get JSON and cache locally
             try:
-                data = requests.get('http://funnel.hasgeek.com/%s/json' % self.funnel_name).json
+                r = requests.get('http://funnel.hasgeek.com/%s/json' % self.funnel_name)
+                data = r.json() if callable(r.json) else r.json
                 sectionmap = dict([(s['title'], s['name']) for s in data['sections']])
                 for proposal in data['proposals']:
                     proposal['submitted'] = datetime.strptime(proposal['submitted'], '%Y-%m-%dT%H:%M:%S')
