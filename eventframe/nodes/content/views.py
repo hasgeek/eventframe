@@ -35,8 +35,7 @@ class ContentHandler(AutoFormHandler):
             return self.form_class()
 
     def process_node(self):
-        if hasattr(self.form, 'author'):
-            self.node.author = self.form.author.data
+        pass
 
     def process_form(self):
         if self.node is None:
@@ -52,6 +51,8 @@ class ContentHandler(AutoFormHandler):
         # FIXME: Not all form fields are in the revision object. Don't
         # use populate_obj here
         self.form.populate_obj(revision)
+        if hasattr(self.form, 'author'):
+            self.node.author = self.form.author.data
         self.node.properties = self.form.properties.data
         self.process_node()
         if not self.node.title:
