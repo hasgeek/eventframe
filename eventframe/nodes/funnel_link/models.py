@@ -30,7 +30,7 @@ class FunnelLink(ContentMixin, Node):
                 data = r.json() if callable(r.json) else r.json
                 sectionmap = dict([(s['title'], s['name']) for s in data['sections']])
                 for proposal in data['proposals']:
-                    proposal['submitted'] = datetime.strptime(proposal['submitted'], '%Y-%m-%dT%H:%M:%S')
+                    proposal['submitted'] = datetime.strptime(proposal['submitted'], '%Y-%m-%dT%H:%M:%SZ')
                     proposal['section_name'] = sectionmap.get(proposal['section'])
                     v = proposal['votes']
                     proposal['votes'] = '+%d' % v if v > 0 else '%d' % v
