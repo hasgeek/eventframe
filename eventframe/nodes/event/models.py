@@ -2,6 +2,7 @@
 
 from pytz import utc, timezone
 from flask import url_for
+from coaster import parse_isoformat
 from eventframe.models import db, BaseMixin, User
 from eventframe.nodes import Node
 from eventframe.nodes.content import ContentMixin
@@ -111,6 +112,38 @@ class Event(ContentMixin, Node):
                 action=action)
         else:
             return super(Event, self).url_for(action)
+
+    def as_json(self):
+        result = super(ContentMixin, self).as_json()
+        result['start_datetime'] = self.start_datetime.isoformat() + 'Z'
+        result['end_datetime'] = self.end_datetime.isoformat() + 'Z'
+        result['timezone'] = self.timezone
+        result['location_name'] = self.location_name
+        result['location_address'] = self.location_address
+        result['map'] = self.map.uuid
+        result['mapmarker'] = self.mapmarker
+        result['capacity'] = self.capacity
+        result['allow_waitlisting'] = self.allow_waitlisting
+        result['allow_maybe'] = self.allow_maybe
+        result['participant_list'] = self.participant_list.uuid
+        return result
+
+    def import_from(self, data):
+        super(ContentMixin, self).import_from(data)
+        self.start_datetime = parse_isoformat(data['start_datetime'])
+        self.end_datetime = parse_isoformat(data['end_datetime'])
+        self.timezone = data['timezone']
+        self.location_name = data['location_name']
+        self.location_address = data['location_address']
+        self.mapmarker = data['mapmarker']
+        self.capacity = data['capacity']
+        self.allow_waitlisting = data['allow_waitlisting']
+        self.allow_maybe = data['allow_maybe']
+
+    def import_from_internal(self, data):
+        super(ContentMixin, self).import_from_internal(data)
+        self.map = Map.query.filter_by(uuid=data['map']).first()
+        self.participant_list = ParticipantList.query.filter_by(uuid=data['participant_list']).first()
 
 
 class EventAttendee(BaseMixin, db.Model):
