@@ -5,8 +5,39 @@ from flask import _request_ctx_stack, url_for
 from flask.ext.assets import Environment, Bundle, get_static_folder
 from flask.ext.themes import static_file_url
 
+try:
+    from flask.ext.assets import FlaskResolver
+except ImportError:
+    FlaskResolver = object
+
+
+# Resolver for Flask-Assets >= 0.8
+class ThemeAwareResolver(FlaskResolver):
+    def resolve_output_to_path(self, target, bundle):
+        if target.startswith('_themes/'):
+            theme, filename = target[8:].split('/', 1)
+            directory = self.env._app.theme_manager.themes[theme].static_path
+            return path.abspath(path.join(directory, filename))
+        return super(ThemeAwareResolver, self).resolve_output_to_path(target, bundle)
+
+    def search_for_source(self, item):
+        if item.startswith('_themes/'):
+            theme, filename = item[8:].split('/', 1)
+            directory = self.env._app.theme_manager.themes[theme].static_path
+            return path.abspath(path.join(directory, filename))
+        return super(ThemeAwareResolver, self).search_for_source(item)
+
+    def resolve_output_to_url(self, target):
+        if target.startswith('_themes/'):
+            theme, filename = target[8:].split('/', 1)
+            return static_file_url(theme, filename)
+        return super(ThemeAwareResolver, self).resolve_output_to_url(target)
+
 
 class ThemeAwareEnvironment(Environment):
+    resolver_class = ThemeAwareResolver
+
+    # Resolver function for Flask-Assets < 0.8
     def _normalize_source_path(self, filename):
         if path.isabs(filename):
             return filename
@@ -90,5 +121,5 @@ def load_theme_assets(env, theme):
     if isinstance(js_list, basestring):
         js_list = [js_list]
     js = Bundle(*[Bundle('_themes/%s/%s' % (theme.identifier, item),
-        filters='jsmin', output='_themes/%s/%s.packed.js' % (theme.identifier, item)) for item in js_list])
+        filters='closure_js', output='_themes/%s/%s.packed.js' % (theme.identifier, item)) for item in js_list])
     env.register('js_%s' % theme.identifier, js)

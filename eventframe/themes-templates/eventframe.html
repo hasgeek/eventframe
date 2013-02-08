@@ -3,7 +3,7 @@
 <!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
 <!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
 <!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang="en"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" class="no-js {%- if g.user %} userlogin {%- else %} no-userlogin {%- endif %}"> <!--<![endif]-->
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -35,9 +35,11 @@
   {% assets "css_baseframe" -%}
     <link rel="stylesheet" href="{{ ASSET_URL }}"/>
   {% endassets -%}
-  {% assets "css_" + _theme -%}
-    <link rel="stylesheet" href="{{ ASSET_URL }}"/>
-  {% endassets -%}
+  {%- if _theme %}
+    {% assets "css_" + _theme -%}
+      <link rel="stylesheet" href="{{ ASSET_URL }}"/>
+    {% endassets -%}
+  {%- endif %}
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600">
   <script src="{{ url_for('baseframe.static', filename='js/modernizr.min.js') }}"></script>
 
@@ -52,7 +54,8 @@
   {%- if website.typekit_code %}
     <script type="text/javascript" src="//use.typekit.com/{{ website.typekit_code }}.js"></script>
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-  {% endif -%}
+  {%- endif %}
+  {% block image_src %}<link rel="image_src" href="{{ url_for('baseframe.static', filename='img/logo@2x.png') }}">{% endblock %}
   {% block layoutheaders %}{% block pageheaders %}{% endblock %}{% endblock %}
 </head>
 <body>
@@ -98,9 +101,11 @@
   {% assets "js_baseframe" -%}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
-  {% assets "js_" + _theme -%}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {%- endassets -%}
+  {%- if _theme %}
+    {% assets "js_" + _theme -%}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {%- endassets -%}
+  {%- endif %}
 
   {%- if website.googleanalytics_code and not config['DEBUG'] -%}
     <script type="text/javascript">

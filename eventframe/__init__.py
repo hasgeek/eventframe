@@ -62,7 +62,7 @@ assets = Environment(app)
 eventassets = ThemeAwareEnvironment(eventapp)
 
 js = Bundle(baseframe_js, toastr_js,
-    filters='jsmin', output='js/packed.js')
+    filters='closure_js', output='js/packed.js')
 
 css = Bundle(baseframe_css, toastr_css, 'css/app.css',
     filters='cssmin', output='css/packed.css')
