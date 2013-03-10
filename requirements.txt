@@ -1,10 +1,10 @@
 ordereddict
 Flask
-https://github.com/hasgeek/coaster/zipball/master#egg=coaster
-https://github.com/hasgeek/baseframe/zipball/master#egg=baseframe
+https://github.com/hasgeek/coaster/archive/master.zip#egg=coaster
+https://github.com/hasgeek/baseframe/archive/master.zip#egg=baseframe
 Flask-SQLAlchemy
-https://github.com/hasgeek/flask-lastuser/zipball/master#egg=Flask-Lastuser
-https://github.com/jace/flask-themes/tarball/master#egg=Flask-Themes
+https://github.com/hasgeek/flask-lastuser/archive/master.zip#egg=Flask-Lastuser
+https://github.com/jace/flask-themes/archive/master.zip#egg=Flask-Themes
 requests
 simplejson
 pytz
