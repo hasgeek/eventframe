@@ -273,7 +273,7 @@ class Node(BaseScopedNameMixin, db.Model):
                 node=self.name)
 
 
-class NodeMixin(TimestampMixin):
+class NodeMixin(object):
     @declared_attr
     def id(cls):
         """Link back to node"""
