@@ -105,3 +105,17 @@ def lookup_current_user(user=None):
                 email=user.email,
                 permissions=user.userinfo.get('permissions', ()),
                 organizations=user.userinfo.get('organizations'))
+
+
+@eventapp.after_request
+def cache_expiry_headers(response):
+    if 'Expires' not in response.headers:
+        response.headers['Expires'] = 'Fri, 01 Jan 1990 00:00:00 GMT'
+    if 'Cache-Control' in response.headers:
+        if 'max-age' not in response.headers['Cache-Control']:
+            response.headers['Cache-Control'] = 'max-age=86400, ' + response.headers['Cache-Control']
+        if 'private' not in response.headers['Cache-Control']:
+            response.headers['Cache-Control'] = 'private, ' + response.headers['Cache-Control']
+    else:
+        response.headers['Cache-Control'] = 'private, max-age=86400'
+    return response
