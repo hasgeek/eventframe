@@ -2,18 +2,20 @@
 
 # The imports in this file are order-sensitive
 
+from __future__ import absolute_import
 from threading import Lock
 from pytz import timezone
 from flask import Flask
-from flask.ext.assets import Environment, Bundle
+from flask.ext.assets import Bundle
 from flask.ext.themes import setup_themes
 from flask.ext.lastuser import Lastuser
 from flask.ext.lastuser.sqlalchemy import UserManager
-from baseframe import baseframe, baseframe_js, baseframe_css, toastr_js, toastr_css
+import baseframe
 from coaster.app import SandboxedFlask, init_app
-from eventframe.assets import ThemeAwareEnvironment, load_theme_assets
-import eventframe.signals
 
+from .assets import ThemeAwareEnvironment, load_theme_assets
+from . import signals
+from ._version import __version__
 
 # First, create a domain dispatcher that knows where to send each request
 
@@ -40,10 +42,10 @@ class DomainDispatcher(object):
 
 # Second, make the main and event apps
 
+version = baseframe.Version(__version__)
 app = Flask(__name__, instance_relative_config=True)
 eventapp = SandboxedFlask(__name__, instance_relative_config=True, template_folder='themes-templates')
 lastuser = Lastuser()
-
 
 # Third, import models, nodes and views
 
@@ -54,18 +56,8 @@ import eventframe.views
 
 
 # Fourth, setup baseframe, assets and theme assets on both apps
-
-app.register_blueprint(baseframe)
-eventapp.register_blueprint(baseframe)
-
-assets = Environment(app)
+baseframe.assets['eventframe.css'][version] = 'css/app.css'
 eventassets = ThemeAwareEnvironment(eventapp)
-
-js = Bundle(baseframe_js, toastr_js,
-    filters='closure_js', output='js/packed.js')
-
-css = Bundle(baseframe_css, toastr_css, 'css/app.css',
-    filters='cssmin', output='css/packed.css')
 
 
 def init_for(env):
@@ -74,12 +66,14 @@ def init_for(env):
     app.config['tz'] = timezone(eventapp.config['TIMEZONE'])
     eventframe.models.db.init_app(app)
     eventframe.models.db.init_app(eventapp)
+    baseframe.baseframe.init_app(app, requires=['baseframe', 'toastr'])
+    baseframe.baseframe.init_app(eventapp, requires=[], assetenv=eventassets)
+    eventapp.assets = eventassets  # Replace baseframe-provided Environment with ThemeAwareEnvironment
+
     lastuser.init_app(app)
     lastuser.init_usermanager(UserManager(eventframe.models.db, eventframe.models.User))
-    assets.register('js_all', js)
-    assets.register('css_all', css)
-    eventassets.register('js_baseframe', baseframe_js)
-    eventassets.register('css_baseframe', baseframe_css)
+    eventassets.register('js_baseframe', baseframe.assets.require('baseframe.js'))
+    eventassets.register('css_baseframe', baseframe.assets.require('baseframe.css'))
 
     setup_themes(eventapp, app_identifier='eventframe')
     setup_themes(app, app_identifier='eventframe')  # To list themes in the admin views
