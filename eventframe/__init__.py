@@ -66,7 +66,7 @@ def init_for(env):
     app.config['tz'] = timezone(eventapp.config['TIMEZONE'])
     eventframe.models.db.init_app(app)
     eventframe.models.db.init_app(eventapp)
-    baseframe.baseframe.init_app(app, requires=['baseframe', 'toastr'])
+    baseframe.baseframe.init_app(app, requires=['baseframe', 'toastr', 'eventframe'])
     baseframe.baseframe.init_app(eventapp, requires=[], assetenv=eventassets)
     eventapp.assets = eventassets  # Replace baseframe-provided Environment with ThemeAwareEnvironment
 
