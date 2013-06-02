@@ -120,12 +120,12 @@ class Event(ContentMixin, Node):
         result['timezone'] = self.timezone
         result['location_name'] = self.location_name
         result['location_address'] = self.location_address
-        result['map'] = self.map.uuid
+        result['map'] = self.map.uuid if self.map else None
         result['mapmarker'] = self.mapmarker
         result['capacity'] = self.capacity
         result['allow_waitlisting'] = self.allow_waitlisting
         result['allow_maybe'] = self.allow_maybe
-        result['participant_list'] = self.participant_list.uuid
+        result['participant_list'] = self.participant_list.uuid if self.participant_list else None
         return result
 
     def import_from(self, data):
@@ -142,8 +142,10 @@ class Event(ContentMixin, Node):
 
     def import_from_internal(self, data):
         super(ContentMixin, self).import_from_internal(data)
-        self.map = Map.query.filter_by(uuid=data['map']).first()
-        self.participant_list = ParticipantList.query.filter_by(uuid=data['participant_list']).first()
+        if data.get('map'):
+            self.map = Map.query.filter_by(uuid=data['map']).first()
+        if data.get('participant_list'):
+            self.participant_list = ParticipantList.query.filter_by(uuid=data['participant_list']).first()
 
 
 class EventAttendee(BaseMixin, db.Model):
