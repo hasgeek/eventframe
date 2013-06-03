@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys
+
 from werkzeug.serving import run_simple
 
 from eventframe import app, eventapp, init_for
@@ -9,5 +11,10 @@ eventapp.debug = True
 application = init_for('development')
 db.create_all(app=app)
 
-run_simple('0.0.0.0', 8090, application,
+try:
+    port = int(sys.argv[1])
+except (IndexError, ValueError):
+    port = 8090
+
+run_simple('0.0.0.0', port, application,
     use_reloader=True, use_debugger=True, use_evalex=True)
