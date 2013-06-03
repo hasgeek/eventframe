@@ -19,6 +19,7 @@ from ._version import __version__
 
 # First, create a domain dispatcher that knows where to send each request
 
+
 class DomainDispatcher(object):
     def __init__(self, hosts, app, eventapp):
         self.hosts = set(hosts)
@@ -27,7 +28,7 @@ class DomainDispatcher(object):
         self.eventapp = eventapp
 
     def get_application(self, host):
-        if ':' in host:
+        if ':' in host:  # Remove port number
             host = host.split(':', 1)[0]
         with self.lock:
             if host in self.hosts:
@@ -72,8 +73,10 @@ def init_for(env):
 
     lastuser.init_app(app)
     lastuser.init_usermanager(UserManager(eventframe.models.db, eventframe.models.User))
-    eventassets.register('js_baseframe', baseframe.assets.require('baseframe.js'))
-    eventassets.register('css_baseframe', baseframe.assets.require('baseframe.css'))
+    eventassets.register('js_baseframe',
+        Bundle(baseframe.assets.require('baseframe.js'), filters='closure_js', output='js/packed.js'))
+    eventassets.register('css_baseframe',
+        Bundle(baseframe.assets.require('baseframe.css'), filters='cssmin', output='css/packed.css'))
 
     setup_themes(eventapp, app_identifier='eventframe')
     setup_themes(app, app_identifier='eventframe')  # To list themes in the admin views
