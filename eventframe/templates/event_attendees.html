@@ -14,7 +14,11 @@
     {% for attendee in attendees -%}
       <li class="row-fluid item item-hover">
         <div class="span1">{{ loop.index }}</div>
-        <div class="span5">{{ attendee.user.fullname }}</div>
+        <div class="span5">{% if attendee.user.fullname -%}
+          {{ attendee.user.fullname }}
+        {%- else -%}
+          <em>(blank)</em>
+        {%- endif %}</div>
         <div class="span4">{{ attendee.user.email }}</div>
         <div class="span2">{{ attendee.status }}</div>
       </li>
