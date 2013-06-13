@@ -1,11 +1,12 @@
 ordereddict
 Flask
-https://github.com/hasgeek/coaster/archive/master.zip#egg=coaster
-https://github.com/hasgeek/baseframe/archive/master.zip#egg=baseframe
 Flask-SQLAlchemy
-https://github.com/hasgeek/flask-lastuser/archive/master.zip#egg=Flask-Lastuser
-https://github.com/jace/flask-themes/archive/master.zip#egg=Flask-Themes
 requests
 simplejson
 pytz
 blinker
+unicodecsv
+https://github.com/hasgeek/coaster/archive/master.zip#egg=coaster
+https://github.com/hasgeek/baseframe/archive/master.zip#egg=baseframe
+https://github.com/hasgeek/flask-lastuser/archive/master.zip#egg=Flask-Lastuser
+https://github.com/jace/flask-themes/archive/master.zip#egg=Flask-Themes

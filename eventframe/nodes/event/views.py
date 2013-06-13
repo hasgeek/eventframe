@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from StringIO import StringIO
+import unicodecsv
 from werkzeug.routing import Map as UrlMap, Rule as UrlRule
 from flask import g, request, render_template, abort, Markup, flash, redirect, escape
 from flask.ext.themes import get_theme, render_theme_template
+from eventframe import lastuser
 from eventframe.forms import ConfirmForm
 from eventframe.nodes import db, NodeHandler
 from eventframe.nodes.content import ContentHandler
@@ -20,7 +23,7 @@ class EventHandler(ContentHandler):
     title_new = u"New event"
     title_edit = u"Edit event"
 
-    actions = ['list']
+    actions = ['list', 'csv', 'update']
 
     def edit_tabs(self):
         tabs = super(EventHandler, self).edit_tabs()
@@ -68,8 +71,35 @@ class EventHandler(ContentHandler):
         self.action = 'list'
         self.form = None
         attendees = self.node.attendees
-        attendees.sort(key=lambda a: a.user.fullname.strip().upper())
+        attendees.sort(key=lambda a: ({'Y': 0, 'M': 1, 'W': 2, 'N': 3}.get(a.status), a.user.fullname.strip().upper()))
         return render_template('event_attendees.html', node=self.node, attendees=attendees, tabs=self.edit_tabs())
+
+    def csv(self):
+        f = StringIO()
+        out = unicodecsv.writer(f, encoding='utf-8')
+        out.writerow(['Name', 'Email', 'Status'])
+        attendees = self.node.attendees
+        attendees.sort(key=lambda a: ({'Y': 0, 'M': 1, 'W': 2, 'N': 3}.get(a.status), a.user.fullname.strip().upper()))
+        for attendee in self.node.attendees:
+            out.writerow([attendee.user.fullname, attendee.user.email, attendee.status])
+        f.seek(0)
+        return f.getvalue(), 200, [
+            ('Content-Type', 'text/csv; charset=utf-8'),
+            ('Content-Disposition', 'attachment; filename=' + self.node.name + '.csv')]
+
+    def update(self):
+        # FIXME: Shouldn't be a GET request
+        for attendee in self.node.attendees:
+            result = lastuser.call_resource('id', all=1,
+                _token=attendee.user.lastuser_token,
+                _token_type=attendee.user.lastuser_token_type)
+            # Step 5. Update locally
+            if result.get('status') == 'ok':
+                userinfo = result['result']
+                lastuser.usermanager.load_user_userinfo(userinfo, update=True)
+        db.session.commit()
+        flash("User details updated", 'success')
+        return redirect(self.node.url_for('list'))
 
 
 class EventViewHandler(NodeHandler):
