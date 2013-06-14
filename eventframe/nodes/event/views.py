@@ -90,16 +90,10 @@ class EventHandler(ContentHandler):
     def update(self):
         # FIXME: Shouldn't be a GET request
         for attendee in self.node.attendees:
-            result = lastuser.call_resource('id', all=1,
-                _token=attendee.user.lastuser_token,
-                _token_type=attendee.user.lastuser_token_type)
-            # Step 5. Update locally
-            if result.get('status') == 'ok':
-                userinfo = result['result']
-                lastuser.usermanager.load_user_userinfo(userinfo, update=True)
+            lastuser.update_user(attendee.user)
         db.session.commit()
         flash("User details updated", 'success')
-        return redirect(self.node.url_for('list'))
+        return redirect(self.node.url_for('list'), code=303)
 
 
 class EventViewHandler(NodeHandler):
