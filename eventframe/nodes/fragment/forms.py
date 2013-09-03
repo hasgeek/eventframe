@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import flask.ext.wtf as wtf
+import wtforms
 from eventframe.forms import (Form, RichTextField, DictField, valid_name,
     tinymce_options, richtext_sanitize_tags, richtext_sanitize_attributes)
 
@@ -11,9 +11,9 @@ class FragmentForm(Form):
     """
     A fragment form is like a content form but without a summary or template.
     """
-    previous_id = wtf.HiddenField(u"Previous revision")
-    title = wtf.TextField(u"Title", validators=[wtf.Required()])
-    name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
+    previous_id = wtforms.HiddenField(u"Previous revision")
+    title = wtforms.TextField(u"Title", validators=[wtforms.validators.Required()])
+    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Required(), valid_name])
     content = RichTextField(u"Page content", linkify=False,
         tinymce_options=tinymce_options,
         sanitize_tags=richtext_sanitize_tags,
@@ -27,7 +27,7 @@ class FragmentForm(Form):
             try:
                 field.data = int(field.data)
             except ValueError:
-                raise wtf.ValidationError(u"Unknown previous revision")
+                raise wtforms.ValidationError(u"Unknown previous revision")
 
     def validate_name(self, field):
         # TODO

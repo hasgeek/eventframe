@@ -3,7 +3,7 @@
 from werkzeug.exceptions import NotFound
 from functools import wraps
 from flask import g, abort, current_app, request, render_template, url_for
-import flask.ext.wtf as wtf
+import wtforms
 from eventframe.models import Hostname
 
 __all__ = ['NodeHandler', 'AutoFormHandler', 'node_registry', 'render_form', 'stream_template', 'get_website']
@@ -107,7 +107,7 @@ def get_website(f):
 def render_form(form, title, message='', formid='form', submit=u"Submit", cancel_url=None, tabs=[], node=None, ajax=False):
     multipart = False
     for field in form:
-        if isinstance(field.widget, wtf.FileInput):
+        if isinstance(field.widget, wtforms.widgets.FileInput):
             multipart = True
     if request.is_xhr and ajax:
         return render_template('baseframe/ajaxform.html', form=form, title=title,

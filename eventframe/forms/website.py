@@ -2,7 +2,8 @@
 
 import simplejson as json
 from coaster import make_name
-import flask.ext.wtf as wtf
+import wtforms
+import wtforms.fields.html5
 from baseframe.forms import Form, RichTextField, DateTimeField
 from pytz import common_timezones
 
@@ -42,8 +43,8 @@ def valid_name(form, field):
     field.data = make_name(field.data)
 
 
-class HostnamesField(wtf.fields.Field):
-    widget = wtf.TextInput()
+class HostnamesField(wtforms.fields.Field):
+    widget = wtforms.widgets.TextInput()
 
     def __init__(self, label='', validators=None, **kwargs):
         super(HostnamesField, self).__init__(label, validators, **kwargs)
@@ -71,8 +72,8 @@ class HostnamesField(wtf.fields.Field):
                 yield item
 
 
-class DictField(wtf.fields.Field):
-    widget = wtf.TextArea()
+class DictField(wtforms.fields.Field):
+    widget = wtforms.widgets.TextArea()
     description = u'One per line, as {"key": "value"}'
 
     def __init__(self, *args, **kwargs):
@@ -96,14 +97,14 @@ class DictField(wtf.fields.Field):
 
 
 class WebsiteForm(Form):
-    title = wtf.TextField(u"Title", validators=[wtf.Required()])
-    name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
-    url = wtf.html5.URLField(u"Website URL", validators=[wtf.Required()])
-    hostnames = HostnamesField(u"Hostnames", validators=[wtf.Required()],
+    title = wtforms.TextField(u"Title", validators=[wtforms.validators.Required()])
+    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Required(), valid_name])
+    url = wtforms.fields.html5.URLField(u"Website URL", validators=[wtforms.validators.Required()])
+    hostnames = HostnamesField(u"Hostnames", validators=[wtforms.validators.Required()],
         description=u"Hostnames at which this website will be accessed, comma separated")
-    theme = wtf.SelectField(u"Website theme", validators=[wtf.Required()])
-    typekit_code = wtf.TextField(u"Typekit code")
-    googleanalytics_code = wtf.TextField(u"Google Analytics code")
+    theme = wtforms.SelectField(u"Website theme", validators=[wtforms.validators.Required()])
+    typekit_code = wtforms.TextField(u"Typekit code")
+    googleanalytics_code = wtforms.TextField(u"Google Analytics code")
 
     def validate_name(self, field):
         # TODO: Ensure name is unique
@@ -115,11 +116,11 @@ class WebsiteForm(Form):
 
 
 class FolderForm(Form):
-    name = wtf.TextField(u"URL name", validators=[wtf.Optional(), valid_name],
+    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Optional(), valid_name],
         description=u"Folder name as it appears in the URL (without slashes)")
-    title = wtf.TextField(u"Title",
+    title = wtforms.TextField(u"Title",
         description=u"Folder title, used in the per-folder blog feed")
-    theme = wtf.SelectField(u"Theme")
+    theme = wtforms.SelectField(u"Theme")
 
     def validate_name(self, field):
         # TODO
@@ -127,8 +128,8 @@ class FolderForm(Form):
 
 
 class ImportForm(Form):
-    import_file = wtf.FileField(u"Upload file", validators=[wtf.Required()])
-    import_updated = wtf.BooleanField(u"Only import newer nodes", default=True,
+    import_file = wtforms.FileField(u"Upload file", validators=[wtforms.validators.Required()])
+    import_updated = wtforms.BooleanField(u"Only import newer nodes", default=True,
         description=u"Nodes that are newer locally will not be imported")
 
 
@@ -137,6 +138,6 @@ class ConfirmForm(Form):
 
 
 class FileFolderForm(Form):
-    name = wtf.TextField(u"URL name", validators=[wtf.Required(), valid_name])
-    title = wtf.TextField(u"Title", validators=[wtf.Required()])
+    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Required(), valid_name])
+    title = wtforms.TextField(u"Title", validators=[wtforms.validators.Required()])
     properties = DictField(u"Properties")
