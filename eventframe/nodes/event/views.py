@@ -109,7 +109,7 @@ class EventHandler(ContentHandler):
                     'ticket_phone': participant.phone,
                     'ticket_twitter': participant.twitter,
                     'ticket_type': participant.ticket_type,
-                    'ticket_jobtitle': participant.job_title,
+                    'ticket_jobtitle': participant.jobtitle,
                     'ticket_company': participant.company,
                     'ticket_city': participant.city,
                     'ticket_tshirt_size': participant.tshirt_size,
