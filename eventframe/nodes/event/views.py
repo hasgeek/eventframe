@@ -3,7 +3,7 @@
 from StringIO import StringIO
 import unicodecsv
 from werkzeug.routing import Map as UrlMap, Rule as UrlRule
-from flask import g, request, render_template, abort, Markup, flash, redirect, escape
+from flask import g, request, render_template, abort, Markup, flash, redirect, escape, jsonify
 from flask.ext.themes import get_theme, render_theme_template
 from eventframe import lastuser
 from eventframe.forms import ConfirmForm
@@ -23,7 +23,7 @@ class EventHandler(ContentHandler):
     title_new = u"New event"
     title_edit = u"Edit event"
 
-    actions = ['list', 'csv', 'update']
+    actions = ['list', 'csv', 'update', 'json']
 
     def edit_tabs(self):
         tabs = super(EventHandler, self).edit_tabs()
@@ -80,12 +80,42 @@ class EventHandler(ContentHandler):
         out.writerow(['Name', 'Email', 'Status'])
         attendees = self.node.attendees
         attendees.sort(key=lambda a: ({'Y': 0, 'M': 1, 'W': 2, 'N': 3}.get(a.status), a.user.fullname.strip().upper()))
-        for attendee in self.node.attendees:
+        for attendee in attendees:
             out.writerow([attendee.user.fullname, attendee.user.email, attendee.status])
         f.seek(0)
         return f.getvalue(), 200, [
             ('Content-Type', 'text/csv; charset=utf-8'),
             ('Content-Disposition', 'attachment; filename=' + self.node.name + '.csv')]
+
+    def json(self):
+        data = []
+        attendees = self.node.attendees
+        attendees.sort(key=lambda a: ({'Y': 0, 'M': 1, 'W': 2, 'N': 3}.get(a.status), a.user.fullname.strip().upper()))
+        for attendee in attendees:
+            if self.node.participant_list:
+                participant = self.node.participant_list.get_participant(attendee.user)
+            else:
+                participant = None
+            adata = {
+                'fullname': attendee.user.fullname,
+                'email': attendee.user.email,
+                'status': attendee.status,
+                }
+            if participant:
+                adata.update({
+                    'ticket': participant.ticket,
+                    'ticket_name': participant.fullname,
+                    'ticket_email': participant.email,
+                    'ticket_phone': participant.phone,
+                    'ticket_twitter': participant.twitter,
+                    'ticket_type': participant.ticket_type,
+                    'ticket_jobtitle': participant.job_title,
+                    'ticket_company': participant.company,
+                    'ticket_city': participant.city,
+                    'ticket_tshirt_size': participant.tshirt_size,
+                    })
+            data.append(adata)
+        return jsonify(attendees=data)
 
     def update(self):
         # FIXME: Shouldn't be a GET request

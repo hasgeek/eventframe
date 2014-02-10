@@ -25,7 +25,10 @@ class ParticipantList(ContentMixin, Node):
         self.participants = []
 
     def has_user(self, user):
-        return Participant.query.filter_by(participant_list=self).filter_by(user=user).first() is not None
+        return Participant.query.filter_by(participant_list=self, user=user).first() is not None
+
+    def get_participant(self, user):
+        return Participant.query.filter_by(participant_list=self, user=user).first()
 
     def url_for(self, action='view'):
         if action in ['sync', 'list']:

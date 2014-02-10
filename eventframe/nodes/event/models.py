@@ -104,7 +104,7 @@ class Event(ContentMixin, Node):
                 return base + 'rsvp'
             else:
                 return base + '/rsvp'
-        elif action in ['list', 'csv', 'update']:
+        elif action in ['list', 'csv', 'update', 'json']:
             return url_for('node_action',
                 website=self.folder.website.name,
                 folder=self.folder.name,

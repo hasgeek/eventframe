@@ -6,6 +6,7 @@
   {{ edit_tabs(tabs, g.website, g.folder) }}
   <p>
     <a href="{{ node.url_for('csv') }}" class="btn">Download CSV</a>
+    <a href="{{ node.url_for('json') }}" class="btn">Download JSON</a>
     <a href="{{ node.url_for('update') }}" class="btn">Update details</a>
   </p>
   <ul class="grid container-fluid">
