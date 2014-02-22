@@ -20,6 +20,12 @@ def longdate(date):
     return utc.localize(date).astimezone(app.config['tz']).strftime('%B %e, %Y')
 
 
+@app.template_filter('datetime')
+@eventapp.template_filter('datetime')
+def datetime_filter(date):
+    return utc.localize(date).astimezone(app.config['tz']).strftime('%B %e, %Y %H:%m')
+
+
 def feedhelper(folder=None, limit=20):
     if folder is None:
         folder = Folder.query.filter_by(name=u'', website=g.website).first()
