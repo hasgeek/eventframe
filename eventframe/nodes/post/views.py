@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from flask import url_for, Response, request
+from flask import url_for, Response, request, jsonify
+from werkzeug.routing import Map as UrlMap, Rule as UrlRule
 from flask.ext.themes import get_theme, render_theme_template
 from coaster.views import load_model
 from eventframe import eventapp
 from eventframe.models import db, Folder, Node
-from eventframe.nodes import get_website
+from eventframe.nodes import get_website, NodeHandler
 from eventframe.nodes.content import ContentHandler
 from eventframe.nodes.post.models import Post
 
-__all__ = ['PostHandler', 'rootfeed', 'folderfeed', 'register']
+__all__ = ['PostHandler', 'PostViewHandler', 'rootfeed', 'folderfeed', 'register']
 
 
 class PostHandler(ContentHandler):
@@ -23,6 +24,18 @@ class PostHandler(ContentHandler):
             form.template.data = 'post.html'
         return form
 
+
+class PostViewHandler(NodeHandler):
+    def GET(self):
+        theme = get_theme(self.folder.theme)
+        return render_theme_template(theme, self.node.template,
+            website=self.website, folder=self.folder, title=self.node.title, node=self.node, _fallback=False)
+    def json(self):
+        return jsonify(title=self.node.title, description=self.node.description, url=self.node.url_for())
+
+url_map = UrlMap([
+    UrlRule('/json', endpoint='json', methods=['GET'])
+    ])
 
 def feedquery():
     return Post.query.filter_by(is_published=True).order_by(db.desc('node.published_at'))
@@ -77,4 +90,4 @@ def folder_feed(folder):
 
 
 def register(registry):
-    registry.register(Post, PostHandler, render=True)
+    registry.register(Post, PostHandler, view_handler=PostViewHandler, view_url_map=url_map, render=True)
