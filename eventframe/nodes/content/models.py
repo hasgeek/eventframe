@@ -196,16 +196,18 @@ class ContentMixin(NodeMixin):
         revision.content = data['content']
         revision.template = data['template']
 
-    def url_for(self, action='view'):
+    def url_for(self, action='view', _external=False):
         if action == 'publish':
             return url_for('node_publish',
                 website=self.folder.website.name,
                 folder=self.folder.name,
-                node=self.name)
+                node=self.name,
+                _external=_external)
         elif action == 'unpublish':
             return url_for('node_unpublish',
                 website=self.folder.website.name,
                 folder=self.folder.name,
-                node=self.name)
+                node=self.name,
+                _external=_external)
         else:
-            return super(ContentMixin, self).url_for(action)
+            return super(ContentMixin, self).url_for(action, _external=_external)

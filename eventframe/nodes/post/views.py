@@ -31,7 +31,7 @@ class PostViewHandler(NodeHandler):
         return render_theme_template(theme, self.node.template,
             website=self.website, folder=self.folder, title=self.node.title, node=self.node, _fallback=False)
     def json(self):
-        return jsonify(title=self.node.title, description=self.node.description, url=self.node.url_for())
+        return jsonify(title=self.node.title, description=self.node.description, url=self.node.url_for('view', _external=True))
 
 url_map = UrlMap([
     UrlRule('/json', endpoint='json', methods=['GET'])

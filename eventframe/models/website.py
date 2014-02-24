@@ -252,25 +252,27 @@ class Node(BaseScopedNameMixin, db.Model):
         # Only required for nodes that keep internal references to other nodes
         pass
 
-    def url_for(self, action='view'):
+    def url_for(self, action='view', _external=False):
         """
         Return a URL to this node.
         """
         if action == 'view':
             if self.folder.name == u'':
-                return url_for('folder', folder=self.name)
+                return url_for('folder', folder=self.name, _external=_external)
             else:
-                return url_for('node', folder=self.folder.name, node=self.name)
+                return url_for('node', folder=self.folder.name, node=self.name, _external=_external)
         elif action == 'edit':
             return url_for('node_edit',
                 website=self.folder.website.name,
                 folder=self.folder.name,
-                node=self.name)
+                node=self.name,
+                _external=_external)
         elif action == 'delete':
             return url_for('node_delete',
                 website=self.folder.website.name,
                 folder=self.folder.name,
-                node=self.name)
+                node=self.name,
+                _external=_external)
 
 
 class NodeMixin(object):
