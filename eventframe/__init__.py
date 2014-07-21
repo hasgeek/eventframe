@@ -74,7 +74,7 @@ def init_for(env):
     lastuser.init_app(app)
     lastuser.init_usermanager(UserManager(eventframe.models.db, eventframe.models.User))
     eventassets.register('js_baseframe',
-        Bundle(baseframe.assets.require('baseframe.js'), filters='closure_js', output='js/packed.js'))
+        Bundle(baseframe.assets.require('baseframe.js'), filters='uglipyjs', output='js/packed.js'))
     eventassets.register('css_baseframe',
         Bundle(baseframe.assets.require('baseframe.css'), filters='cssmin', output='css/packed.css'))
 

@@ -121,5 +121,5 @@ def load_theme_assets(env, theme):
     if isinstance(js_list, basestring):
         js_list = [js_list]
     js = Bundle(*[Bundle('_themes/%s/%s' % (theme.identifier, item),
-        filters='closure_js', output='_themes/%s/%s.packed.js' % (theme.identifier, item)) for item in js_list])
+        filters='uglipyjs', output='_themes/%s/%s.packed.js' % (theme.identifier, item)) for item in js_list])
     env.register('js_%s' % theme.identifier, js)
