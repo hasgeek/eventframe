@@ -6,6 +6,8 @@ simplejson
 pytz
 blinker
 unicodecsv
+webassets>=0.10
+Flask-Assets>=0.10
 https://github.com/hasgeek/coaster/archive/master.zip#egg=coaster
 https://github.com/hasgeek/baseframe/archive/master.zip#egg=baseframe
 https://github.com/hasgeek/flask-lastuser/archive/master.zip#egg=Flask-Lastuser

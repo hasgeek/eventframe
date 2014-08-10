@@ -11,27 +11,50 @@ except ImportError:
     FlaskResolver = object
 
 
-# Resolver for Flask-Assets >= 0.8
+# Resolver for Flask-Assets >= 0.10
 class ThemeAwareResolver(FlaskResolver):
+    def resolve_output_to_path(self, ctx, target, bundle):
+        if target.startswith('_themes/'):
+            theme, filename = target[8:].split('/', 1)
+            directory = ctx._app.theme_manager.themes[theme].static_path
+            return path.abspath(path.join(directory, filename))
+        return super(ThemeAwareResolver, self).resolve_output_to_path(ctx, target, bundle)
+
+    def search_for_source(self, ctx, item):
+        if item.startswith('_themes/'):
+            theme, filename = item[8:].split('/', 1)
+            directory = ctx._app.theme_manager.themes[theme].static_path
+            return path.abspath(path.join(directory, filename))
+        return super(ThemeAwareResolver, self).search_for_source(ctx, item)
+
+    def resolve_output_to_url(self, ctx, target):
+        if target.startswith('_themes/'):
+            theme, filename = target[8:].split('/', 1)
+            return static_file_url(theme, filename)
+        return super(ThemeAwareResolver, self).resolve_output_to_url(ctx, target)
+
+
+# Resolver for Flask-Assets >= 0.8, < 0.10, deprecated
+class OldThemeAwareResolver(FlaskResolver):
     def resolve_output_to_path(self, target, bundle):
         if target.startswith('_themes/'):
             theme, filename = target[8:].split('/', 1)
             directory = self.env._app.theme_manager.themes[theme].static_path
             return path.abspath(path.join(directory, filename))
-        return super(ThemeAwareResolver, self).resolve_output_to_path(target, bundle)
+        return super(OldThemeAwareResolver, self).resolve_output_to_path(target, bundle)
 
     def search_for_source(self, item):
         if item.startswith('_themes/'):
             theme, filename = item[8:].split('/', 1)
             directory = self.env._app.theme_manager.themes[theme].static_path
             return path.abspath(path.join(directory, filename))
-        return super(ThemeAwareResolver, self).search_for_source(item)
+        return super(OldThemeAwareResolver, self).search_for_source(item)
 
     def resolve_output_to_url(self, target):
         if target.startswith('_themes/'):
             theme, filename = target[8:].split('/', 1)
             return static_file_url(theme, filename)
-        return super(ThemeAwareResolver, self).resolve_output_to_url(target)
+        return super(OldThemeAwareResolver, self).resolve_output_to_url(target)
 
 
 class ThemeAwareEnvironment(Environment):
