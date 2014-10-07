@@ -113,11 +113,12 @@ def clipboard_paste(folder, nodeids, action):
         elif action == 'copy':
             # Copy and paste data
             data = node.as_json()
-            newnode = node.__class__(folder=folder)
-            newnode.user = g.user
-            newnode.import_from(data)
-            newnode.import_from_internal(data)
-            newnode.uuid = newid()  # import_from will copy the UUID. Regenerate it.
+            with db.session.no_autoflush:
+                newnode = node.__class__(folder=folder)
+                newnode.user = g.user
+                newnode.import_from(data)
+                newnode.import_from_internal(data)
+                newnode.uuid = newid()  # import_from will copy the UUID. Regenerate it.
             node = newnode  # For the namecheck below
         # If the name conflicts, give it a new name. maxlength=250 from coaster.sqlalchemy
         returnids.append(node.uuid)
@@ -240,20 +241,21 @@ def folder_import(website, folder):
         for inode in data['nodes']:
             mtime = parse_isoformat(inode.get('revision_updated_at', inode['updated_at']))
             node = Node.query.filter_by(folder=folder, uuid=inode['uuid']).first()
-            if node is None:
-                nreg = node_registry.get(inode['type'])
-                if nreg is None:
-                    flash("Could not import node of unknown type '%s'" % inode['type'], "error")
-                    continue
-                node = nreg.model(folder=folder)
-                user = User.query.filter_by(userid=inode['userid']).first()
-                node.user = user or g.user
-                db.session.add(node)
-                create_count += 1
-            else:
-                if form.import_updated.data and mtime <= node.updated_at:
-                    continue
-            node.import_from(inode)
+            with db.session.no_autoflush:
+                if node is None:
+                    nreg = node_registry.get(inode['type'])
+                    if nreg is None:
+                        flash("Could not import node of unknown type '%s'" % inode['type'], "error")
+                        continue
+                    node = nreg.model(folder=folder)
+                    user = User.query.filter_by(userid=inode['userid']).first()
+                    node.user = user or g.user
+                    db.session.add(node)
+                    create_count += 1
+                else:
+                    if form.import_updated.data and mtime <= node.updated_at:
+                        continue
+                node.import_from(inode)
             internal_imports.append(inode)
             import_count += 1
         db.session.commit()
