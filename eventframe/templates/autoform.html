@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% from "baseframe/forms.html" import renderform, ajaxform, tinymce3_editor %}
+{% from "baseframe/forms.html" import renderform, ajaxform, widgetscripts %}
 {% from "macros.html" import edit_tabs %}
 
 {% block headline %}{% endblock %}
@@ -9,10 +9,12 @@
 {% endblock %}
 
 {% block footerscripts %}
-  {% for field in form -%}
-    {% if field.widget.input_type == 'tinymce' -%}
-      {{ tinymce3_editor(field) }}
-    {%- endif %}
-  {%- endfor %}
-  {{ ajaxform(formid, request, ajax) }}
+  <script type="text/javascript">
+    $(function() {
+      {{ widgetscripts(form, script=false) }};
+      // Reset disabled state if page was reloaded (TODO: does this really get called?)
+      $('#{{ formid }} .submit-disabled').prop('disabled', false);
+    });
+  </script>
+  {{ ajaxform(formid=formid, request=request, force=ajax) }}
 {% endblock %}
