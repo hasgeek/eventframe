@@ -187,6 +187,7 @@ class _NodeProperties(dict):
 
 class Node(BaseScopedNameMixin, db.Model):
     __tablename__ = 'node'
+    __name_blank_allowed__ = True
     #: Id of the node across sites (staging, production, etc) for import/export
     uuid = db.Column(db.Unicode(22), unique=True, default=newid, nullable=False)
     #: User who made this node
