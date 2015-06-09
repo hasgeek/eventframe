@@ -90,6 +90,7 @@ class LoginCode(BaseMixin, db.Model):
 
 class Folder(BaseScopedNameMixin, db.Model):
     __tablename__ = 'folder'
+    __name_blank_allowed__ = True
     #: Website this folder is under
     website_id = db.Column(db.Integer, db.ForeignKey('website.id'), nullable=False)
 
