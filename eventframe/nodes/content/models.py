@@ -94,7 +94,8 @@ class ContentMixin(NodeMixin):
     def last_revision(self):
         revision = self.revisions.draft or self.revisions.published
         if revision is None:
-            revision = ContentRevision.query.filter_by(parent=self.revisions).order_by(db.desc('id')).limit(1).first()
+            with db.session.no_autoflush:
+                revision = ContentRevision.query.filter_by(parent=self.revisions).order_by(db.desc('id')).limit(1).first()
         return revision
 
     def publish(self, revision=None):
