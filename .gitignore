@@ -22,3 +22,7 @@ error.log
 packed.js
 packed.css
 eventframe/static/gen/
+*.sql
+*.sql.gz
+*.sql.bz2
+node_modules/

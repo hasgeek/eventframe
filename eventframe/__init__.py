@@ -55,6 +55,7 @@ import eventframe.nodes
 eventframe.nodes.init()
 import eventframe.views
 
+from eventframe.models import db  # NOQA
 
 # Fourth, setup baseframe, assets and theme assets on both apps
 baseframe.assets['eventframe.css'][version] = 'css/app.css'
