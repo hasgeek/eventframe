@@ -15,7 +15,7 @@ class ContentRevision(BaseMixin, db.Model):
     """
     __tablename__ = 'content_revision'
     parent_id = db.Column(db.Integer, db.ForeignKey('revisions.id', use_alter=True,
-        name='fk_content_revision_parent_id'), nullable=False)
+        name='content_revision_parent_id_fkey'), nullable=False)
     #: Previous revision
     previous_id = db.Column(db.Integer, db.ForeignKey('content_revision.id'), nullable=True)
     previous = db.relationship('ContentRevision', remote_side='ContentRevision.id', uselist=False)
