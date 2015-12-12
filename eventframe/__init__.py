@@ -14,7 +14,6 @@ import baseframe
 from coaster.app import SandboxedFlask, init_app
 
 from .assets import ThemeAwareEnvironment, load_theme_assets
-from . import signals
 from ._version import __version__
 
 # First, create a domain dispatcher that knows where to send each request
