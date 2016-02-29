@@ -7,7 +7,7 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from urlparse import urljoin
 from flask import g, url_for
 from coaster import newid, parse_isoformat
-from eventframe.models import db, TimestampMixin, BaseMixin, BaseNameMixin, BaseScopedNameMixin
+from eventframe.models import db, BaseMixin, BaseNameMixin, BaseScopedNameMixin
 from eventframe.models.user import User
 
 __all__ = ['Website', 'Hostname', 'LoginCode', 'Folder', 'Node', 'NodeMixin']
@@ -36,7 +36,7 @@ class Website(BaseNameMixin, db.Model):
         super(Website, self).__init__(**kwargs)
         root = Folder(name=u'', title=u'', website=self)
         self.folders.append(root)
-        #root.pages[0].template = u'index.html'
+        # root.pages[0].template = u'index.html'
 
     def __repr__(self):
         return u'<Website %s "%s">' % (self.name, self.title)
@@ -99,7 +99,7 @@ class Folder(BaseScopedNameMixin, db.Model):
     website = db.relationship(Website,
         backref=db.backref('folders', order_by='Folder.name', cascade='all, delete-orphan'))
     parent = db.synonym('website')
-    __table_args__ = (db.UniqueConstraint('name', 'website_id'),)
+    __table_args__ = (db.UniqueConstraint('website_id', 'name'),)
 
     @property
     def theme(self):
@@ -114,9 +114,9 @@ class Folder(BaseScopedNameMixin, db.Model):
 
     def __init__(self, **kwargs):
         super(Folder, self).__init__(**kwargs)
-        #index = Page(name=u'', title=u'Index', folder=self, template=u'page.html')
-        #index.name = u''  # Reset it to a blank
-        #self.pages.append(index)
+        # index = Page(name=u'', title=u'Index', folder=self, template=u'page.html')
+        # index.name = u''  # Reset it to a blank
+        # self.pages.append(index)
 
     def __repr__(self):
         return u'<Folder %s at %s>' % (self.name or '(root)', self.website.name)
@@ -143,7 +143,7 @@ class Property(BaseMixin, db.Model):
     name = db.Column(db.Unicode(40), nullable=False)
     value = db.Column(db.Unicode(250), nullable=False)
 
-    __table_args__ = (db.UniqueConstraint('name', 'node_id'),)
+    __table_args__ = (db.UniqueConstraint('node_id', 'name'),)
 
 
 _marker = []
@@ -205,7 +205,7 @@ class Node(BaseScopedNameMixin, db.Model):
     published_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     #: Type of node, for polymorphic identity
     type = db.Column('type', db.Unicode(20))
-    __table_args__ = (db.UniqueConstraint('name', 'folder_id'),)
+    __table_args__ = (db.UniqueConstraint('folder_id', 'name'),)
     __mapper_args__ = {'polymorphic_on': type}
 
     node_properties = db.relationship(Property,
