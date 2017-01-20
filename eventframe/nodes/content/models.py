@@ -136,9 +136,10 @@ class ContentMixin(NodeMixin):
         if revision is None:
             # If parent is still None after this, there was no parent
             revision = self.last_revision()
-        new_revision = ContentRevision(parent=self.revisions, previous=revision)
-        self.revisions.draft = new_revision
-        db.session.add(new_revision)
+        with db.session.no_autoflush:
+            new_revision = ContentRevision(parent=self.revisions, previous=revision)
+            self.revisions.draft = new_revision
+            db.session.add(new_revision)
         return new_revision
 
     @property
