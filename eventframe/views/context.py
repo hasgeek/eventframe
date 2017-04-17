@@ -11,19 +11,19 @@ from eventframe.nodes.fragment import Fragment
 @app.template_filter('shortdate')
 @eventapp.template_filter('shortdate')
 def shortdate(date):
-    return utc.localize(date).astimezone(app.config['tz']).strftime('%b %e')
+    return utc.localize(date).astimezone(app.config['tz']).strftime('%e %b')
 
 
 @app.template_filter('longdate')
 @eventapp.template_filter('longdate')
 def longdate(date):
-    return utc.localize(date).astimezone(app.config['tz']).strftime('%B %e, %Y')
+    return utc.localize(date).astimezone(app.config['tz']).strftime('%e %B %Y')
 
 
 @app.template_filter('datetime')
 @eventapp.template_filter('datetime')
 def datetime_filter(date):
-    return utc.localize(date).astimezone(app.config['tz']).strftime('%B %e, %Y %H:%m')
+    return utc.localize(date).astimezone(app.config['tz']).strftime('%e %B %Y %H:%m')
 
 
 def feedhelper(folder=None, limit=20):
