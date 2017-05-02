@@ -23,7 +23,7 @@ def longdate(date):
 @app.template_filter('datetime')
 @eventapp.template_filter('datetime')
 def datetime_filter(date):
-    return utc.localize(date).astimezone(app.config['tz']).strftime('%e %B %Y %H:%m')
+    return utc.localize(date).astimezone(app.config['tz']).strftime('%e %B %Y %H:%M')
 
 
 def feedhelper(folder=None, limit=20):
