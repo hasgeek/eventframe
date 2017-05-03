@@ -6,10 +6,10 @@ from __future__ import absolute_import
 from threading import Lock
 from pytz import timezone
 from flask import Flask
-from flask.ext.assets import Bundle
-from flask.ext.themes import setup_themes
-from flask.ext.lastuser import Lastuser
-from flask.ext.lastuser.sqlalchemy import UserManager
+from flask_assets import Bundle
+from flask_themes import setup_themes
+from flask_lastuser import Lastuser
+from flask_lastuser.sqlalchemy import UserManager
 import baseframe
 from coaster.app import SandboxedFlask, init_app
 

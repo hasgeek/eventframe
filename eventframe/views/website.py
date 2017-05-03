@@ -3,7 +3,7 @@
 import os.path
 from werkzeug.exceptions import NotFound
 from flask import g, request, abort, redirect, send_file
-from flask.ext.themes import get_theme, render_theme_template
+from flask_themes import get_theme, render_theme_template
 from baseframe import favicon as baseframe_favicon
 from eventframe import eventapp
 from eventframe.nodes import node_registry, get_website

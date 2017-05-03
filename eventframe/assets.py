@@ -2,11 +2,11 @@
 
 from os import path
 from flask import _request_ctx_stack, url_for
-from flask.ext.assets import Environment, Bundle, get_static_folder
-from flask.ext.themes import static_file_url
+from flask_assets import Environment, Bundle, get_static_folder
+from flask_themes import static_file_url
 
 try:
-    from flask.ext.assets import FlaskResolver
+    from flask_assets import FlaskResolver
 except ImportError:
     FlaskResolver = object
 

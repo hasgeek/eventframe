@@ -3,7 +3,7 @@
 from urlparse import urljoin
 from functools import wraps
 from flask import g, request, url_for, redirect, session, abort
-from flask.ext.lastuser import UserInfo as LastuserInfo
+from flask_lastuser import UserInfo as LastuserInfo
 from coaster.views import get_next_url, get_current_url
 from eventframe import app, eventapp
 from eventframe.signals import signal_login, signal_logout

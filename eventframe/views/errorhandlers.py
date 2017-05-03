@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask.ext.themes import get_theme, render_theme_template
+from flask_themes import get_theme, render_theme_template
 from eventframe import eventapp
 from eventframe.nodes import get_website
 

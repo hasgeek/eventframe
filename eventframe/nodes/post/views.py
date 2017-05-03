@@ -2,7 +2,7 @@
 from datetime import datetime
 from flask import url_for, Response, request, jsonify
 from werkzeug.routing import Map as UrlMap, Rule as UrlRule
-from flask.ext.themes import get_theme, render_theme_template
+from flask_themes import get_theme, render_theme_template
 from coaster.views import load_model
 from eventframe import eventapp
 from eventframe.models import db, Folder, Node

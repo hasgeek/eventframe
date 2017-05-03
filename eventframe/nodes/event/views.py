@@ -4,7 +4,7 @@ from StringIO import StringIO
 import unicodecsv
 from werkzeug.routing import Map as UrlMap, Rule as UrlRule
 from flask import g, request, render_template, abort, Markup, flash, redirect, escape, jsonify
-from flask.ext.themes import get_theme, render_theme_template
+from flask_themes import get_theme, render_theme_template
 from eventframe import lastuser
 from eventframe.forms import ConfirmForm
 from eventframe.nodes import db, NodeHandler
