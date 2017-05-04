@@ -3,12 +3,12 @@ import sys
 
 from werkzeug.serving import run_simple
 
-from eventframe import app, eventapp, init_for
+from eventframe import app, eventapp, debug_app
 from eventframe.models import db
 
 app.debug = True
 eventapp.debug = True
-application = init_for('development')
+application = debug_app
 db.create_all(app=app)
 
 try:

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rqworker -c rqdev eventframe
+rqworker -c rqinit eventframe

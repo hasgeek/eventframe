@@ -61,26 +61,25 @@ baseframe.assets['eventframe.css'][version] = 'css/app.css'
 eventassets = ThemeAwareEnvironment(eventapp)
 
 
-def init_for(env):
-    init_app(app, env)
-    init_app(eventapp, env)
-    app.config['tz'] = timezone(eventapp.config['TIMEZONE'])
-    eventframe.models.db.init_app(app)
-    eventframe.models.db.init_app(eventapp)
-    baseframe.baseframe.init_app(app, requires=['baseframe', 'toastr', 'eventframe'])
-    baseframe.baseframe.init_app(eventapp, requires=[], assetenv=eventassets)
-    eventapp.assets = eventassets  # Replace baseframe-provided Environment with ThemeAwareEnvironment
+init_app(app)
+init_app(eventapp)
+app.config['tz'] = timezone(eventapp.config['TIMEZONE'])
+eventframe.models.db.init_app(app)
+eventframe.models.db.init_app(eventapp)
+baseframe.baseframe.init_app(app, requires=['baseframe', 'toastr', 'eventframe'])
+baseframe.baseframe.init_app(eventapp, requires=[], assetenv=eventassets)
+eventapp.assets = eventassets  # Replace baseframe-provided Environment with ThemeAwareEnvironment
 
-    lastuser.init_app(app)
-    lastuser.init_usermanager(UserManager(eventframe.models.db, eventframe.models.User))
-    eventassets.register('js_baseframe',
-        Bundle(baseframe.assets.require('baseframe.js'), filters='uglipyjs', output='js/packed.js'))
-    eventassets.register('css_baseframe',
-        Bundle(baseframe.assets.require('baseframe.css'), filters='cssmin', output='css/packed.css'))
+lastuser.init_app(app)
+lastuser.init_usermanager(UserManager(eventframe.models.db, eventframe.models.User))
+eventassets.register('js_baseframe',
+    Bundle(baseframe.assets.require('baseframe.js'), filters='uglipyjs', output='js/packed.js'))
+eventassets.register('css_baseframe',
+    Bundle(baseframe.assets.require('baseframe.css'), filters='cssmin', output='css/packed.css'))
 
-    setup_themes(eventapp, app_identifier='eventframe')
-    setup_themes(app, app_identifier='eventframe')  # To list themes in the admin views
-    for theme in eventapp.theme_manager.list_themes():
-        load_theme_assets(eventassets, theme)
+setup_themes(eventapp, app_identifier='eventframe')
+setup_themes(app, app_identifier='eventframe')  # To list themes in the admin views
+for theme in eventapp.theme_manager.list_themes():
+    load_theme_assets(eventassets, theme)
 
-    return DomainDispatcher(app.config['ADMIN_HOSTS'], app, eventapp)
+debug_app = DomainDispatcher(app.config['ADMIN_HOSTS'], app, eventapp)
