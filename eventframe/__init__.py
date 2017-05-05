@@ -11,6 +11,7 @@ from flask_themes import setup_themes
 from flask_lastuser import Lastuser
 from flask_lastuser.sqlalchemy import UserManager
 import baseframe
+from flask_migrate import Migrate
 from coaster.app import SandboxedFlask, init_app
 
 from .assets import ThemeAwareEnvironment, load_theme_assets
@@ -66,6 +67,7 @@ init_app(eventapp)
 app.config['tz'] = timezone(eventapp.config['TIMEZONE'])
 eventframe.models.db.init_app(app)
 eventframe.models.db.init_app(eventapp)
+migrate = Migrate(app, eventframe.models.db)
 baseframe.baseframe.init_app(app, requires=['baseframe', 'toastr', 'eventframe'])
 baseframe.baseframe.init_app(eventapp, requires=[], assetenv=eventassets)
 eventapp.assets = eventassets  # Replace baseframe-provided Environment with ThemeAwareEnvironment
