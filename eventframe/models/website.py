@@ -6,7 +6,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from urlparse import urljoin
 from flask import g, url_for
-from coaster import newid, parse_isoformat
+from coaster.utils import buid, parse_isoformat
 from eventframe.models import db, BaseMixin, BaseNameMixin, BaseScopedNameMixin
 from eventframe.models.user import User
 
@@ -85,7 +85,7 @@ class LoginCode(BaseMixin, db.Model):
 
     def __init__(self, **kwargs):
         super(LoginCode, self).__init__(**kwargs)
-        self.code = newid()
+        self.code = buid()
 
 
 class Folder(BaseScopedNameMixin, db.Model):
@@ -190,7 +190,7 @@ class Node(BaseScopedNameMixin, db.Model):
     __tablename__ = 'node'
     __name_blank_allowed__ = True
     #: Id of the node across sites (staging, production, etc) for import/export
-    uuid = db.Column(db.Unicode(22), unique=True, default=newid, nullable=False)
+    uuid = db.Column(db.Unicode(22), unique=True, default=buid, nullable=False)
     #: User who made this node
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, default=default_user_id)
     user = db.relationship(User)
