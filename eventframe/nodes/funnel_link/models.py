@@ -3,7 +3,7 @@
 from datetime import datetime
 import requests
 from requests.exceptions import ConnectionError
-from coaster import parse_isoformat
+from coaster.utils import parse_isoformat
 from eventframe.nodes import db, Node
 from eventframe.nodes.content import ContentMixin
 
