@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import url_for
-from coaster import newsecret
+from coaster.utils import newsecret
 from eventframe.nodes import User
 from eventframe.nodes import db, BaseMixin, Node
 from eventframe.nodes.content import ContentMixin
