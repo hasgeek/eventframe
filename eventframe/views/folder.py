@@ -4,7 +4,7 @@
 Admin views
 """
 
-from coaster import parse_isoformat, newid, make_name
+from coaster.utils import parse_isoformat, buid, make_name
 from coaster.views import load_model, load_models
 from flask import g, flash, url_for, render_template, request, Response, session
 import simplejson as json
@@ -118,7 +118,7 @@ def clipboard_paste(folder, nodeids, action):
                 newnode.user = g.user
                 newnode.import_from(data)
                 newnode.import_from_internal(data)
-                newnode.uuid = newid()  # import_from will copy the UUID. Regenerate it.
+                newnode.uuid = buid()  # import_from will copy the UUID. Regenerate it.
             node = newnode  # For the namecheck below
         # If the name conflicts, give it a new name. maxlength=250 from coaster.sqlalchemy
         returnids.append(node.uuid)
