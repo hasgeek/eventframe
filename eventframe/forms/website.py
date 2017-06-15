@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import simplejson as json
-from coaster import make_name
+from coaster.utils import make_name
 import wtforms
 import wtforms.fields.html5
 from baseframe.forms import Form, RichTextField, DateTimeField
