@@ -2,7 +2,7 @@
 
 from pytz import utc, timezone
 from flask import url_for
-from coaster import parse_isoformat
+from coaster.utils import parse_isoformat
 from eventframe.models import db, BaseMixin, User
 from eventframe.nodes import Node
 from eventframe.nodes.content import ContentMixin
