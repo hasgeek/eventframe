@@ -3,7 +3,7 @@
 from datetime import datetime
 from flask import Markup, url_for
 from sqlalchemy.ext.declarative import declared_attr
-from coaster import parse_isoformat
+from coaster.utils import parse_isoformat
 from eventframe.nodes import db, BaseMixin, User, default_user_id, NodeMixin
 
 __all__ = ['ContentMixin']
