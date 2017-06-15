@@ -2,7 +2,7 @@
 
 import requests
 from flask import request, Response, stream_with_context, url_for, render_template
-from coaster import parse_isoformat
+from coaster.utils import parse_isoformat
 from eventframe import eventapp, lastuser
 from eventframe.signals import signal_login
 from eventframe.forms import ConfirmForm
