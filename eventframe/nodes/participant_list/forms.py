@@ -16,6 +16,6 @@ class ParticipantListForm(ContentForm):
     api_key = wtforms.TextField(u"API Key",
         description=u"API key to retrieve data from the selected data source.")
     participant_template = wtforms.TextField("Participant template",
-        validators=[wtforms.validators.Required()], default='participant.html',
+        validators=[wtforms.validators.Required()], default='participant.html.jinja2',
         description=u"Template with which a participant’s directory entry will be rendered.")
     properties = DictField(u"Properties")

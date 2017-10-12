@@ -41,7 +41,7 @@ class ParticipantListHandler(ContentHandler):
                 form.api_key.data = self.node.api_key
                 form.participant_template.data = self.node.participant_template
             else:
-                form.template.data = 'directory.html'
+                form.template.data = 'directory.html.jinja2'
         return form
 
     def process_node(self):
@@ -55,14 +55,14 @@ class ParticipantListHandler(ContentHandler):
         self.form = None
         participants = self.node.participants
         participants.sort(key=lambda p: p.fullname.strip().upper())
-        return render_template('participant_list.html', node=self.node, participants=participants, tabs=self.edit_tabs())
+        return render_template('participant_list.html.jinja2', node=self.node, participants=participants, tabs=self.edit_tabs())
 
     def sync(self):
         self.action = 'sync'
         self.form = ConfirmForm()
 
         if self.form.validate_on_submit():
-            return Response(stream_template('stream.html',
+            return Response(stream_template('stream.html.jinja2',
                 stream=stream_with_context(self._sync()),
                 tabs=self.edit_tabs(),
                 node=self.node,

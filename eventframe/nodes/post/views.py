@@ -21,7 +21,7 @@ class PostHandler(ContentHandler):
     def make_form(self):
         form = super(PostHandler, self).make_form()
         if request.method == 'GET' and not self.node:
-            form.template.data = 'post.html'
+            form.template.data = 'post.html.jinja2'
         return form
 
 

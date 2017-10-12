@@ -51,7 +51,7 @@ class EventHandler(ContentHandler):
                 form.allow_maybe.data = self.node.allow_maybe
                 form.participant_list.data = self.node.participant_list
             else:
-                form.template.data = 'event.html'
+                form.template.data = 'event.html.jinja2'
         return form
 
     def process_node(self):
@@ -72,7 +72,7 @@ class EventHandler(ContentHandler):
         self.form = None
         attendees = self.node.attendees
         attendees.sort(key=lambda a: ({'Y': 0, 'M': 1, 'W': 2, 'N': 3}.get(a.status), a.user.fullname.strip().upper()))
-        return render_template('event_attendees.html', node=self.node, attendees=attendees, tabs=self.edit_tabs())
+        return render_template('event_attendees.html.jinja2', node=self.node, attendees=attendees, tabs=self.edit_tabs())
 
     def csv(self):
         f = StringIO()
