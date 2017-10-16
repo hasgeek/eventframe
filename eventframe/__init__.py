@@ -69,7 +69,7 @@ eventframe.models.db.init_app(app)
 eventframe.models.db.init_app(eventapp)
 migrate = Migrate(app, eventframe.models.db)
 baseframe.baseframe.init_app(app, requires=['baseframe', 'toastr', 'eventframe'])
-baseframe.baseframe.init_app(eventapp, requires=[], assetenv=eventassets)
+baseframe.baseframe.init_app(eventapp, requires=['baseframe'], assetenv=eventassets)
 eventapp.assets = eventassets  # Replace baseframe-provided Environment with ThemeAwareEnvironment
 
 lastuser.init_app(app)
