@@ -1,5 +1,5 @@
-{% from "baseframe/forms.html" import renderform_inner -%}
-{% extends "layout.html" %}
+{% from "baseframe/forms.html.jinja2" import renderform_inner -%}
+{% extends "layout.html.jinja2" %}
 {% block title %}{% if folder.name %}{{ folder.title or folder.name }} &mdash; {% endif %}{{ website.title }}{% endblock %}
 {% block headline %}{% endblock %}
 {% block content %}

@@ -21,7 +21,7 @@ class FunnelLinkHandler(ContentHandler):
             if self.node:
                 form.funnel_name.data = self.node.funnel_name
             else:
-                form.template.data = 'funnel.html'
+                form.template.data = 'funnel.html.jinja2'
         return form
 
     def process_node(self):

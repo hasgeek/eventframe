@@ -174,7 +174,7 @@ def folder(website, folder):
         elif action == 'rename':
             flash("Rename hasn't been implemented yet", "info")
 
-    return render_template('folder.html', website=website, folder=folder,
+    return render_template('folder.html.jinja2', website=website, folder=folder,
         node_registry=node_registry, importform=ImportForm(),
         highlight=highlight, cutlist=cutlist)
 

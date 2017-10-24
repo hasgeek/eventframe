@@ -9,4 +9,4 @@ from eventframe.views.login import lastuser
 @app.route('/')
 def index():
     websites = Website.query.order_by('title').all()
-    return render_template('index.html', websites=websites, admin=lastuser.has_permission('siteadmin'))
+    return render_template('index.html.jinja2', websites=websites, admin=lastuser.has_permission('siteadmin'))

@@ -18,7 +18,7 @@ class ContentForm(Form):
         tinymce_options=tinymce_options,
         sanitize_tags=richtext_sanitize_tags,
         sanitize_attributes=richtext_sanitize_attributes)
-    template = wtforms.TextField("Template", validators=[wtforms.validators.Required()], default='page.html',
+    template = wtforms.TextField("Template", validators=[wtforms.validators.Required()], default='page.html.jinja2',
         description=u"Template with which this page will be rendered.")
     properties = DictField(u"Properties")
 
