@@ -36,7 +36,7 @@ class Website(BaseNameMixin, db.Model):
         super(Website, self).__init__(**kwargs)
         root = Folder(name=u'', title=u'', website=self)
         self.folders.append(root)
-        # root.pages[0].template = u'index.html.jinja2'
+        # root.pages[0].template = u'index.html'
 
     def __repr__(self):
         return u'<Website %s "%s">' % (self.name, self.title)
@@ -114,7 +114,7 @@ class Folder(BaseScopedNameMixin, db.Model):
 
     def __init__(self, **kwargs):
         super(Folder, self).__init__(**kwargs)
-        # index = Page(name=u'', title=u'Index', folder=self, template=u'page.html.jinja2')
+        # index = Page(name=u'', title=u'Index', folder=self, template=u'page.html')
         # index.name = u''  # Reset it to a blank
         # self.pages.append(index)
 
