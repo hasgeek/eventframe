@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from flask import g, flash, url_for, redirect
-
+from flask import flash, url_for, redirect
+from coaster.auth import current_auth
 from baseframe.forms import render_redirect
 
 from eventframe.nodes import db, AutoFormHandler, NodeHandler
@@ -21,7 +21,7 @@ class RedirectHandler(AutoFormHandler):
 
     def process_form(self):
         if self.node is None:
-            self.node = self.model(folder=self.folder, user=g.user)
+            self.node = self.model(folder=self.folder, user=current_auth.user)
             db.session.add(self.node)
         self.form.populate_obj(self.node)
         db.session.commit()

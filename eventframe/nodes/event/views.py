@@ -3,8 +3,9 @@
 from StringIO import StringIO
 import unicodecsv
 from werkzeug.routing import Map as UrlMap, Rule as UrlRule
-from flask import g, request, render_template, abort, Markup, flash, redirect, escape, jsonify
+from flask import request, render_template, abort, Markup, flash, redirect, escape, jsonify
 from flask_themes import get_theme, render_theme_template
+from coaster.auth import current_auth
 from eventframe import lastuser
 from eventframe.forms import ConfirmForm
 from eventframe.nodes import db, NodeHandler
@@ -142,7 +143,7 @@ class EventViewHandler(NodeHandler):
             else:
                 flash("An error occured. Please try again.", category='error')
                 return redirect(self.node.url_for('view'), code=303)
-        if not g.user:
+        if current_auth.is_anonymous:
             if request.is_xhr:
                 return Markup('<div class="alert alert-error">You are not logged in</div>')
             else:
@@ -150,7 +151,7 @@ class EventViewHandler(NodeHandler):
         status = request.form.get('status')
         # All good. Set status for this user.
         try:
-            self.node.set_status(g.user, status)
+            self.node.set_status(current_auth.user, status)
         except ValueError, e:
             if request.is_xhr:
                 return Markup('<div class="alert alert-error">%s</div>' % escape(unicode(e)))
