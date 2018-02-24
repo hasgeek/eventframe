@@ -15,4 +15,4 @@ class File(BaseScopedNameMixin, db.Model):
     parent = db.synonym('file_folder')
     url = db.Column(db.Unicode(250), nullable=False)
 
-    __table_args__ = (db.UniqueConstraint('file_folder_id', 'name'))
+    __table_args__ = (db.UniqueConstraint('file_folder_id', 'name'),)

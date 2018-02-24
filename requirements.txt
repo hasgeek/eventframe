@@ -8,8 +8,8 @@ blinker
 unicodecsv
 webassets>=0.10
 Flask-Assets>=0.10
-git+https://github.com/hasgeek/coaster
-git+https://github.com/hasgeek/baseframe
-git+https://github.com/hasgeek/flask-lastuser
-git+https://github.com/jace/flask-themes
+https://github.com/hasgeek/coaster
+https://github.com/hasgeek/baseframe
+https://github.com/hasgeek/flask-lastuser
+https://github.com/jace/flask-themes
 Flask-Migrate
