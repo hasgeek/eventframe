@@ -12,4 +12,4 @@ https://github.com/hasgeek/coaster
 https://github.com/hasgeek/baseframe
 https://github.com/hasgeek/flask-lastuser
 https://github.com/jace/flask-themes
-Flask-Migrate==2.2.0
+Flask-Migrate==2.2.1
