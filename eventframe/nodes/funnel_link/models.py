@@ -46,7 +46,7 @@ class FunnelLink(ContentMixin, Node):
 
     def proposals_mapping(self):
         if not hasattr(self, '_dict_cached'):
-            self._dict_cached = dict([(p['id'], p) for p in self.proposals()])
+            self._dict_cached = dict([(p['legacy_id'], p) for p in self.proposals()])
         return self._dict_cached
 
     def sections(self):
