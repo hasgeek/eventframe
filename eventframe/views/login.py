@@ -2,7 +2,8 @@
 
 import urlparse
 
-from flask import g, request, Response, redirect, flash, abort, url_for
+from flask import request, Response, redirect, flash, abort, url_for
+from coaster.auth import current_auth
 from coaster.views import get_next_url, get_current_url
 
 from eventframe import app, lastuser
@@ -15,17 +16,17 @@ def login_event():
     if 'code' in request.args:
         code = LoginCode.query.filter_by(code=request.args['code']).first()
         if code and not code.user:
-            if not g.user:
+            if current_auth.is_anonymous:
                 return login(scope=code.scope, next=get_current_url())
             # Check for scope expansion
-            has_scope = set(g.user.lastuser_token_scope.split(' '))
+            has_scope = set(current_auth.user.lastuser_token_scope.split(' '))
             need_scope = set(code.scope.split(' '))
             if '' in need_scope:
                 need_scope.remove('')
             if need_scope - has_scope != set([]):
                 # Need additional scope. Send user to Lastuser for access rights
                 return login(scope=code.scope, next=get_current_url())
-            code.user = g.user
+            code.user = current_auth.user
             db.session.commit()
             # Redirect to event website
             if urlparse.urlsplit(code.return_url).query:
@@ -73,7 +74,7 @@ def logout():
     else:
         next = get_next_url()
         flash(u"You are now logged out", category='success')
-    signal_logout.send(app, user=g.user)
+    signal_logout.send(app, user=current_auth.user)
     return next
 
 
@@ -81,7 +82,7 @@ def logout():
 @lastuser.auth_handler
 def lastuserauth():
     # Save the user object
-    signal_login.send(app, user=g.user)
+    signal_login.send(app, user=current_auth.user)
     db.session.commit()
     return redirect(get_next_url())
 

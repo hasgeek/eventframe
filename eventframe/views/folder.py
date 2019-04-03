@@ -4,6 +4,7 @@
 Admin views
 """
 
+from coaster.auth import current_auth
 from coaster.utils import parse_isoformat, buid, make_name
 from coaster.views import load_model, load_models
 from flask import g, flash, url_for, render_template, request, Response, session
@@ -115,7 +116,7 @@ def clipboard_paste(folder, nodeids, action):
             data = node.as_json()
             with db.session.no_autoflush:
                 newnode = node.__class__(folder=folder)
-                newnode.user = g.user
+                newnode.user = current_auth.user
                 newnode.import_from(data)
                 newnode.import_from_internal(data)
                 newnode.uuid = buid()  # import_from will copy the UUID. Regenerate it.
@@ -249,7 +250,7 @@ def folder_import(website, folder):
                         continue
                     node = nreg.model(folder=folder)
                     user = User.query.filter_by(userid=inode['userid']).first()
-                    node.user = user or g.user
+                    node.user = user or current_auth.user
                     db.session.add(node)
                     create_count += 1
                 else:

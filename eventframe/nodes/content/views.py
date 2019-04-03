@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from flask import g, flash, url_for, request
+from flask import flash, url_for, request
 from baseframe.forms import render_redirect
+from coaster.auth import current_auth
 from eventframe.nodes import db, Node, AutoFormHandler
 from eventframe.nodes.content.forms import ContentForm
 
@@ -40,7 +41,7 @@ class ContentHandler(AutoFormHandler):
     def process_form(self):
         if self.node is None:
             # Creating a new object
-            self.node = self.model(folder=self.folder, user=g.user)
+            self.node = self.model(folder=self.folder, user=current_auth.user)
             db.session.add(self.node)
         # Name isn't in revision history, so name changes
         # are applied to the node. TODO: Move this into a separate

@@ -5,7 +5,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from urlparse import urljoin
-from flask import g, url_for
+from flask import url_for
+from coaster.auth import current_auth
 from coaster.utils import buid, parse_isoformat
 from eventframe.models import db, BaseMixin, BaseNameMixin, BaseScopedNameMixin
 from eventframe.models.user import User
@@ -14,7 +15,7 @@ __all__ = ['Website', 'Hostname', 'LoginCode', 'Folder', 'Node', 'NodeMixin']
 
 
 def default_user_id():
-    return g.user.id if g.user else None
+    return current_auth.user.id if current_auth.user else None
 
 
 class Website(BaseNameMixin, db.Model):

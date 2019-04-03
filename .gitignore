@@ -26,3 +26,4 @@ eventframe/static/gen/
 *.sql.gz
 *.sql.bz2
 node_modules/
+.pytest_cache

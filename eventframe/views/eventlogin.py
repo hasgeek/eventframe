@@ -4,6 +4,7 @@ from urlparse import urljoin
 from functools import wraps
 from flask import g, request, url_for, redirect, session, abort
 from flask_lastuser import UserInfo as LastuserInfo
+from coaster.auth import add_auth_attribute, current_auth
 from coaster.views import get_next_url, get_current_url
 from eventframe import app, eventapp
 from eventframe.signals import signal_login, signal_logout
@@ -17,9 +18,9 @@ def requires_scope(*scope):
     def inner(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if g.user is None:
+            if current_auth.is_anonymous:
                 return redirect(url_for('login', next=get_current_url()))
-            has_scope = set(g.user.lastuser_token_scope.split(' '))
+            has_scope = set(current_auth.user.lastuser_token_scope.split(' '))
             need_scope = set(scope)
             if need_scope - has_scope != set([]):
                 # Need additional scope. Send user to Lastuser for access rights
@@ -66,7 +67,8 @@ def logout():
     code = LoginCode(next_url=get_next_url(external=False, referrer=True),
         return_url=url_for('logout_return', _external=True))
     session.pop('userid', None)
-    signal_logout.send(eventapp, user=g.user)
+    signal_logout.send(eventapp, user=current_auth.user)
+    add_auth_attribute('user', None)
     g.user = None
     db.session.add(code)
     db.session.commit()
@@ -89,14 +91,16 @@ def logout_return():
 
 @eventapp.before_request
 def lookup_current_user(user=None):
+    add_auth_attribute('user', None)
     g.user = None
-    g.lastuserinfo = None
+    add_auth_attribute('lastuserinfo', None)
     if 'userid' in session:
         if user is None:
             user = User.query.filter_by(userid=session['userid']).first()
+        add_auth_attribute('user', user)
         g.user = user
         if user:
-            g.lastuserinfo = LastuserInfo(token=user.lastuser_token,
+            add_auth_attribute('lastuserinfo', LastuserInfo(token=user.lastuser_token,
                 token_type=user.lastuser_token_type,
                 token_scope=user.lastuser_token_scope,
                 userid=user.userid,
@@ -104,7 +108,7 @@ def lookup_current_user(user=None):
                 fullname=user.fullname,
                 email=user.email,
                 permissions=user.userinfo.get('permissions', ()),
-                organizations=user.userinfo.get('organizations'))
+                organizations=user.userinfo.get('organizations')))
 
 
 @eventapp.after_request
