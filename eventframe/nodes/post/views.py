@@ -38,7 +38,7 @@ url_map = UrlMap([
     ])
 
 def feedquery():
-    return Post.query.filter_by(is_published=True).order_by(db.desc('node.published_at'))
+    return Post.query.filter_by(is_published=True).order_by(Node.published_at.desc())
 
 
 def rootfeed(website, limit=20):

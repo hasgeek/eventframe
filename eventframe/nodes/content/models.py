@@ -95,7 +95,7 @@ class ContentMixin(NodeMixin):
         revision = self.revisions.draft or self.revisions.published
         if revision is None:
             with db.session.no_autoflush:
-                revision = ContentRevision.query.filter_by(parent=self.revisions).order_by(db.desc('id')).limit(1).first()
+                revision = ContentRevision.query.filter_by(parent=self.revisions).order_by(ContentRevision.id.desc()).limit(1).first()
         return revision
 
     def publish(self, revision=None):
@@ -123,7 +123,7 @@ class ContentMixin(NodeMixin):
         Withdraw the published version and go back to being a draft.
         """
         self.revisions.published = None
-        revision = ContentRevision.query.filter_by(parent=self.revisions).order_by(db.desc('id')).limit(1).first()
+        revision = ContentRevision.query.filter_by(parent=self.revisions).order_by(ContentRevision.id.desc()).limit(1).first()
         self.revisions.draft = revision
         self.title = revision.title
         self.is_published = False
