@@ -46,6 +46,11 @@ class FunnelLink(ContentMixin, Node):
             self._dict_cached = dict([(p['legacy_id'], p) for p in self.proposals()])
         return self._dict_cached
 
+    def sections(self):
+        # There are no sections anymore. Keeping this method because it's used in all the themes.
+        # Can be removed when `node.sections()` is removed from all the themes.
+        return u""
+
     def proposals(self):
         return self._data()['proposals']
 
