@@ -29,17 +29,14 @@ class FunnelLink(ContentMixin, Node):
             try:
                 r = requests.get('http://funnel.hasgeek.com/%s/json' % self.funnel_name)
                 data = r.json() if callable(r.json) else r.json
-                sectionmap = dict([(s['title'], s['name']) for s in data['sections']])
                 for proposal in data['proposals']:
                     proposal['submitted'] = parse_isoformat(proposal['submitted'])
-                    proposal['section_name'] = sectionmap.get(proposal['section'])
                     v = proposal['votes']
                     proposal['votes'] = '+%d' % v if v > 0 else '%d' % v
                 self._data_cached = data
             except ConnectionError:
                 self._data_cached = {
                     'proposals': [],
-                    'sections': [],
                     'space': {},
                 }
         return self._data_cached
@@ -48,10 +45,6 @@ class FunnelLink(ContentMixin, Node):
         if not hasattr(self, '_dict_cached'):
             self._dict_cached = dict([(p['legacy_id'], p) for p in self.proposals()])
         return self._dict_cached
-
-    def sections(self):
-        # Get data from Funnel and cache locally
-        return self._data()['sections']
 
     def proposals(self):
         return self._data()['proposals']
