@@ -1,9 +1,9 @@
 ordereddict==1.1
-Flask==1.0.3
+Flask==1.1.1
 Flask-SQLAlchemy==2.4.0
 requests==2.22.0
 simplejson==3.16.0
-pytz==2019.1
+pytz==2019.2
 blinker==1.4
 unicodecsv==0.14.1
 webassets>=0.10
