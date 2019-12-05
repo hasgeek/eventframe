@@ -8,19 +8,19 @@ __all__ = ['ContentForm']
 
 
 class ContentForm(Form):
-    previous_id = wtforms.HiddenField(u"Previous revision")
-    title = wtforms.TextField(u"Title", validators=[wtforms.validators.Required()])
-    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Optional(), valid_name])
-    author = wtforms.TextField(u"Author (optional)", validators=[wtforms.validators.Length(max=40)],
+    previous_id = wtforms.HiddenField("Previous revision")
+    title = wtforms.TextField("Title", validators=[wtforms.validators.Required()])
+    name = wtforms.TextField("URL name", validators=[wtforms.validators.Optional(), valid_name])
+    author = wtforms.TextField("Author (optional)", validators=[wtforms.validators.Length(max=40)],
         description="Name of the author. Will default to your name if blank")
-    description = wtforms.TextAreaField(u"Summary", description=u"Summary of this page")
-    content = RichTextField(u"Page content", linkify=False,
+    description = wtforms.TextAreaField("Summary", description="Summary of this page")
+    content = RichTextField("Page content", linkify=False,
         tinymce_options=tinymce_options,
         sanitize_tags=richtext_sanitize_tags,
         sanitize_attributes=richtext_sanitize_attributes)
     template = wtforms.TextField("Template", validators=[wtforms.validators.Required()], default='page.html.jinja2',
-        description=u"Template with which this page will be rendered.")
-    properties = DictField(u"Properties")
+        description="Template with which this page will be rendered.")
+    properties = DictField("Properties")
 
     def validate_previous_id(self, field):
         if not field.data:

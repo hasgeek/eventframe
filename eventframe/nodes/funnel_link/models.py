@@ -49,7 +49,7 @@ class FunnelLink(ContentMixin, Node):
     def sections(self):
         # There are no sections anymore. Keeping this method because it's used in all the themes.
         # Can be removed when `node.sections()` is removed from all the themes.
-        return u""
+        return ""
 
     def proposals(self):
         return self._data()['proposals']

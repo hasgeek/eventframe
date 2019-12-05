@@ -2,7 +2,7 @@
 
 # The imports in this file are order-sensitive
 
-from __future__ import absolute_import
+
 from threading import Lock
 from pytz import timezone
 from flask import Flask

@@ -18,8 +18,8 @@ __all__ = ['ParticipantListHandler', 'register']
 class ParticipantListHandler(ContentHandler):
     form_class = ParticipantListForm
     model = ParticipantList
-    title_new = u"New participant list"
-    title_edit = u"Edit participant list"
+    title_new = "New participant list"
+    title_edit = "Edit participant list"
 
     actions = ['sync', 'list']
 
@@ -27,8 +27,8 @@ class ParticipantListHandler(ContentHandler):
         tabs = super(ParticipantListHandler, self).edit_tabs()
         if self.node:
             tabs = tabs + [
-                {'title': u"List", 'url': self.node.url_for('list'), 'active': self.action == 'list'},
-                {'title': u"Sync", 'url': self.node.url_for('sync'), 'active': self.action == 'sync'},
+                {'title': "List", 'url': self.node.url_for('list'), 'active': self.action == 'list'},
+                {'title': "Sync", 'url': self.node.url_for('sync'), 'active': self.action == 'sync'},
                 ]
         return tabs
 
@@ -68,7 +68,7 @@ class ParticipantListHandler(ContentHandler):
                 node=self.node,
                 title="Syncing participants..."))
 
-        return render_form(form=self.form, title="Sync participant list", submit=u"Sync", tabs=self.edit_tabs(),
+        return render_form(form=self.form, title="Sync participant list", submit="Sync", tabs=self.edit_tabs(),
         cancel_url=url_for('folder', website=self.node.folder.website.name, folder=self.node.folder.name),
         node=self.node)
 
@@ -112,9 +112,9 @@ class ParticipantListHandler(ContentHandler):
                 local_tickets.add(participant.ticket)
             syncinfo = {
                 'datetime': parse_isoformat(p['Date']),
-                'fullname': p['Name'].strip() if isinstance(p['Name'], basestring) else p['Name'],
-                'email': p['Email'].strip() if isinstance(p['Email'], basestring) else p['Email'],
-                'ticket_type': p['Ticket_Name'].strip() if isinstance(p['Ticket_Name'], basestring) else p['Ticket_Name'],
+                'fullname': p['Name'].strip() if isinstance(p['Name'], str) else p['Name'],
+                'email': p['Email'].strip() if isinstance(p['Email'], str) else p['Email'],
+                'ticket_type': p['Ticket_Name'].strip() if isinstance(p['Ticket_Name'], str) else p['Ticket_Name'],
             }
             pinfo = p.get('participant_information', [])
             if isinstance(pinfo, dict):
@@ -123,17 +123,17 @@ class ParticipantListHandler(ContentHandler):
                 key = keyval['desc']
                 value = keyval.get('info')
                 if key == 'Job Title':
-                    syncinfo['jobtitle'] = value.strip() if isinstance(value, basestring) else value
+                    syncinfo['jobtitle'] = value.strip() if isinstance(value, str) else value
                 elif key == 'Company':
-                    syncinfo['company'] = value.strip() if isinstance(value, basestring) else value
+                    syncinfo['company'] = value.strip() if isinstance(value, str) else value
                 elif key == 'Twitter Handle':
-                    syncinfo['twitter'] = value.strip() if isinstance(value, basestring) else value
+                    syncinfo['twitter'] = value.strip() if isinstance(value, str) else value
                 elif key == 'City':
-                    syncinfo['city'] = value.strip() if isinstance(value, basestring) else value
+                    syncinfo['city'] = value.strip() if isinstance(value, str) else value
                 elif key == 'T-shirt size':
-                    syncinfo['tshirt_size'] = value.split('-', 1)[0].strip() if isinstance(value, basestring) else value
+                    syncinfo['tshirt_size'] = value.split('-', 1)[0].strip() if isinstance(value, str) else value
             edited = False
-            for key, value in syncinfo.items():
+            for key, value in list(syncinfo.items()):
                 if getattr(participant, key) != value:
                     setattr(participant, key, value)
                     if 'key' == 'email':

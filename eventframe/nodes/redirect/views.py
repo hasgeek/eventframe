@@ -13,8 +13,8 @@ __all__ = ['RedirectHandler', 'RedirectViewHandler', 'register']
 
 class RedirectHandler(AutoFormHandler):
     model = Redirect
-    title_new = u"New redirect"
-    title_edit = u"Edit redirect"
+    title_new = "New redirect"
+    title_edit = "Edit redirect"
 
     def make_form(self):
         return RedirectForm(obj=self.node)
@@ -25,7 +25,7 @@ class RedirectHandler(AutoFormHandler):
             db.session.add(self.node)
         self.form.populate_obj(self.node)
         db.session.commit()
-        flash(u"Edited redirect '%s'." % self.node.title, 'success')
+        flash("Edited redirect '%s'." % self.node.title, 'success')
         return render_redirect(url_for('folder', website=self.website.name, folder=self.folder.name), code=303)
 
 

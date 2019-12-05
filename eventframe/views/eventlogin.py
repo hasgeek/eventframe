@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from urlparse import urljoin
+from urllib.parse import urljoin
 from functools import wraps
 from flask import g, request, url_for, redirect, session, abort
 from flask_lastuser import UserInfo as LastuserInfo

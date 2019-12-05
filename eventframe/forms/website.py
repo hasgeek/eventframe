@@ -51,9 +51,9 @@ class HostnamesField(wtforms.fields.Field):
 
     def _value(self):
         if self.data:
-            return u', '.join(self.data)
+            return ', '.join(self.data)
         else:
-            return u''
+            return ''
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -74,7 +74,7 @@ class HostnamesField(wtforms.fields.Field):
 
 class DictField(wtforms.fields.Field):
     widget = wtforms.widgets.TextArea()
-    description = u'One per line, as {"key": "value"}'
+    description = 'One per line, as {"key": "value"}'
 
     def __init__(self, *args, **kwargs):
         if not 'description' in kwargs:
@@ -83,7 +83,7 @@ class DictField(wtforms.fields.Field):
 
     def _value(self):
         if isinstance(self.data, dict):
-            return '\r\n'.join([json.dumps({key: value}) for key, value in self.data.items()])
+            return '\r\n'.join([json.dumps({key: value}) for key, value in list(self.data.items())])
         return ''
 
     def process_formdata(self, valuelist):
@@ -97,14 +97,14 @@ class DictField(wtforms.fields.Field):
 
 
 class WebsiteForm(Form):
-    title = wtforms.TextField(u"Title", validators=[wtforms.validators.Required()])
-    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Required(), valid_name])
-    url = wtforms.fields.html5.URLField(u"Website URL", validators=[wtforms.validators.Required()])
-    hostnames = HostnamesField(u"Hostnames", validators=[wtforms.validators.Required()],
-        description=u"Hostnames at which this website will be accessed, comma separated")
-    theme = wtforms.SelectField(u"Website theme", validators=[wtforms.validators.Required()])
-    typekit_code = wtforms.TextField(u"Typekit code")
-    googleanalytics_code = wtforms.TextField(u"Google Analytics code")
+    title = wtforms.TextField("Title", validators=[wtforms.validators.Required()])
+    name = wtforms.TextField("URL name", validators=[wtforms.validators.Required(), valid_name])
+    url = wtforms.fields.html5.URLField("Website URL", validators=[wtforms.validators.Required()])
+    hostnames = HostnamesField("Hostnames", validators=[wtforms.validators.Required()],
+        description="Hostnames at which this website will be accessed, comma separated")
+    theme = wtforms.SelectField("Website theme", validators=[wtforms.validators.Required()])
+    typekit_code = wtforms.TextField("Typekit code")
+    googleanalytics_code = wtforms.TextField("Google Analytics code")
 
     def validate_name(self, field):
         # TODO: Ensure name is unique
@@ -116,11 +116,11 @@ class WebsiteForm(Form):
 
 
 class FolderForm(Form):
-    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Optional(), valid_name],
-        description=u"Folder name as it appears in the URL (without slashes)")
-    title = wtforms.TextField(u"Title",
-        description=u"Folder title, used in the per-folder blog feed")
-    theme = wtforms.SelectField(u"Theme")
+    name = wtforms.TextField("URL name", validators=[wtforms.validators.Optional(), valid_name],
+        description="Folder name as it appears in the URL (without slashes)")
+    title = wtforms.TextField("Title",
+        description="Folder title, used in the per-folder blog feed")
+    theme = wtforms.SelectField("Theme")
 
     def validate_name(self, field):
         # TODO
@@ -128,9 +128,9 @@ class FolderForm(Form):
 
 
 class ImportForm(Form):
-    import_file = wtforms.FileField(u"Upload file", validators=[wtforms.validators.Required()])
-    import_updated = wtforms.BooleanField(u"Only import newer nodes", default=True,
-        description=u"Nodes that are newer locally will not be imported")
+    import_file = wtforms.FileField("Upload file", validators=[wtforms.validators.Required()])
+    import_updated = wtforms.BooleanField("Only import newer nodes", default=True,
+        description="Nodes that are newer locally will not be imported")
 
 
 class ConfirmForm(Form):
@@ -138,6 +138,6 @@ class ConfirmForm(Form):
 
 
 class FileFolderForm(Form):
-    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Required(), valid_name])
-    title = wtforms.TextField(u"Title", validators=[wtforms.validators.Required()])
-    properties = DictField(u"Properties")
+    name = wtforms.TextField("URL name", validators=[wtforms.validators.Required(), valid_name])
+    title = wtforms.TextField("Title", validators=[wtforms.validators.Required()])
+    properties = DictField("Properties")

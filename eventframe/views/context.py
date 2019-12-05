@@ -28,7 +28,7 @@ def datetime_filter(date):
 
 def feedhelper(folder=None, limit=20):
     if folder is None:
-        folder = Folder.query.filter_by(name=u'', website=g.website).first()
+        folder = Folder.query.filter_by(name='', website=g.website).first()
     if folder.name == '':
         return rootfeed(folder.website, limit)
     else:

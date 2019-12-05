@@ -25,11 +25,11 @@ class ContentRevision(BaseMixin, db.Model):
     #: Title of the current revision
     title = db.Column(db.Unicode(250), nullable=False)
     #: Abstract that is shown in summaries. Plain text.
-    description = db.Column(db.UnicodeText, nullable=False, default=u'')
+    description = db.Column(db.UnicodeText, nullable=False, default='')
     #: Page content. Rich text.
-    _content = db.Column('content', db.UnicodeText, nullable=False, default=u'')
+    _content = db.Column('content', db.UnicodeText, nullable=False, default='')
     #: Template with which this page will be rendered
-    template = db.Column(db.Unicode(80), nullable=False, default=u'')
+    template = db.Column(db.Unicode(80), nullable=False, default='')
 
     def __init__(self, **kwargs):
         super(ContentRevision, self).__init__(**kwargs)
@@ -166,7 +166,7 @@ class ContentMixin(NodeMixin):
             return self.revisions.draft.content
 
     def __repr__(self):
-        return u'<%s %s/%s "%s" at %s>' % (self.__tablename__.title(), self.folder.name, self.name or '(index)',
+        return '<%s %s/%s "%s" at %s>' % (self.__tablename__.title(), self.folder.name, self.name or '(index)',
             self.title, self.folder.website.name)
 
     def as_json(self):

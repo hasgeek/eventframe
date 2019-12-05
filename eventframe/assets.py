@@ -133,7 +133,7 @@ class ThemeAwareEnvironment(Environment):
 
 def load_theme_assets(env, theme):
     css_list = theme.options.get('assets_css', [])
-    if isinstance(css_list, basestring):
+    if isinstance(css_list, str):
         css_list = [css_list]
     css = Bundle(*[Bundle('_themes/%s/%s' % (theme.identifier, item),
             filters='cssmin', output='_themes/%s/%s.packed.css' % (theme.identifier, item)) for item in css_list])  # ,
@@ -141,7 +141,7 @@ def load_theme_assets(env, theme):
     env.register('css_%s' % theme.identifier, css)
 
     js_list = theme.options.get('assets_js', [])
-    if isinstance(js_list, basestring):
+    if isinstance(js_list, str):
         js_list = [js_list]
     js = Bundle(*[Bundle('_themes/%s/%s' % (theme.identifier, item),
         filters='uglipyjs', output='_themes/%s/%s.packed.js' % (theme.identifier, item)) for item in js_list])

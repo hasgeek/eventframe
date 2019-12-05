@@ -13,7 +13,7 @@ from eventframe.views.login import lastuser
 # --- Routes ------------------------------------------------------------------
 
 @app.route('/<website>/<folder>/_new/<type>', methods=['GET', 'POST'])
-@app.route('/<website>/_root/_new/<type>', defaults={'folder': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/_new/<type>', defaults={'folder': ''}, methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 @load_models(
     (Website, {'name': 'website'}, 'website'),
@@ -41,9 +41,9 @@ def node_new(website, folder, kwargs):
 
 
 @app.route('/<website>/<folder>/<node>/_edit', methods=['GET', 'POST'])
-@app.route('/<website>/_root/<node>/_edit', defaults={'folder': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/<folder>/_index/_edit', defaults={'node': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/_root/_index/_edit', defaults={'folder': u'', 'node': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/<node>/_edit', defaults={'folder': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/<folder>/_index/_edit', defaults={'node': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/_index/_edit', defaults={'folder': '', 'node': ''}, methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 @load_models(
     (Website, {'name': 'website'}, 'website'),
@@ -68,9 +68,9 @@ def node_edit(website, folder, node):
 
 
 @app.route('/<website>/<folder>/<node>/do/<action>', methods=['GET', 'POST'])
-@app.route('/<website>/_root/<node>/do/<action>', defaults={'folder': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/<folder>/_index/do/<action>', defaults={'node': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/_root/_index/do/<action>', defaults={'folder': u'', 'node': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/<node>/do/<action>', defaults={'folder': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/<folder>/_index/do/<action>', defaults={'node': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/_index/do/<action>', defaults={'folder': '', 'node': ''}, methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 @load_models(
     (Website, {'name': 'website'}, 'website'),
@@ -98,9 +98,9 @@ def node_action(website, folder, node, kwargs):
 
 
 @app.route('/<website>/<folder>/<node>/_delete', methods=['GET', 'POST'])
-@app.route('/<website>/_root/<node>/_delete', defaults={'folder': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/<folder>/_index/_delete', defaults={'node': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/_root/_index/_delete', defaults={'folder': u'', 'node': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/<node>/_delete', defaults={'folder': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/<folder>/_index/_delete', defaults={'node': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/_index/_delete', defaults={'folder': '', 'node': ''}, methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 @load_models(
     (Website, {'name': 'website'}, 'website'),
@@ -110,17 +110,17 @@ def node_action(website, folder, node, kwargs):
 def node_delete(website, folder, node):
     g.website = website
     g.folder = folder
-    return render_delete_sqla(node, db, title=u"Confirm delete",
-        message=u"Delete '%s'? This is permanent. There is no undo." % node.title,
-        success=u"You have deleted '%s'." % node.title,
+    return render_delete_sqla(node, db, title="Confirm delete",
+        message="Delete '%s'? This is permanent. There is no undo." % node.title,
+        success="You have deleted '%s'." % node.title,
         next=url_for('folder', website=website.name, folder=folder.name))
 
 
 # Temporary publish handler that needs to be rolled into the edit handler
 @app.route('/<website>/<folder>/<node>/_publish', methods=['GET', 'POST'])
-@app.route('/<website>/_root/<node>/_publish', defaults={'folder': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/<folder>/_index/_publish', defaults={'node': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/_root/_index/_publish', defaults={'folder': u'', 'node': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/<node>/_publish', defaults={'folder': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/<folder>/_index/_publish', defaults={'node': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/_index/_publish', defaults={'folder': '', 'node': ''}, methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 @load_models(
     (Website, {'name': 'website'}, 'website'),
@@ -136,18 +136,18 @@ def node_publish(website, folder, node):
     if form.validate_on_submit():
         node.publish()
         db.session.commit()
-        flash(u"Published '%s'" % node.title, 'success')
+        flash("Published '%s'" % node.title, 'success')
         return render_redirect(url_for('folder', website=folder.website.name, folder=folder.name), code=303)
-    return render_form(form=form, title="Publish node", submit=u"Publish",
+    return render_form(form=form, title="Publish node", submit="Publish",
         cancel_url=url_for('folder', website=folder.website.name, folder=folder.name),
         node=node)
 
 
 # Temporary publish handler that needs to be rolled into the edit handler
 @app.route('/<website>/<folder>/<node>/_unpublish', methods=['GET', 'POST'])
-@app.route('/<website>/_root/<node>/_unpublish', defaults={'folder': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/<folder>/_index/_unpublish', defaults={'node': u''}, methods=['GET', 'POST'])
-@app.route('/<website>/_root/_index/_unpublish', defaults={'folder': u'', 'node': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/<node>/_unpublish', defaults={'folder': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/<folder>/_index/_unpublish', defaults={'node': ''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/_index/_unpublish', defaults={'folder': '', 'node': ''}, methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 @load_models(
     (Website, {'name': 'website'}, 'website'),
@@ -163,8 +163,8 @@ def node_unpublish(website, folder, node):
     if form.validate_on_submit():
         node.unpublish()
         db.session.commit()
-        flash(u"Unpublished '%s'" % node.title, 'success')
+        flash("Unpublished '%s'" % node.title, 'success')
         return render_redirect(url_for('folder', website=folder.website.name, folder=folder.name), code=303)
-    return render_form(form=form, title="Unpublish node", submit=u"Unpublish",
+    return render_form(form=form, title="Unpublish node", submit="Unpublish",
         cancel_url=url_for('folder', website=folder.website.name, folder=folder.name),
         node=node)

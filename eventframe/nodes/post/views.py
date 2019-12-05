@@ -15,8 +15,8 @@ __all__ = ['PostHandler', 'PostViewHandler', 'rootfeed', 'folderfeed', 'register
 
 class PostHandler(ContentHandler):
     model = Post
-    title_new = u"New blog post"
-    title_edit = u"Edit blog post"
+    title_new = "New blog post"
+    title_edit = "Edit blog post"
 
     def make_form(self):
         form = super(PostHandler, self).make_form()
@@ -84,7 +84,7 @@ def folder_feed(folder):
             theme, 'feed.xml',
             feedid=url_for('folder', folder=folder.name),
             website=folder.website,
-            title=u"%s — %s" % (folder.title or folder.name, folder.website.title),
+            title="%s — %s" % (folder.title or folder.name, folder.website.title),
             posts=posts, updated=updated),
         content_type='application/atom+xml; charset=utf-8')
 

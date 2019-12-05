@@ -10,8 +10,8 @@ __all__ = ['FragmentHandler', 'register']
 class FragmentHandler(ContentHandler):
     model = Fragment
     form_class = FragmentForm
-    title_new = u"New page fragment"
-    title_edit = u"Edit page fragment"
+    title_new = "New page fragment"
+    title_edit = "Edit page fragment"
 
 
 def register(registry):

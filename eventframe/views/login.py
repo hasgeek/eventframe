@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import urlparse
+import urllib.parse
 
 from flask import request, Response, redirect, flash, abort, url_for
 from coaster.auth import current_auth
@@ -29,7 +29,7 @@ def login_event():
             code.user = current_auth.user
             db.session.commit()
             # Redirect to event website
-            if urlparse.urlsplit(code.return_url).query:
+            if urllib.parse.urlsplit(code.return_url).query:
                 return redirect(code.return_url + '&code=' + code.code, code=302)
             else:
                 return redirect(code.return_url + '?code=' + code.code, code=302)
@@ -55,7 +55,7 @@ def logout_event():
         code = LoginCode.query.filter_by(code=request.args['code']).first()
         if code:
             # Redirect to event website
-            if urlparse.urlsplit(code.return_url).query:
+            if urllib.parse.urlsplit(code.return_url).query:
                 return redirect(code.return_url + '&code=' + code.code, code=302)
             else:
                 return redirect(code.return_url + '?code=' + code.code, code=302)
@@ -73,7 +73,7 @@ def logout():
         next = url_for('logout_event', code=code.code)
     else:
         next = get_next_url()
-        flash(u"You are now logged out", category='success')
+        flash("You are now logged out", category='success')
     signal_logout.send(app, user=current_auth.user)
     return next
 
@@ -99,7 +99,7 @@ def lastuser_error(error, error_description=None, error_uri=None):
     if error == 'access_denied':
         flash("You denied the request to login", category='error')
         return redirect(get_next_url())
-    return Response(u"Error: %s\n"
-                    u"Description: %s\n"
-                    u"URI: %s" % (error, error_description, error_uri),
+    return Response("Error: %s\n"
+                    "Description: %s\n"
+                    "URI: %s" % (error, error_description, error_uri),
                     mimetype="text/plain")

@@ -15,9 +15,9 @@ class ContentHandler(AutoFormHandler):
     def edit_tabs(self):
         if self.node:
             return [
-                {'title': u"Edit", 'url': self.node.url_for('edit'), 'active': self.action == 'edit'},
-                {'title': u"Publish", 'url': self.node.url_for('publish'), 'active': self.action == 'publish'},
-                {'title': u"Unpublish", 'url': self.node.url_for('unpublish'), 'active': self.action == 'unpublish'},
+                {'title': "Edit", 'url': self.node.url_for('edit'), 'active': self.action == 'edit'},
+                {'title': "Publish", 'url': self.node.url_for('publish'), 'active': self.action == 'publish'},
+                {'title': "Unpublish", 'url': self.node.url_for('unpublish'), 'active': self.action == 'unpublish'},
                 ]
         else:
             return []
@@ -64,10 +64,10 @@ class ContentHandler(AutoFormHandler):
             self.node.title = revision.title
         if not self.node.id and not self.node.name:
             # Is there already an index node in this folder?
-            index = db.session.query(Node.id).filter_by(folder=self.folder, name=u'').first()
+            index = db.session.query(Node.id).filter_by(folder=self.folder, name='').first()
             if index is not None:
                 self.node.make_name()
         db.session.commit()
         # FIXME: Say created when created
-        flash(u"Edited node '%s'." % self.node.title, 'success')
+        flash("Edited node '%s'." % self.node.title, 'success')
         return render_redirect(url_for('folder', website=self.website.name, folder=self.folder.name), code=303)

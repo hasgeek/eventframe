@@ -7,13 +7,13 @@ __all__ = ['RedirectForm']
 
 
 class RedirectForm(Form):
-    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Optional(), valid_name])
-    title = wtforms.TextField(u"Title", validators=[wtforms.validators.Required()])
-    redirect_url = wtforms.TextField(u"Redirect URL", validators=[wtforms.validators.Required()])
-    properties = DictField(u"Properties")
+    name = wtforms.TextField("URL name", validators=[wtforms.validators.Optional(), valid_name])
+    title = wtforms.TextField("Title", validators=[wtforms.validators.Required()])
+    redirect_url = wtforms.TextField("Redirect URL", validators=[wtforms.validators.Required()])
+    properties = DictField("Properties")
 
     def validate_name(self, field):
-        if field.data == u'/':
-            field.data = u''
+        if field.data == '/':
+            field.data = ''
         # TODO
         pass

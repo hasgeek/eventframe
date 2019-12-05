@@ -23,14 +23,14 @@ class Event(ContentMixin, Node):
     #: Timezone as a string
     timezone = db.Column(db.Unicode(32), nullable=False)
     #: Location name
-    location_name = db.Column(db.Unicode(80), nullable=False, default=u'')
+    location_name = db.Column(db.Unicode(80), nullable=False, default='')
     #: Location address
-    location_address = db.Column(db.Unicode(250), nullable=False, default=u'')
+    location_address = db.Column(db.Unicode(250), nullable=False, default='')
     #: Location on map
     map_id = db.Column(None, db.ForeignKey('map.id'), nullable=True)
     map = db.relationship(Map, primaryjoin=map_id == Map.id)
     #: Map marker
-    mapmarker = db.Column(db.Unicode(80), nullable=False, default=u'')
+    mapmarker = db.Column(db.Unicode(80), nullable=False, default='')
     #: Venue capacity, if attendance is capped
     capacity = db.Column(db.Integer, nullable=False, default=0)
     #: Allow wait-listing?
@@ -54,7 +54,7 @@ class Event(ContentMixin, Node):
 
     def count(self):
         """Return count of confirmed attendees."""
-        return len([a for a in self.attendees if a.status == u'Y'])
+        return len([a for a in self.attendees if a.status == 'Y'])
 
     def has_capacity(self):
         """Does the event have spare capacity for more attendees?"""
@@ -72,18 +72,18 @@ class Event(ContentMixin, Node):
 
     def set_status(self, user, status):
         """Set RSVP status for user."""
-        if status not in [u'Y', u'N', u'M']:
+        if status not in ['Y', 'N', 'M']:
             raise ValueError("Invalid status")
-        if status == u'M' and not self.allow_maybe:
-            raise ValueError(u"A “Maybe” response is not allowed")
+        if status == 'M' and not self.allow_maybe:
+            raise ValueError("A “Maybe” response is not allowed")
         if not self.can_rsvp(user):
             raise ValueError("This user cannot participate")
         attendee = EventAttendee.query.filter_by(event=self, user=user).first()
         if not attendee:
             attendee = EventAttendee(event=self, user=user)
-        if status == u'Y' and not self.has_capacity():
+        if status == 'Y' and not self.has_capacity():
             if self.allow_waitlisting:
-                status = u'W'
+                status = 'W'
             else:
                 raise ValueError("This event is over capacity")
         db.session.add(attendee)
@@ -93,7 +93,7 @@ class Event(ContentMixin, Node):
         """Get RSVP status for this user."""
         attendee = EventAttendee.query.filter_by(event=self, user=user).first()
         if not attendee:
-            return u'U'
+            return 'U'
         else:
             return attendee.status
 
@@ -157,5 +157,5 @@ class EventAttendee(BaseMixin, db.Model):
     event_id = db.Column(None, db.ForeignKey('event.id'), nullable=False)
     event = db.relationship(Event, backref=db.backref('attendees', cascade='all, delete-orphan'))
     # Status codes: U/known, Y/es, N/o, M/aybe, W/ait-listed
-    status = db.Column(db.Unicode(1), nullable=False, default=u'U')
+    status = db.Column(db.Unicode(1), nullable=False, default='U')
     __table_args__ = (db.UniqueConstraint('user_id', 'event_id'),)

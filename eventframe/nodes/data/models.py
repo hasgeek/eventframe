@@ -23,7 +23,7 @@ class Data(NodeMixin, Node):
         return len(self.data)
 
     def __iter__(self):
-        return self.data.iterkeys()
+        return iter(self.data.keys())
 
     def __contains__(self, item):
         return item in self.data

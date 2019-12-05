@@ -31,7 +31,7 @@ def website_new():
         db.session.add(website)
         db.session.commit()
         return render_redirect(url_for('website', website=website.name), code=303)
-    return render_form(form=form, title=u"New website", submit=u"Create",
+    return render_form(form=form, title="New website", submit="Create",
         cancel_url=url_for('index'), ajax=True)
 
 
@@ -47,7 +47,7 @@ def website_edit(website):
         form.populate_obj(website)
         db.session.commit()
         return render_redirect(url_for('website', website=website.name), code=303)
-    return render_form(form=form, title=u"Edit website", submit=u"Save",
+    return render_form(form=form, title="Edit website", submit="Save",
         cancel_url=url_for('website', website=website.name), ajax=True)
 
 
@@ -56,10 +56,10 @@ def website_edit(website):
 @load_model(Website, {'name': 'website'}, 'website')
 def website_delete(website):
     g.website = website
-    return render_delete_sqla(website, db, title=u"Confirm delete",
-        message=u"Delete website '%s'? This will also permanently remove all "
+    return render_delete_sqla(website, db, title="Confirm delete",
+        message="Delete website '%s'? This will also permanently remove all "
             "pages associated with the website. There is no undo." % website.title,
-        success=u"You have deleted website '%s'." % website.title,
+        success="You have deleted website '%s'." % website.title,
         next=url_for('index'))
 
 
@@ -77,7 +77,7 @@ def folder_new(website):
         db.session.add(folder)
         db.session.commit()
         return render_redirect(url_for('folder', website=website.name, folder=folder.name), code=303)
-    return render_form(form=form, title=u"New folder", submit=u"Create",
+    return render_form(form=form, title="New folder", submit="Create",
         cancel_url=url_for('website', website=website.name), ajax=True)
 
 
@@ -99,7 +99,7 @@ def folder_edit(website, folder):
         form.populate_obj(folder)
         db.session.commit()
         return render_redirect(url_for('folder', website=website.name, folder=folder.name), code=303)
-    return render_form(form=form, title=u"Edit folder", submit=u"Save",
+    return render_form(form=form, title="Edit folder", submit="Save",
         cancel_url=url_for('folder', website=website.name, folder=folder.name), ajax=True)
 
 
@@ -157,9 +157,9 @@ def folder(website, folder):
                     highlight.update(clipboard_paste(folder, session['clipboard'], clip_action))
                     db.session.commit()
                 else:
-                    flash(u"Unknown clipboard action requested", "error")
+                    flash("Unknown clipboard action requested", "error")
             else:
-                flash(u"Nothing to paste", "error")
+                flash("Nothing to paste", "error")
             session.pop('clipboard', None)
             session.pop('clipboard_type', None)
         elif action == 'delete':
@@ -168,9 +168,9 @@ def folder(website, folder):
             for node in nodes:
                 db.session.delete(node)
             if len(nodes) == 1:
-                flash(u"“%s” has been deleted" % nodes[0].title, "success")
+                flash("“%s” has been deleted" % nodes[0].title, "success")
             else:
-                flash(u"%d items have been deleted" % len(nodes), "success")
+                flash("%d items have been deleted" % len(nodes), "success")
             db.session.commit()
         elif action == 'rename':
             flash("Rename hasn't been implemented yet", "info")
@@ -196,15 +196,15 @@ def website(website):
 def folder_delete(website, folder):
     g.website = website
     g.folder = folder
-    return render_delete_sqla(folder, db, title=u"Confirm delete",
-        message=u"Delete folder '%s'? This will also permanently remove all "
+    return render_delete_sqla(folder, db, title="Confirm delete",
+        message="Delete folder '%s'? This will also permanently remove all "
             "pages in this folder. There is no undo." % folder.name,
-        success=u"You have deleted folder '%s'." % folder.name,
+        success="You have deleted folder '%s'." % folder.name,
         next=url_for('website', website=website.name))
 
 
 @app.route('/<website>/<folder>/_export')
-@app.route('/<website>/_root/_export', defaults={'folder': u''})
+@app.route('/<website>/_root/_export', defaults={'folder': ''})
 @lastuser.requires_permission('siteadmin')
 @load_models(
     (Website, {'name': 'website'}, 'website'),
@@ -224,7 +224,7 @@ def folder_export(website, folder):
 
 
 @app.route('/<website>/<folder>/_import', methods=['GET', 'POST'])
-@app.route('/<website>/_root/_import', defaults={'folder': u''}, methods=['GET', 'POST'])
+@app.route('/<website>/_root/_import', defaults={'folder': ''}, methods=['GET', 'POST'])
 @lastuser.requires_permission('siteadmin')
 @load_models(
     (Website, {'name': 'website'}, 'website'),
@@ -267,5 +267,5 @@ def folder_import(website, folder):
         db.session.commit()
         flash("%d nodes were imported and %d new nodes were created" % (import_count, create_count), "success")
         return render_redirect(url_for('folder', website=website.name, folder=folder.name), code=303)
-    return render_form(form=form, title=u"Import to folder", submit=u"Upload",
+    return render_form(form=form, title="Import to folder", submit="Upload",
         cancel_url=url_for('folder', website=website.name, folder=folder.name))

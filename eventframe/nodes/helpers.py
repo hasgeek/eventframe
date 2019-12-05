@@ -37,8 +37,8 @@ class NodeHandler(object):
 
 
 class AutoFormHandler(NodeHandler):
-    title_new = u"New node"
-    title_edit = u"Edit node"
+    title_new = "New node"
+    title_edit = "Edit node"
 
     def __init__(self, app, website, folder, node):
         super(AutoFormHandler, self).__init__(app, website, folder, node)
@@ -63,7 +63,7 @@ class AutoFormHandler(NodeHandler):
         raise NotImplementedError
 
     def render_form(self):
-        return render_form(form=self.form, title=self.title_edit if self.node else self.title_new, submit=u"Save",
+        return render_form(form=self.form, title=self.title_edit if self.node else self.title_new, submit="Save",
             cancel_url=url_for('folder', website=self.website.name, folder=self.folder.name),
             tabs=self.edit_tabs(), node=self.node, ajax=False)
 
@@ -104,7 +104,7 @@ def get_website(f):
     return decorated_function
 
 
-def render_form(form, title, message='', formid='form', submit=u"Submit", cancel_url=None, tabs=[], node=None, ajax=False):
+def render_form(form, title, message='', formid='form', submit="Submit", cancel_url=None, tabs=[], node=None, ajax=False):
     multipart = False
     for field in form:
         if isinstance(field.widget, wtforms.widgets.FileInput):

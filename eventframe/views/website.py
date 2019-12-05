@@ -12,7 +12,7 @@ from eventframe.models import Folder, Node
 
 @eventapp.route('/')
 def index():
-    return node(folder=u'', node=u'')
+    return node(folder='', node='')
 
 
 @eventapp.route('/favicon.ico')
@@ -33,10 +33,10 @@ def node(website, folder, node):
     folderob = Folder.query.filter_by(name=folder, website=website).first()
     if folderob is None:
         # Are we handling a /node/custom_url case?
-        folderob = Folder.query.filter_by(name=u'', website=website).first_or_404()
+        folderob = Folder.query.filter_by(name='', website=website).first_or_404()
         nodeob = Node.query.filter_by(name=folder, folder=folderob).first_or_404()
         # The node exists. Let the path handler figure out what to do with it
-        return path_handler(path=u'/' + nodeob.name + u'/' + node)
+        return path_handler(path='/' + nodeob.name + '/' + node)
     else:
         nodeob = Node.query.filter_by(name=node, folder=folderob).first_or_404()
 
@@ -59,9 +59,9 @@ def node(website, folder, node):
 @get_website
 def folder(website, folder):
     try:
-        return node(folder=folder, node=u'')
+        return node(folder=folder, node='')
     except NotFound:
-        return node(folder=u'', node=folder)
+        return node(folder='', node=folder)
 
 
 @eventapp.route('/<path:path>', methods=['GET', 'POST'])
@@ -70,13 +70,13 @@ def path_handler(website, path):
     """Handles paths for nodes with internal items."""
     components = path.split('/')
     pathcomponents = []
-    if components[0] == u'':
+    if components[0] == '':
         # We had a / prefix. Discard it.
         components.pop(0)
-    if len(components) > 2 and components[-1] == u'':
+    if len(components) > 2 and components[-1] == '':
         # We got a trailing slash and it's not a folder. Pop it.
         components.pop(-1)
-        return redirect(request.script_root + u'/' + u'/'.join(components))
+        return redirect(request.script_root + '/' + '/'.join(components))
     # Now what do we have?
     # A: /
     # B: /folder/ or /node/
@@ -85,15 +85,15 @@ def path_handler(website, path):
     # E: /folder/node/custom where custom can have many segments
     if len(components) == 0:
         # A: Render (root)/(index) [both named '']
-        folder = Folder.query.filter_by(website=website, name=u'').first_or_404()
-        node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
+        folder = Folder.query.filter_by(website=website, name='').first_or_404()
+        node = Node.query.filter_by(folder=folder, name='').first_or_404()
     elif len(components) == 1:
         # B: Could be a folder or node:
         folder = Folder.query.filter_by(website=website, name=components[0]).first()
         if folder is not None:
-            node = Node.query.filter_by(folder=folder, name=u'').first_or_404()
+            node = Node.query.filter_by(folder=folder, name='').first_or_404()
         else:
-            folder = Folder.query.filter_by(website=website, name=u'').first_or_404()
+            folder = Folder.query.filter_by(website=website, name='').first_or_404()
             node = Node.query.filter_by(folder=folder, name=components[0]).first_or_404()
     else:
         folder = Folder.query.filter_by(website=website, name=components[0]).first()
@@ -103,7 +103,7 @@ def path_handler(website, path):
             pathcomponents = components[2:]
         else:
             # D: node/custom
-            folder = Folder.query.filter_by(website=website, name=u'').first_or_404()
+            folder = Folder.query.filter_by(website=website, name='').first_or_404()
             node = Node.query.filter_by(folder=folder, name=components[0]).first_or_404()
             pathcomponents = components[1:]
 

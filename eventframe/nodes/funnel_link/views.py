@@ -12,8 +12,8 @@ __all__ = ['FunnelLinkHandler', 'register']
 class FunnelLinkHandler(ContentHandler):
     model = FunnelLink
     form_class = FunnelLinkForm
-    title_new = u"New funnel link"
-    title_edit = u"Edit funnel link"
+    title_new = "New funnel link"
+    title_edit = "Edit funnel link"
 
     def make_form(self):
         form = super(FunnelLinkHandler, self).make_form()

@@ -8,14 +8,14 @@ __all__ = ['DataForm']
 
 
 class DataForm(Form):
-    name = wtforms.TextField(u"URL name", validators=[wtforms.validators.Required(), valid_name])
-    title = wtforms.TextField(u"Title", validators=[wtforms.validators.Required()])
-    data = wtforms.TextAreaField(u"Data", validators=[wtforms.validators.Required()],
-        description=u"Enter JSON data")
-    properties = DictField(u"Properties")
+    name = wtforms.TextField("URL name", validators=[wtforms.validators.Required(), valid_name])
+    title = wtforms.TextField("Title", validators=[wtforms.validators.Required()])
+    data = wtforms.TextAreaField("Data", validators=[wtforms.validators.Required()],
+        description="Enter JSON data")
+    properties = DictField("Properties")
 
     def validate_data(self, field):
         # Check for exceptions when loading data
         parsed = simplejson.loads(field.data, use_decimal=True)
         if not isinstance(parsed, dict):
-            raise wtforms.ValidationError(u'This is not a valid JSON object. Use {"key": value, ...}')
+            raise wtforms.ValidationError('This is not a valid JSON object. Use {"key": value, ...}')

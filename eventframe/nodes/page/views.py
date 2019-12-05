@@ -8,8 +8,8 @@ __all__ = ['PageHandler', 'register']
 
 class PageHandler(ContentHandler):
     model = Page
-    title_new = u"New page"
-    title_edit = u"Edit page"
+    title_new = "New page"
+    title_edit = "Edit page"
 
 
 def register(registry):

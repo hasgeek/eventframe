@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
-from urlparse import urljoin
+from urllib.parse import urljoin
 from flask import url_for
 from coaster.auth import current_auth
 from coaster.utils import buid, parse_isoformat
@@ -21,13 +21,13 @@ def default_user_id():
 class Website(BaseNameMixin, db.Model):
     __tablename__ = 'website'
     #: URL to the website
-    url = db.Column(db.Unicode(80), nullable=False, default=u'')
+    url = db.Column(db.Unicode(80), nullable=False, default='')
     #: Theme that this website uses as the default (folders can override)
-    theme = db.Column(db.Unicode(80), nullable=False, default=u'default')
+    theme = db.Column(db.Unicode(80), nullable=False, default='default')
     #: Typekit code, if used
-    typekit_code = db.Column(db.Unicode(20), nullable=False, default=u'')
+    typekit_code = db.Column(db.Unicode(20), nullable=False, default='')
     #: Google Analytics code, if used
-    googleanalytics_code = db.Column(db.Unicode(20), nullable=False, default=u'')
+    googleanalytics_code = db.Column(db.Unicode(20), nullable=False, default='')
 
     _hostnames = db.relationship("Hostname", cascade='all, delete-orphan', backref='website')
     hostnames = association_proxy('_hostnames', 'name',
@@ -35,12 +35,12 @@ class Website(BaseNameMixin, db.Model):
 
     def __init__(self, **kwargs):
         super(Website, self).__init__(**kwargs)
-        root = Folder(name=u'', title=u'', website=self)
+        root = Folder(name='', title='', website=self)
         self.folders.append(root)
         # root.pages[0].template = u'index.html'
 
     def __repr__(self):
-        return u'<Website %s "%s">' % (self.name, self.title)
+        return '<Website %s "%s">' % (self.name, self.title)
 
     def folder_ids(self):
         return [i[0] for i in db.session.query(Folder.id).filter_by(website=self).all()]
@@ -62,7 +62,7 @@ class Hostname(BaseMixin, db.Model):
     website_id = db.Column(db.Integer, db.ForeignKey('website.id'), nullable=False)
 
     def __repr__(self):
-        return u'<Hostname %s>' % self.name
+        return '<Hostname %s>' % self.name
 
     @classmethod
     def get(cls, name, website=None):
@@ -75,7 +75,7 @@ class LoginCode(BaseMixin, db.Model):
     #: Tracking code to enable users to login to an event website
     code = db.Column(db.Unicode(22), nullable=False, unique=True)
     #: Access scope requested
-    scope = db.Column(db.Unicode(250), nullable=False, default=u'')
+    scope = db.Column(db.Unicode(250), nullable=False, default='')
     #: User who logged in
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, default=None)
     user = db.relationship(User)
@@ -95,7 +95,7 @@ class Folder(BaseScopedNameMixin, db.Model):
     #: Website this folder is under
     website_id = db.Column(db.Integer, db.ForeignKey('website.id'), nullable=False)
 
-    _theme = db.Column("theme", db.Unicode(80), nullable=False, default=u'')
+    _theme = db.Column("theme", db.Unicode(80), nullable=False, default='')
 
     website = db.relationship(Website,
         backref=db.backref('folders', order_by='Folder.name', cascade='all, delete-orphan'))
@@ -120,7 +120,7 @@ class Folder(BaseScopedNameMixin, db.Model):
         # self.pages.append(index)
 
     def __repr__(self):
-        return u'<Folder %s at %s>' % (self.name or '(root)', self.website.name)
+        return '<Folder %s at %s>' % (self.name or '(root)', self.website.name)
 
     def url_for(self, action='view'):
         """
@@ -129,12 +129,12 @@ class Folder(BaseScopedNameMixin, db.Model):
         if action == 'view':
             return urljoin(self.website.url, self.name)
         elif action == 'list':
-            if self.name == u'':
+            if self.name == '':
                 return url_for('website', website=self.website.name)
             else:
                 return url_for('folder', website=self.website.name, folder=self.name)
         elif action == 'edit':
-            if self.name != u'':
+            if self.name != '':
                 return url_for('folder_edit', website=self.website.name, folder=self.name)
 
 
@@ -159,7 +159,7 @@ class _NodeProperties(dict):
         self.update(*args, **kwargs)
 
     def update(self, *args, **kwargs):
-        for k, v in dict(*args, **kwargs).iteritems():
+        for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
     def __delitem__(self, key):
@@ -178,7 +178,7 @@ class _NodeProperties(dict):
         if isinstance(value, Property):
             dict.__setitem__(self, key, value.value)
         else:
-            value = unicode(value)  # Since Property.value = db.Unicode
+            value = str(value)  # Since Property.value = db.Unicode
             dict.__setitem__(self, key, value)
             if key in self.node.node_properties:
                 self.node.node_properties[key].value = value
@@ -260,7 +260,7 @@ class Node(BaseScopedNameMixin, db.Model):
         Return a URL to this node.
         """
         if action == 'view':
-            if self.folder.name == u'':
+            if self.folder.name == '':
                 return url_for('folder', folder=self.name, _external=_external)
             else:
                 return url_for('node', folder=self.folder.name, node=self.name, _external=_external)

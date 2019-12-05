@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from StringIO import StringIO
+from io import StringIO
 import unicodecsv
 from werkzeug.routing import Map as UrlMap, Rule as UrlRule
 from flask import request, render_template, abort, Markup, flash, redirect, escape, jsonify
@@ -21,8 +21,8 @@ __all__ = ['EventHandler', 'EventViewHandler', 'register']
 class EventHandler(ContentHandler):
     form_class = EventForm
     model = Event
-    title_new = u"New event"
-    title_edit = u"Edit event"
+    title_new = "New event"
+    title_edit = "Edit event"
 
     actions = ['list', 'csv', 'update', 'json']
 
@@ -30,7 +30,7 @@ class EventHandler(ContentHandler):
         tabs = super(EventHandler, self).edit_tabs()
         if self.node:
             tabs = tabs + [
-                {'title': u"Attendees", 'url': self.node.url_for('list'), 'active': self.action == 'list'},
+                {'title': "Attendees", 'url': self.node.url_for('list'), 'active': self.action == 'list'},
                 ]
         return tabs
 
@@ -152,9 +152,9 @@ class EventViewHandler(NodeHandler):
         # All good. Set status for this user.
         try:
             self.node.set_status(current_auth.user, status)
-        except ValueError, e:
+        except ValueError as e:
             if request.is_xhr:
-                return Markup('<div class="alert alert-error">%s</div>' % escape(unicode(e)))
+                return Markup('<div class="alert alert-error">%s</div>' % escape(str(e)))
             else:
                 abort(403)
         db.session.commit()

@@ -13,10 +13,10 @@ __all__ = ['Participant', 'ParticipantList']
 class ParticipantList(ContentMixin, Node):
     __tablename__ = 'participant_list'
 
-    source = db.Column(db.Unicode(80), nullable=False, default=u'')
-    sourceid = db.Column(db.Unicode(80), nullable=False, default=u'')
-    api_key = db.Column(db.Unicode(80), nullable=False, default=u'')
-    participant_template = db.Column(db.Unicode(80), nullable=False, default=u'')
+    source = db.Column(db.Unicode(80), nullable=False, default='')
+    sourceid = db.Column(db.Unicode(80), nullable=False, default='')
+    api_key = db.Column(db.Unicode(80), nullable=False, default='')
+    participant_template = db.Column(db.Unicode(80), nullable=False, default='')
 
     def purge(self):
         """
@@ -77,10 +77,10 @@ class Participant(BaseMixin, db.Model):
     is_listed = db.Column(db.Boolean, default=False, nullable=False)
     #: Data fields the participant has chosen to reveal in public
     fields_directory = db.Column(db.Unicode(250), nullable=False,
-        default=u'fullname company')
+        default='fullname company')
     #: Data fields the participant has chosen to reveal via ContactPoint
     fields_contactpoint = db.Column(db.Unicode(250), nullable=False,
-        default=u'fullname email phone twitter jobtitle company city')
+        default='fullname email phone twitter jobtitle company city')
 
     participant_list = db.relationship(ParticipantList,
         backref=db.backref(

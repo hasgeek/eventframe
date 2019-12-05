@@ -22,11 +22,11 @@ class DataHandler(AutoFormHandler):
         if self.node is None:
             self.node = Data(folder=self.folder, name=self.form.name.data, title=self.form.title.data)
             db.session.add(self.node)
-            flash(u"Created new data node '%s'" % self.node.title, 'success')
+            flash("Created new data node '%s'" % self.node.title, 'success')
         else:
             self.node.name = self.form.name.data
             self.node.title = self.form.title.data
-            flash(u"Edited data node '%s'" % self.node.title, 'success')
+            flash("Edited data node '%s'" % self.node.title, 'success')
         self.node.data = json.loads(self.form.data.data, use_decimal=True)
         db.session.commit()
         return render_redirect(url_for('folder', website=self.website.name, folder=self.folder.name), code=303)
