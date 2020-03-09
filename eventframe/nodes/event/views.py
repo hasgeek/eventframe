@@ -6,6 +6,7 @@ from werkzeug.routing import Map as UrlMap, Rule as UrlRule
 from flask import request, render_template, abort, Markup, flash, redirect, escape, jsonify
 from flask_themes import get_theme, render_theme_template
 from coaster.auth import current_auth
+from baseframe import request_is_xhr
 from eventframe import lastuser
 from eventframe.forms import ConfirmForm
 from eventframe.nodes import db, NodeHandler
@@ -138,13 +139,13 @@ class EventViewHandler(NodeHandler):
     def rsvp(self):
         form = ConfirmForm()
         if not form.validate_on_submit():
-            if request.is_xhr:
+            if request_is_xhr():
                 return Markup('<div class="alert alert-error">An error occured. Please reload the page and try again.</div>>')
             else:
                 flash("An error occured. Please try again.", category='error')
                 return redirect(self.node.url_for('view'), code=303)
         if current_auth.is_anonymous:
-            if request.is_xhr:
+            if request_is_xhr():
                 return Markup('<div class="alert alert-error">You are not logged in</div>')
             else:
                 abort(403)
@@ -153,12 +154,12 @@ class EventViewHandler(NodeHandler):
         try:
             self.node.set_status(current_auth.user, status)
         except ValueError, e:
-            if request.is_xhr:
+            if request_is_xhr():
                 return Markup('<div class="alert alert-error">%s</div>' % escape(unicode(e)))
             else:
                 abort(403)
         db.session.commit()
-        if request.is_xhr:
+        if request_is_xhr():
             return Markup('<div class="alert alert-success">Your response has been recorded.</div>')
         else:
             flash("Your response has been recorded.", category='success')

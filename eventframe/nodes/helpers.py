@@ -4,6 +4,7 @@ from werkzeug.exceptions import NotFound
 from functools import wraps
 from flask import g, abort, current_app, request, render_template, url_for
 import wtforms
+from baseframe import request_is_xhr
 from eventframe.models import Hostname
 
 __all__ = ['NodeHandler', 'AutoFormHandler', 'node_registry', 'render_form', 'stream_template', 'get_website']
@@ -109,7 +110,7 @@ def render_form(form, title, message='', formid='form', submit=u"Submit", cancel
     for field in form:
         if isinstance(field.widget, wtforms.widgets.FileInput):
             multipart = True
-    if request.is_xhr and ajax:
+    if request_is_xhr() and ajax:
         return render_template('baseframe/ajaxform.html.jinja2', form=form, title=title,
             message=message, formid=formid, submit=submit,
             cancel_url=cancel_url, multipart=multipart, node=node)
