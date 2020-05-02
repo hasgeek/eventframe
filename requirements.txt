@@ -1,9 +1,9 @@
 ordereddict==1.1
-Flask==1.1.1
+Flask==1.1.2
 Flask-SQLAlchemy==2.4.1
-requests==2.22.0
-simplejson==3.16.0
-pytz==2019.3
+requests==2.23.0
+simplejson==3.17.0
+pytz==2020.1
 blinker==1.4
 unicodecsv==0.14.1
 webassets>=0.10
@@ -12,4 +12,4 @@ git+https://github.com/hasgeek/coaster.git
 git+https://github.com/hasgeek/baseframe.git
 git+https://github.com/hasgeek/flask-lastuser.git
 git+https://github.com/jace/flask-themes.git
-Flask-Migrate==2.5.2
+Flask-Migrate==2.5.3
